@@ -8,6 +8,12 @@
 
 ## Chapter 1 · Mathematical Foundations
 
+> 💡 **Top Picks:**
+> - [ericjang/awesome-graphics](https://github.com/ericjang/awesome-graphics) ![Stars](https://img.shields.io/github/stars/ericjang/awesome-graphics?style=flat) — Curated list of CG tutorials, books, math & programming resources
+> - [zheng95z/fun-with-computer-graphics](https://github.com/zheng95z/fun-with-computer-graphics) ![Stars](https://img.shields.io/github/stars/zheng95z/fun-with-computer-graphics?style=flat) — Massive collection of CG courses, books, & tutorials (Chinese-friendly)
+> - [ssloy/tinyrenderer](https://github.com/ssloy/tinyrenderer) ![Stars](https://img.shields.io/github/stars/ssloy/tinyrenderer?style=flat) — Learn CG math by building a software rasterizer from scratch (~500 lines C++)
+> - [Apress/mathematics-for-computer-graphics](https://github.com/Apress/mathematics-for-computer-graphics) — Code companion for *Mathematics for Computer Graphics* (Vince)
+
 ### 1.1 Linear Algebra
 - 1.1.1 Scalars, Vectors & Vector Spaces
 - 1.1.2 Vector Operations (Dot Product, Cross Product, Tensor Product, Mixed Product)
@@ -23,6 +29,13 @@
 - 1.1.12 Rotation Groups SO(3), SE(3) & Lie Algebras
 - 1.1.13 Fundamentals of Tensor Algebra
 - 1.1.14 Sparse Matrices & Iterative Solvers
+
+> 📚 **Resources:**
+> - [MIT 18.06 Linear Algebra (Gilbert Strang)](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/) — Classic linear algebra course
+> - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Jupyter book + high-performance numerical LA
+> - [kenjihiranabe/The-Art-of-Linear-Algebra](https://github.com/kenjihiranabe/The-Art-of-Linear-Algebra) ![Stars](https://img.shields.io/github/stars/kenjihiranabe/The-Art-of-Linear-Algebra?style=flat) — Visual graphic notes on key LA concepts
+> - [3b1b/manim](https://github.com/3b1b/manim) ![Stars](https://img.shields.io/github/stars/3b1b/manim?style=flat) — Mathematical animation engine for visualizing linear algebra
+> - [mml-book/mml-book.github.io](https://github.com/mml-book/mml-book.github.io) ![Stars](https://img.shields.io/github/stars/mml-book/mml-book.github.io?style=flat) — *Mathematics for Machine Learning* companion (Ch.2-5 cover LA)
 
 ### 1.2 Calculus
 - 1.2.1 Limits, Continuity & Differentiability
@@ -40,6 +53,12 @@
 - 1.2.13 Calculus of Variations & Function Spaces
 - 1.2.14 Differential Forms & Exterior Algebra Fundamentals
 
+> 📚 **Resources:**
+> - [3Blue1Brown Essence of Calculus (YouTube)](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr) — Visual, intuitive calculus explanations
+> - [ageron/handson-ml3](https://github.com/ageron/handson-ml3) ![Stars](https://img.shields.io/github/stars/ageron/handson-ml3?style=flat) — Hands-On ML book covering calculus, gradient descent, autodiff
+> - [dair-ai/ML-Course-Notes](https://github.com/dair-ai/ML-Course-Notes) ![Stars](https://img.shields.io/github/stars/dair-ai/ML-Course-Notes?style=flat) — Curated calculus & ML math notes from top courses
+> - [sympy/sympy](https://github.com/sympy/sympy) ![Stars](https://img.shields.io/github/stars/sympy/sympy?style=flat) — Python symbolic math for derivatives, integrals, transforms
+
 ### 1.3 Differential Geometry
 - 1.3.1 Curve Theory: Arc-length Parameterization, Frenet Frame (Tangent, Normal, Binormal)
 - 1.3.2 Curve Theory: Curvature & Torsion
@@ -53,6 +72,12 @@
 - 1.3.10 Riemannian Metrics & Riemannian Geometry Fundamentals
 - 1.3.11 Exterior Differentiation & Stokes' Theorem
 - 1.3.12 Discrete Differential Geometry (DDG)
+
+> 📚 **Resources:**
+> - [geometry-central/geometry-central](https://github.com/nmwsharp/geometry-central) ![Stars](https://img.shields.io/github/stars/nmwsharp/geometry-central?style=flat) — Modern C++ library for surface mesh geometry & DDG
+> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Swiss-army-knife geometry processing library
+> - [Discrete Differential Geometry (Keenan Crane, CMU)](https://www.cs.cmu.edu/~kmcrane/Projects/DDG/) — Freely available notes, slides & videos
+> - [alecjacobson/geometry-processing](https://github.com/alecjacobson/geometry-processing) — Course assignments & code (Gaussian curvature, geodesics, Laplace-Beltrami)
 
 ### 1.4 Computational Geometry
 - 1.4.1 Convex Hull: Graham Scan, QuickHull
@@ -69,6 +94,12 @@
 - 1.4.12 Scanline Algorithms & Plane Sweep
 - 1.4.13 Robust Geometric Computation (Floating-Point Error Handling, Exact Arithmetic)
 
+> 📚 **Resources:**
+> - [CGAL/cgal](https://github.com/CGAL/cgal) ![Stars](https://img.shields.io/github/stars/CGAL/cgal?style=flat) — C++ Computational Geometry Algorithms Library (the gold standard)
+> - [Habrador/Computational-geometry](https://github.com/Habrador/Computational-geometry) ![Stars](https://img.shields.io/github/stars/Habrador/Computational-geometry?style=flat) — Unity/C# implementations of 2D/3D CG algorithms
+> - [Turfjs/turf](https://github.com/Turfjs/turf) ![Stars](https://img.shields.io/github/stars/Turfjs/turf?style=flat) — JavaScript spatial analysis & computational geometry
+> - [locationtech/jts](https://github.com/locationtech/jts) ![Stars](https://img.shields.io/github/stars/locationtech/jts?style=flat) — Java Topology Suite, core algorithms in Java
+
 ### 1.5 Probability & Statistics
 - 1.5.1 Probability Spaces & Random Variables
 - 1.5.2 Common Distributions (Uniform, Normal, Poisson, Exponential, Beta, Gamma)
@@ -82,6 +113,12 @@
 - 1.5.10 Multiple Importance Sampling (MIS)
 - 1.5.11 Resampled Importance Sampling (RIS / ReSTIR)
 - 1.5.12 Information Theory Fundamentals: Entropy, KL Divergence, Mutual Information
+
+> 📚 **Resources:**
+> - [CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers](https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers) ![Stars](https://img.shields.io/github/stars/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers?style=flat) — Full book + code: Bayesian stats, MCMC from scratch
+> - [chi-feng/mcmc-demo](https://github.com/chi-feng/mcmc-demo) ![Stars](https://img.shields.io/github/stars/chi-feng/mcmc-demo?style=flat) — Interactive browser-based MCMC visualization (MH, HMC, NUTS)
+> - [probml/pml-book](https://github.com/probml/pml-book) ![Stars](https://img.shields.io/github/stars/probml/pml-book?style=flat) — *Probabilistic Machine Learning* by Kevin Murphy (full book + code)
+> - [graykode/distribution-is-all-you-need](https://github.com/graykode/distribution-is-all-you-need) ![Stars](https://img.shields.io/github/stars/graykode/distribution-is-all-you-need?style=flat) — Visual cheatsheet of common probability distributions
 
 ### 1.6 Numerical Analysis
 - 1.6.1 Floating-Point Representation & IEEE 754 Standard
@@ -98,6 +135,12 @@
 - 1.6.12 Preconditioners for Sparse Linear Systems
 - 1.6.13 Optimization Fundamentals (Gradient Descent, Newton's Method, Quasi-Newton, Conjugate Gradient)
 
+> 📚 **Resources:**
+> - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Iterative solvers, SVD, QR, LU decomposition in Python
+> - [SciML/DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl) ![Stars](https://img.shields.io/github/stars/SciML/DifferentialEquations.jl?style=flat) — Julia suite for numerical ODE/PDE solvers
+> - [scientific-python/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — Python's standard library for numerical integration, optimization, interpolation
+> - [JuliaMath](https://github.com/JuliaMath) — Julia packages for numerical analysis (FFT, linear solve, special functions)
+
 ### 1.7 Signal & Image Processing
 - 1.7.1 Continuous / Discrete Signals & Systems
 - 1.7.2 Sampling Theorem (Nyquist-Shannon)
@@ -112,6 +155,12 @@
 - 1.7.11 Histogram Processing & Equalization
 - 1.7.12 Morphological Operations (Dilation, Erosion, Opening/Closing)
 
+> 📚 **Resources:**
+> - [scikit-image/scikit-image](https://github.com/scikit-image/scikit-image) ![Stars](https://img.shields.io/github/stars/scikit-image/scikit-image?style=flat) — Python image processing algorithms & tutorials
+> - [opencv/opencv](https://github.com/opencv/opencv) ![Stars](https://img.shields.io/github/stars/opencv/opencv?style=flat) — Industry-standard computer vision library (filtering, FFT, edge detection)
+> - [mikound/awesome-signal-processing](https://github.com/mikound/awesome-signal-processing) — Curated list of signal processing resources
+> - [AllenDowney/ThinkDSP](https://github.com/AllenDowney/ThinkDSP) ![Stars](https://img.shields.io/github/stars/AllenDowney/ThinkDSP?style=flat) — *Think DSP* book + code: signals, FFT, convolution, filters
+
 ### 1.8 Optimization Theory
 - 1.8.1 Unconstrained Optimization (Gradient Descent, Newton's Method, L-BFGS)
 - 1.8.2 Constrained Optimization (Lagrange Multipliers, KKT Conditions)
@@ -122,7 +171,12 @@
 - 1.8.7 Sparse Optimization & Compressed Sensing
 - 1.8.8 Gradient Descent Variants (SGD, Adam, RMSprop)
 
----
+> 📚 **Resources:**
+> - [epfml/OptML_course](https://github.com/epfml/OptML_course) ![Stars](https://img.shields.io/github/stars/epfml/OptML_course?style=flat) — EPFL Optimization for ML (convex, SGD, ADMM, Quasi-Newton)
+> - [cvxpy/cvxpy](https://github.com/cvxpy/cvxpy) ![Stars](https://img.shields.io/github/stars/cvxpy/cvxpy?style=flat) — Python-embedded convex optimization modeling language
+> - [scipy/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — `scipy.optimize`: gradient descent, Newton, L-BFGS, global optimization
+> - [jakevdp/PythonDataScienceHandbook](https://github.com/jakevdp/PythonDataScienceHandbook) ![Stars](https://img.shields.io/github/stars/jakevdp/PythonDataScienceHandbook?style=flat) — Clear gradient descent & optimization tutorials
+> - [cvxgrp/cvx_short_course](https://github.com/cvxgrp/cvx_short_course) — Stanford convex optimization short course (Boyd & Vandenberghe)
 
 ## Chapter 2 · Modeling
 
