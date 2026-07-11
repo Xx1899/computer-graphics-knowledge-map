@@ -696,121 +696,458 @@
 
 ## Chapter 2 · Geometry & Shape Representation
 
-### 2.1 Explicit Representations
+*This chapter covers how virtual worlds are encoded — from classical polygon meshes to cutting-edge neural representations. Each concept is linked to its CG use via `▸ CG use:` annotations.*
 
-#### 2.1.1 Polygon Meshes
-- 2.1.1.1 Mesh Data Structures (Face List, Winged-Edge, Half-Edge, Directed-Edge)
-- 2.1.1.2 Manifold vs. Non-manifold Meshes
-- 2.1.1.3 Mesh Topology (Euler Characteristic, Genus, Boundaries, Holes)
-- 2.1.1.4 Vertex Normal & Face Normal Computation
-- 2.1.1.5 Mesh Formats (OBJ, PLY, STL, FBX, glTF, USD, Alembic)
-- 2.1.1.6 Adaptive Mesh Refinement (AMR)
-
-#### 2.1.2 Parametric Curves
-- 2.1.2.1 Polynomial Interpolation Curves (Lagrange, Hermite)
-- 2.1.2.2 Bézier Curves (Bernstein Basis, de Casteljau Algorithm, Degree Elevation/Reduction)
-- 2.1.2.3 B-Spline Curves (Knot Vector, Basis Function Recurrence, Local Support)
-- 2.1.2.4 NURBS: Weights, Rational Form, Conic Section Representation
-- 2.1.2.5 T-Splines
-- 2.1.2.6 Subdivision Curves (Chaikin Algorithm, Four-Point Method)
-
-#### 2.1.3 Parametric Surfaces
-- 2.1.3.1 Tensor Product Surfaces
-- 2.1.3.2 Bézier Surfaces
-- 2.1.3.3 B-Spline Surfaces (Uniform, Non-uniform)
-- 2.1.3.4 NURBS Surfaces (Trimmed NURBS)
-- 2.1.3.5 Surfaces of Revolution & Swept Surfaces
-- 2.1.3.6 Coons Surfaces & Gordon Surfaces
-- 2.1.3.7 N-Sided Patch Filling
-
-#### 2.1.4 Subdivision Surfaces
-- 2.1.4.1 Catmull-Clark Subdivision (Quad Meshes)
-- 2.1.4.2 Loop Subdivision (Triangle Meshes)
-- 2.1.4.3 Doo-Sabin Subdivision
-- 2.1.4.4 √3 Subdivision
-- 2.1.4.5 Butterfly Subdivision (Interpolatory)
-- 2.1.4.6 Semi-sharp Crease & Boundary Feature Handling
-- 2.1.4.7 Adaptive Subdivision
-
-### 2.2 Implicit Representations
-
-#### 2.2.1 Traditional Implicit Methods
-- 2.2.1.1 Algebraic Surfaces (Zero-sets of Polynomials)
-- 2.2.1.2 Isosurfaces
-- 2.2.1.3 Blobby Models / Metaballs
-- 2.2.1.4 Function Representation (F-Rep / FRep)
-- 2.2.1.5 Signed Distance Fields (SDF) & Operations (Union, Intersection, Difference, Smooth Blend, Offset)
-- 2.2.1.6 R-Functions (Rvachev Functions)
-- 2.2.1.7 Fractals (Mandelbrot Set, Julia Set, IFS Iterated Function Systems)
-
-#### 2.2.2 Neural Implicit Representations
-- 2.2.2.1 SIREN (Sinusoidal Activation Networks)
-- 2.2.2.2 Positional Encoding & Fourier Features
-- 2.2.2.3 Occupancy Networks
-- 2.2.2.4 DeepSDF
-- 2.2.2.5 Neural Radiance Field (NeRF) & Variants
-- 2.2.2.6 Instant Neural Graphics Primitives (Instant NGP, Multi-resolution Hash Encoding)
-- 2.2.2.7 3D Gaussian Splatting (Explicit-Implicit Hybrid)
-
-### 2.3 Voxels & Discrete Representations
-- 2.3.1 Uniform Grids
-- 2.3.2 Sparse Voxel Octree (SVO)
-- 2.3.3 Adaptively Sampled Distance Fields (ADFs)
-- 2.3.4 Adaptive Mesh Refinement (AMR)
-- 2.3.5 Clipmaps & Virtual Textures
-- 2.3.6 Signed Distance Field Voxelization
-- 2.3.7 OpenVDB (Sparse Hierarchical Voxel Data Structure)
-
-### 2.4 Point Clouds & Point-Based Representations
-- 2.4.1 Point Cloud Acquisition (LiDAR, Structured Light, Photogrammetry, Depth Cameras)
-- 2.4.2 Point Cloud Registration (ICP: Point-to-Point, Point-to-Plane, Generalized ICP, Go-ICP Global Registration)
-- 2.4.3 Point Cloud Features (PFH, FPFH, SHOT, ISS Keypoints, Normal Estimation)
-- 2.4.4 Point Cloud Filtering (Voxel Downsampling, Statistical Outlier Removal, Bilateral Filtering)
-- 2.4.5 Point Cloud Segmentation & Clustering (RANSAC, Region Growing, Euclidean Clustering, Supervoxels)
-- 2.4.6 Point-Based Rendering (Point Splatting, QSplat, Surfels)
-- 2.4.7 Point Cloud Completion & Upsampling
-
-### 2.5 Constructive Solid Geometry (CSG)
-- 2.5.1 Primitives: Cube, Sphere, Cylinder, Cone, Torus
-- 2.5.2 Boolean Operations (Union ∪, Intersection ∩, Difference \, Symmetric Difference)
-- 2.5.3 CSG Trees & Evaluation
-- 2.5.4 Boundary Evaluation Algorithms
-- 2.5.5 Point Classification for CSG Models (Point Classification & Ray Casting)
-
-### 2.6 Procedural Modeling
-- 2.6.1 Noise Functions (Perlin, Simplex, Worley/Voronoi, Curl Noise)
-- 2.6.2 Fractional Brownian Motion (fBm) & Turbulence
-- 2.6.3 L-Systems: Plant & Tree Modeling, Stochastic & Parametric L-Systems
-- 2.6.4 Shape Grammars: Architecture & City Modeling
-- 2.6.5 Fractal Terrain (Diamond-Square / Midpoint Displacement, Erosion Simulation)
-- 2.6.6 Tile-Based / Wave Function Collapse (WFC)
-- 2.6.7 Self-Similar Structure Generation
-- 2.6.8 Physically-Based Growth Simulation (Diffusion-Limited Aggregation DLA)
-- 2.6.9 Data-Driven Procedural Modeling (Learning Rules from Examples)
-
-### 2.7 Data-Driven Modeling
-- 2.7.1 Photogrammetry & Structure from Motion (SfM)
-- 2.7.2 Multi-View Stereo (MVS): PMVS, PatchMatch
-- 2.7.3 Depth Map Fusion (TSDF / KinectFusion, Voxel Hashing)
-- 2.7.4 Semantic Modeling (from Images / Point Clouds to Semantic CAD)
-- 2.7.5 Reverse Engineering & CAD Reconstruction
-- 2.7.6 3D Generative Models (3D GANs, Diffusion Models, Autoregressive Models)
-- 2.7.7 Text-to-3D (DreamFusion, SJC, Magic3D, ProlificDreamer)
-- 2.7.8 Image-to-3D (Single-view / Multi-view Reconstruction Networks)
-
-### 2.8 Scene Graphs & Hierarchical Representations
-- 2.8.1 Scene Graph Data Structure (Hierarchical Tree Transforms)
-- 2.8.2 Entity-Component-System (ECS) Architecture
-- 2.8.3 Bounding Volume Hierarchy (BVH) Construction & Update
-- 2.8.4 Level of Detail (LOD) — Discrete LOD, Continuous LOD, View-Dependent LOD
-- 2.8.5 Instancing & Indirect Drawing
-- 2.8.6 GPU-Driven Rendering Batching & Batch Strategies
-- 2.8.7 Large-World Coordinate Handling (Floating-Point Precision, Camera-Relative Rendering, Multi-Origin)
+> 💡 **Top-Level References:**
+> - [ssloy/tinyrenderer](https://github.com/ssloy/tinyrenderer) ![Stars](https://img.shields.io/github/stars/ssloy/tinyrenderer?style=flat) — Build a renderer from scratch (learns mesh loading, rasterization, geometry processing)
+> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Swiss-army-knife geometry processing library
+> - [graphdeco-inria/gaussian-splatting](https://github.com/graphdeco-inria/gaussian-splatting) ![Stars](https://img.shields.io/github/stars/graphdeco-inria/gaussian-splatting?style=flat) — Original 3DGS implementation (the reference for modern point-based geometry)
 
 ---
 
+### 2.1 Polygon Meshes & Mesh Data Structures
+
+#### 2.1.1 Mesh Representations
+- 2.1.1.1 Face-Vertex List (Simplest: List of Vertex Positions + List of Face Index Triplets); OBJ Format
+  - ▸ *CG use:* The default interchange format; every DCC tool imports/exports OBJ; GPU vertex/index buffers
+- 2.1.1.2 Winged-Edge Structure (Baumgart 1972): Per-Edge: Two Faces, Two Vertices, Four Adjacent Edges
+  - ▸ *CG use:* Historical significance; foundation for topology queries in early CAD systems
+- 2.1.1.3 Half-Edge Structure (Mäntylä 1988): Directed Edges; Each Edge = Two Half-Edges (Opposite Directions); Constant-Time Adjacency Queries
+  - ▸ *CG use:* THE standard for mesh processing libraries (OpenMesh, CGAL Polyhedron); supports edge flip, collapse, split operations
+- 2.1.1.4 Directed-Edge (Campagna et al. 1998): Storage-Efficient Variant; Single Integer Index Per Half-Edge
+  - ▸ *CG use:* Used in geometry compression and GPU-friendly mesh data layouts (mesh shaders)
+- 2.1.1.5 Corner Table (Rossignac et al. 2001): Implicit Connectivity via Corner-to-Corner Mapping; Extremely Compact (≈2 integers per triangle)
+  - ▸ *CG use:* Efficient GPU traversal; basis for several geometry image and compression schemes
+
+#### 2.1.2 Mesh Topology & Quality
+- 2.1.2.1 Manifold Condition: Every Point Has Neighborhood Homeomorphic to Disk (2-Manifold) or Half-Disk (2-Manifold with Boundary)
+  - ▸ *CG use:* Non-manifold edges (shared by >2 faces) and vertices break most geometry processing algorithms; must detect and repair
+- 2.1.2.2 Euler Characteristic χ = V − E + F = 2 − 2g − b (g = Genus, b = Boundary Loops); Gauss-Bonnet Connection
+  - ▸ *CG use:* Topology verification; guarantees for simplification algorithms; genus detection for shape retrieval
+- 2.1.2.3 Mesh Quality Metrics: Aspect Ratio, Skewness, Jacobian Determinant, Minimum/Maximum Angle, Condition Number of Element Jacobian
+  - ▸ *CG use:* FEM simulation quality directly depends on mesh quality (sliver elements → singular stiffness matrices); remeshing targets
+- 2.1.2.4 Vertex Normals: Uniform Weighted (Fast, Poor Quality), Area Weighted (Better for Non-Uniform Tessellation), Angle Weighted (Best — Thürmer-Wüthrich 1998)
+  - ▸ *CG use:* Smooth shading normal computation; angle-weighted formula = most accurate for arbitrary triangulation
+- 2.1.2.5 Mesh Formats Deep-Dive:
+  - OBJ: ASCII, simple but verbose; MTL for materials; no animation
+  - PLY: Binary/ASCII, extensible per-vertex/face properties (Stanford format)
+  - STL: Binary or ASCII, no topology info; de-facto 3D printing standard
+  - FBX: Autodesk proprietary binary; scene hierarchy, animation, materials, embedded textures
+  - glTF 2.0: "JPEG of 3D"; JSON + binary buffers; PBR materials; Draco compression; web-friendly
+  - USD (Universal Scene Description): Pixar's composition engine; Hydra rendering framework; industry standard for VFX pipelines
+  - Alembic: Geometry caching; efficient animated mesh streaming (HDF5-based)
+
+#### 2.1.3 Mesh Operations & GPU Geometry Pipeline
+- 2.1.3.1 Local Topological Operations: Edge Flip (2→2 Triangles), Edge Collapse (2→0, Simplification), Edge Split (2→4, Refinement), Vertex Removal
+  - ▸ *CG use:* Remeshing operations; progressive mesh construction; adaptive LOD transitions
+- 2.1.3.2 GPU Vertex Pipeline: Vertex Shader → (Tessellation Control → Tessellator → Tessellation Evaluation) → Geometry Shader → Primitive Assembly → Rasterizer
+  - ▸ *CG use:* Modern tessellation allows GPU-side geometry amplification (displacement mapping, adaptive subdivision)
+- 2.1.3.3 Mesh Shaders (Turing/Ampere+): Replace Vertex→Tessellation→Geometry with Task Shader (Work Distribution) + Mesh Shader (Output Primitives Directly)
+  - ▸ *CG use:* Nanite-style GPU-driven rendering; meshlet-based culling and LOD selection; up to 3× geometry throughput
+- 2.1.3.4 Meshlet Representation: Small Mesh Chunks (Typically 64-128 Triangles) with Local Index Buffer; Optimized for GPU Mesh Shader Output
+  - ▸ *CG use:* UE5 Nanite virtualized geometry; GPU-driven rendering pipelines; fine-grained culling
+
+> 📚 **GitHub Repos:**
+> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Half-edge ops, normals, topology queries in C++/Python
+> - [alecjacobson/geometry-processing](https://github.com/alecjacobson/geometry-processing) — Course: mesh data structures, simplification, parameterization
+> - [hhoppe/mesh_simplification](https://github.com/hhoppe/mesh_simplification) — Progressive meshes & LOD examples
+>
+> 📖 **Textbooks:** *Polygon Mesh Processing* — Botsch, Kobbelt, Pauly, Alliez, Lévy; *Computer Graphics: Principles and Practice* — Hughes et al. (Ch. 12-14)
 
 ---
+
+### 2.2 Parametric Curves & Surfaces
+
+#### 2.2.1 Polynomial & Bézier Curves
+- 2.2.1.1 Lagrange Interpolation: Given n+1 Points, Unique Degree-n Polynomial; Prone to Runge Oscillations for High Degree
+  - ▸ *CG use:* Camera path interpolation (low degree); Hermite interpolation (specify value + derivative at endpoints)
+- 2.2.1.2 Bézier Curves: Bernstein Basis B_i^n(t) = C(n,i) t^i (1−t)^{n−i}; Affine Invariance; Convex Hull Property; Variation Diminishing
+  - ▸ *CG use:* Font rendering (TrueType=Quadratic Bézier, PostScript/OpenType=Cubic Bézier); animation path smoothing; curve editing in all DCC tools
+- 2.2.1.3 de Casteljau Algorithm: Repeated Linear Interpolation (Stable, Geometric); Subdivision at Parameter t Generates Two Bézier Segments
+  - ▸ *CG use:* GPU tessellation of Bézier patches; adaptive rendering via recursive subdivision
+- 2.2.1.4 Degree Elevation (Exact Representation Change), Degree Reduction (Approximation); Bernstein-Bézier-to-Power Basis Conversion
+  - ▸ *CG use:* Degree compatibility in CAD exchange; efficient evaluation via Horner's method for power basis
+
+#### 2.2.2 B-Splines & NURBS
+- 2.2.2.1 B-Spline Basis Functions N_{i,k}(t): Cox-de Boor Recurrence; Defined by Knot Vector [t₀, t₁, ..., t_{n+k}]; Local Support (Span Only k Intervals); C^{k−m} Continuity at Knot Multiplicity m
+  - ▸ *CG use:* Local control (moving one control point affects only k spans — unlike Bézier where all change)
+- 2.2.2.2 Knot Vector Types: Uniform (Equally Spaced), Open Uniform (Repeated End Knots → Interpolates Endpoints), Non-Uniform; Knot Insertion (Boehm's Algorithm — Refines Without Changing Shape)
+  - ▸ *CG use:* Adding detail in specific regions without global change; interactive curve editing
+- 2.2.2.3 NURBS: Rational Extension R_i(t) = w_i N_{i,k}(t) / Σ w_j N_{j,k}(t); Weights Provide Exact Conic Section Representation (Circle, Ellipse, Hyperbola)
+  - ▸ *CG use:* CAD industry backbone (CATIA, SolidWorks, Rhino); exact circle representation (weight = cos(θ/2) for arc); IGES/STEP exchange
+- 2.2.2.4 NURBS Surface Fitting: Least-Squares Fit to Point Cloud; Smoothness Regularization; Parameter Correction (Iterative); B-spline Surface Skinning
+  - ▸ *CG use:* Reverse engineering from 3D scans to CAD; automotive/aerospace surface reconstruction
+
+#### 2.2.3 Advanced Parametric Representations
+- 2.2.3.1 T-Splines (Sederberg 2003): Allow T-Junctions in Control Grid; Local Refinement Without Global Knot Insertion; 2011 Acquisition by Autodesk (Fusion 360)
+  - ▸ *CG use:* Gap-free merging of NURBS patches; organic-to-mechanical surface transitions in CAD
+- 2.2.3.2 Subdivision Surfaces as Parametric Surfaces: Catmull-Clark and Loop Produce Limit Surfaces Expressible as Bi-Cubic B-Splines (Regular Regions); Irregular Patches Require Eigen-Analysis
+  - ▸ *CG use:* Pixar's RenderMan uses Catmull-Clark subdivision surfaces as its primary geometry primitive; OpenSubdiv library
+- 2.2.3.3 Coons Patches (1967): Interpolate Four Boundary Curves; Gordon Surfaces: Interpolate Network of Curves (Bi-Directional Coons)
+  - ▸ *CG use:* Lofting between profile curves (aircraft fuselage design); filling holes with G¹ continuity
+
+> 📚 **GitHub Repos:**
+> - [NURBS-Python (geomdl)](https://github.com/orbingol/NURBS-Python) ![Stars](https://img.shields.io/github/stars/orbingol/NURBS-Python?style=flat) — Pure Python NURBS library with visualization
+> - [PixarAnimationStudios/OpenSubdiv](https://github.com/PixarAnimationStudios/OpenSubdiv) ![Stars](https://img.shields.io/github/stars/PixarAnimationStudios/OpenSubdiv?style=flat) — Production Catmull-Clark subdivision (used in RenderMan)
+>
+> 📖 **Textbooks:** *The NURBS Book* — Piegl & Tiller (The definitive reference); *Curves and Surfaces for CAGD* — Gerald Farin (Classic foundation)
+
+---
+
+### 2.3 Subdivision Surfaces
+
+#### 2.3.1 Approximating Schemes
+- 2.3.1.1 Catmull-Clark (1978): Quad-Dominant; Face Point + Edge Point + Vertex Point; Generalizes Bi-Cubic B-Spline to Arbitrary Topology; C² Everywhere Except C¹ at Extraordinary Vertices
+  - ▸ *CG use:* Film-quality character modeling; Pixar's subdivision surfaces since *Geri's Game* (1997); OpenSubdiv in real-time engines
+- 2.3.1.2 Loop Subdivision (1987): Triangle Meshes; Edge Split (1→4) + Vertex Smoothing with Weight β(n) for Valence-n Vertices; C² Except C¹ at Irregular Vertices
+  - ▸ *CG use:* Triangle-mesh-based modeling workflows; topology-preserving refinement for FEM
+- 2.3.1.3 Doo-Sabin (1978): Generalizes Bi-Quadratic B-Spline; Face-Centered Refinement; Produces Only Quadrilateral Faces
+  - ▸ *CG use:* Less common than Catmull-Clark; useful for quad-remeshing applications
+
+#### 2.3.2 Interpolating & Specialized Schemes
+- 2.3.2.1 Butterfly Subdivision (Dyn et al. 1990): Interpolating (Original Vertices Unchanged); 8-Point Stencil for Interior; Modified Butterfly (Zorin 1996) for Boundaries
+  - ▸ *CG use:* When exact interpolation of control points is required (landmark preservation in medical modeling)
+- 2.3.2.2 √3 Subdivision (Kobbelt 2000): Face Split (1→3); Rotates Edge Directions Each Step; Slower Refinement Rate
+  - ▸ *CG use:* Adaptive refinement with natural triangle hierarchy; geometric multigrid solvers
+- 2.3.2.3 Semi-Sharp Creases (DeRose et al. 1998): Tagged Edges with Sharpness Parameter s; Infinitely Sharp (s=∞) = Hard Edge, s=0 = Smooth; Fractional s = Semi-Sharp
+  - ▸ *CG use:* Character modeling (sharp eyelids, lips, fingernails on otherwise smooth skin); Pixar's *Geri's Game* and every subsequent film
+
+#### 2.3.3 Theory & Analysis
+- 2.3.3.1 Subdivision Matrix Eigen-Analysis: Limit Position = Eigenvector for λ=1; Limit Tangent = Eigenvectors for Subdominant λ; C¹ Condition: 1 = λ₀ > λ₁ = λ₂ > |λ₃|
+  - ▸ *CG use:* Mathematical guarantee of smoothness; automatically satisfied by Catmull-Clark and Loop
+- 2.3.3.2 Exact Evaluation at Arbitrary Parameter (Stam 1998): Eigen-Decomposition of Subdivision Matrix → Closed-Form Evaluation; Removes Need for Recursive Subdivision
+  - ▸ *CG use:* Direct limit surface evaluation for ray tracing and displacement mapping; RenderMan REYES→RIS transition
+- 2.3.3.3 Adaptive Subdivision: Refine Only Where Needed (Silhouettes, High Curvature, Creases); View-Dependent Refinement
+  - ▸ *CG use:* Real-time tessellation on GPU; save geometry bandwidth for flat, distant regions
+
+> 📚 **GitHub Repos:**
+> - [PixarAnimationStudios/OpenSubdiv](https://github.com/PixarAnimationStudios/OpenSubdiv) ![Stars](https://img.shields.io/github/stars/PixarAnimationStudios/OpenSubdiv?style=flat) — Production Catmull-Clark with semi-sharp creases, GPU tessellation
+>
+> 📖 **Textbooks:** *Subdivision Methods for Geometric Design* — Warren & Weimer; *Computer Graphics: Principles and Practice* — Hughes et al. (Ch. 22)
+
+---
+
+### 2.4 Implicit Representations & Signed Distance Fields
+
+#### 2.4.1 Classical Implicit Methods
+- 2.4.1.1 Algebraic Surfaces: Polynomial Equations f(x,y,z)=0; Quadrics (Sphere, Ellipsoid, Cylinder, Cone, Paraboloid, Hyperboloid); Torus (Quartic)
+  - ▸ *CG use:* Exact inside/outside testing; analytical ray intersection (sphere, quadric); CSG primitives
+- 2.4.1.2 Isosurface Extraction: Marching Cubes (Lorensen & Cline 1987) — 256 Cases (15 Unique by Symmetry); Marching Tetrahedra (Topologically Correct); Dual Contouring (Ju et al. 2002 — Sharp Features)
+  - ▸ *CG use:* Converting implicit/imaged data to triangle meshes; CT/MRI visualization; SDF→mesh conversion
+- 2.4.1.3 Metaballs (Blinn 1982): Sum of Radial Density Functions φ_i(r) = exp(−a r²); Isosurface at Iso-value; Organic Blobby Shapes
+  - ▸ *CG use:* Particle-based fluid surface reconstruction; organic modeling; special effects (T-1000 in Terminator 2)
+- 2.4.1.4 Function Representation (F-Rep): Complex Object as Single Real-Valued Function; R-Functions for Exact Boolean Operations (Union, Intersection, Difference with C^n Continuity)
+  - ▸ *CG use:* HyperFun/Pasko framework; procedurally defined infinite-detail geometry; CAD/CAE integration
+
+#### 2.4.2 Signed Distance Fields (SDF)
+- 2.4.2.1 SDF Definition: f(x) = Signed Distance to Closest Surface Point (Negative Inside, Positive Outside); ‖∇f‖=1 (Eikonal Equation) Almost Everywhere
+  - ▸ *CG use:* Sphere tracing (Hart 1996) for robust ray-marching SDFs; guaranteed convergence with Lipschitz bound
+- 2.4.2.2 SDF Operations: Union min(d₁,d₂), Intersection max(d₁,d₂), Difference max(d₁,−d₂); Smooth Blend (Quilez — Polynomial Smooth min); Elongation, Rounding, Onion (Shell)
+  - ▸ *CG use:* Shadertoy/Inigo Quilez style modeling; real-time ray-marched visuals (dreams, clayxels)
+- 2.4.2.3 SDF to Mesh: Marching Cubes on Adaptive Grid; Octree Refinement Near Surface; Feature-Sensitive Sampling
+  - ▸ *CG use:* 3D printing from SDF; game engine SDF→mesh baking (UE5 mesh distance fields)
+- 2.4.2.4 Mesh to SDF: Signed Distance Computation via Closest Point Query; BVH-Accelerated; Pseudo-Normal Sign Determination for Open Meshes; Fast Sweeping/Winding Number Methods
+  - ▸ *CG use:* Collision detection proxy generation; level set simulation initialization; ambient occlusion baking
+
+#### 2.4.3 Advanced Implicit Techniques
+- 2.4.3.1 Radial Basis Functions (RBF) Interpolation: f(x) = Σ w_i φ(‖x−c_i‖) + P(x); Global (Thin-Plate, Multiquadric) vs. Compact Support (Wendland); Exact Interpolation of Point+Normal Constraints
+  - ▸ *CG use:* Implicit surface reconstruction from oriented point clouds; HRBF (Hermite RBF) for Hermite data
+- 2.4.3.2 Moving Least Squares (MLS) Implicit: Locally Weighted Least-Squares Fit of Algebraic Surface; MLS Surface Definition (Levin 2003); Point Set Surfaces (Alexa et al. 2001)
+  - ▸ *CG use:* Smooth surface definition from raw point clouds without explicit connectivity; denoising via MLS projection
+- 2.4.3.3 Partition of Unity Implicits (Ohtake et al. 2003): Blend Local Quadratic Approximations via Weight Functions; Handle Large-Scale and Sparse Data
+  - ▸ *CG use:* Multi-scale implicit surface reconstruction; adaptive detail handling (fine features on large smooth regions)
+- 2.4.3.4 Fractals: Iterated Function Systems (IFS); Mandelbrot/Julia Sets; Fractal Landscapes (Midpoint Displacement, Diamond-Square)
+  - ▸ *CG use:* Procedural terrain generation; infinite detail for background environments; artistic visual effects
+
+> 📚 **GitHub Repos:**
+> - [Interactive Computer Graphics (Cem Yuksel)](https://github.com/cem-yuksel) — Mesh processing and SDF course resources
+> - [SDF-Lib](https://github.com/nv-tlabs/sdf-lib) — NVIDIA's SDF utilities and signed distance computation
+>
+> 📖 **Textbooks:** *Level Set Methods and Dynamic Implicit Surfaces* — Osher & Fedkiw; *Implicit Objects in Computer Graphics* — Velho, Gomes, de Figueiredo
+
+---
+
+### 2.5 Neural Implicit Representations
+
+#### 2.5.1 Coordinate-Based Neural Representations
+- 2.5.1.1 Occupancy Networks (Mescheder et al. 2019): f_θ(x) → Occupancy Probability ∈ [0,1]; Decision Boundary = Surface; Conditioned on Shape Latent Code
+  - ▸ *CG use:* Implicit 3D shape representation; continuous surface at infinite resolution; shape completion
+- 2.5.1.2 DeepSDF (Park et al. 2019): f_θ(x,z) → Signed Distance; Autodecoder Architecture (Latent Code z per Shape); Regularized Latent Space → Shape Interpolation
+  - ▸ *CG use:* Shape space learning; interpolation between chairs/tables/cars; single-view 3D reconstruction
+- 2.5.1.3 SIREN (Sitzmann et al. NeurIPS 2020): Sinusoidal Activation Functions = sin(Wx+b); Networks as Continuous Signals; Derivatives Are Also Networks (Smooth Normals!)
+  - ▸ *CG use:* Implicit surface with analytical gradient → ∇f gives normals; wave propagation simulation; audio synthesis
+- 2.5.1.4 Fourier Features (Tancik et al. NeurIPS 2020): γ(x) = [cos(2πBx), sin(2πBx)] with Random Gaussian B ∼ N(0,σ²); Controls Spectral Bias (Low σ→Smooth, High σ→High-Freq)
+  - ▸ *CG use:* NeRF positional encoding is a special case with log-spaced frequencies; controls detail level of neural representations
+
+#### 2.5.2 Multi-Resolution & Hybrid Representations
+- 2.5.2.1 Instant NGP (Müller et al. SIGGRAPH 2022): Multi-Resolution Hash Encoding; L Levels × T Hash Table Size × F Features; Fast Training (Seconds!) via Tiny-CUDA-NN
+  - ▸ *CG use:* Real-time NeRF training; SDF from point clouds in seconds; the backbone of modern neural graphics
+- 2.5.2.2 TensoRF (Chen et al. ECCV 2022): Factorize 3D Grid into CP or VM Decomposition; Dense Grid = Σ Vectors ⊗ Matrices; Equivalent Quality to NGP with Fewer Parameters
+  - ▸ *CG use:* Compact radiance field representation; explicit decomposition enables analysis and editing
+- 2.5.2.3 Triplane Representation (EG3D, Chan et al. 2022): Three Axis-Aligned 2D Feature Planes (XY, XZ, YZ); Decoder MLP Queries Three 2D Features + Aggregation
+  - ▸ *CG use:* Efficient 3D-aware GANs; fast feed-forward 3D reconstruction (LRM family); balance of memory vs. quality
+- 2.5.2.4 NeuS (Wang et al. NeurIPS 2021): Volume Rendering of SDF with Unbiased Weight Function; Weight = α(ρ(t)) · T(t) Where α Derived from SDF-to-Density Transform
+  - ▸ *CG use:* High-quality surface reconstruction from multi-view images; watertight surfaces from NeRF-like optimization
+
+#### 2.5.3 Large-Scale & Editable Neural Representations
+- 2.5.3.1 Block-NeRF (Tancik et al. 2022): City-Scale NeRF via Tiling; Block Boundary Blending via Appearance Embedding Overlap; Waymo/Google Street View Data
+  - ▸ *CG use:* Autonomous driving simulation; city-scale novel view synthesis; digital twin captures
+- 2.5.3.2 NeRF in the Wild (NeRF-W, Martin-Brualla et al. 2021): Per-Image Appearance Embedding; Transient Object Handling via Uncertainty; Works on Internet Photo Collections
+  - ▸ *CG use:* Tourist landmark reconstruction from Flickr; removes pedestrians/cars automatically
+- 2.5.3.3 Editable NeRF: Object Removal/Insertion via Compositional NeRF (Yang et al. 2021); NeRF-Editing (Yuan et al. 2022) — Explicit Surface Proxy for Intuitive Deformation
+  - ▸ *CG use:* Scene editing for VFX; product visualization with background replacement
+- 2.5.3.4 UNISURF (Oechsle et al. 2021): Unified Surface and Volume Rendering; Smooth Transition from NeRF Volume to Explicit Surface; No Discrete Occupancy Threshold
+  - ▸ *CG use:* Bridges gap between volumetric NeRF and surface-based rendering; enables level-of-detail
+
+> 📚 **GitHub Repos:**
+> - [NVlabs/instant-ngp](https://github.com/NVlabs/instant-ngp) ![Stars](https://img.shields.io/github/stars/NVlabs/instant-ngp?style=flat) — Multi-resolution hash encoding + SDF/NeRF training
+> - [vincentsitzmann/siren](https://github.com/vincentsitzmann/siren) ![Stars](https://img.shields.io/github/stars/vincentsitzmann/siren?style=flat) — Periodic activations for implicit neural representations
+> - [apchenstu/TensoRF](https://github.com/apchenstu/TensoRF) ![Stars](https://img.shields.io/github/stars/apchenstu/TensoRF?style=flat) — VM-decomposition tensor radiance fields
+> - [autonomousvision/sdfstudio](https://github.com/autonomousvision/sdfstudio) ![Stars](https://img.shields.io/github/stars/autonomousvision/sdfstudio?style=flat) — Unified framework for neural implicit surface reconstruction
+>
+> 📖 **Textbooks:** No dedicated textbook yet — area moves too fast; see NeurIPS/SIGGRAPH proceedings for NeRF, SIREN, Instant NGP, NeuS papers
+
+---
+
+### 2.6 3D Gaussian Splatting & Point-Based Geometry
+
+#### 2.6.1 3D Gaussian Splatting (3DGS) — The 2023 Revolution
+- 2.6.1.1 3DGS Core (Kerbl et al. SIGGRAPH 2023): Anisotropic 3D Gaussians G(x) = exp(−½(x−μ)ᵀΣ⁻¹(x−μ)); Σ = RSSᵀRᵀ (Decomposed into Rotation R + Scale S); Differentiable Tile-Based Rasterizer
+  - ▸ *CG use:* Real-time novel view synthesis at 1080p 30+ FPS; quality matching or exceeding NeRF; training in minutes
+- 2.6.1.2 Adaptive Density Control: Clone (Small Gradients + Small Gaussians → Fill Under-Reconstructed Regions); Split (Large Gradients + Large Gaussians → Split into Two Smaller)
+  - ▸ *CG use:* Automatic geometric detail level; fewer Gaussians on smooth surfaces, many on detailed regions
+- 2.6.1.3 3DGS as Geometry Representation: Each Gaussian is a 3D Position + Covariance (Oriented Ellipsoid) + Opacity + Spherical Harmonics Color (48 coeffs)
+  - ▸ *CG use:* Explicit geometry unlike NeRF — can extract point clouds, meshes; editable in 3D software
+- 2.6.1.4 SuGaR (Guédon & Lepetit 2023): Extract Mesh from 3DGS via Poisson Reconstruction on Gaussian-Aligned Points; Regularization for Flat Gaussians on Surface
+  - ▸ *CG use:* Convert Gaussian splats to standard meshes for traditional rendering pipelines; texture baking
+
+#### 2.6.2 3DGS Variants & Extensions
+- 2.6.2.1 2D Gaussian Splatting (Huang et al. SIGGRAPH 2024): "Flat" Gaussians (Surfels) — One Dimension Collapsed; Better Surface Normal Reconstruction; SDF Extraction
+  - ▸ *CG use:* Superior geometry recovery; direct normal map rendering; multi-view stereo quality
+- 2.6.2.2 Dynamic 3DGS: 4D Gaussian Splatting (Luiten et al. 2024) — Time-Varying Position + Rotation + SH; Deformable 3DGS (Yang et al. 2024) — MLP Predicts Per-Frame Deformation
+  - ▸ *CG use:* Real-time dynamic scene rendering from multi-view video; sports replay; volumetric video
+- 2.6.2.3 Compact/Compressed 3DGS: Scalar Quantization + Entropy Coding (Niedermayr et al. 2024); LightGaussian; EAGLES (Efficient 3DGS)
+  - ▸ *CG use:* Streaming 3DGS on web/mobile; 10-50× compression with minimal quality loss
+- 2.6.2.4 SLAM with 3DGS: GS-SLAM; SplaTAM; MonoGS (Single RGB Camera!)
+  - ▸ *CG use:* Real-time dense 3D reconstruction from moving camera; AR/VR mapping; robot navigation
+
+#### 2.6.3 Traditional Point-Based Graphics
+- 2.6.3.1 Point Splatting (Grossman & Dally 1998; Zwicker et al. 2001): Render Points as Elliptical Discs; EWA (Elliptical Weighted Average) Filtering for Anti-Aliasing; Surfels (Surface Elements = Point + Normal + Radius)
+  - ▸ *CG use:* QSplat (Rusinkiewicz & Levoy 2000) — Progressive point-based rendering for large models; historical significance
+- 2.6.3.2 Point Set Surfaces (Alexa et al. 2001): MLS Surface Definition from Points; Polynomial Fit in Local Neighborhood → Projection Operator
+  - ▸ *CG use:* Smooth surface definition from noisy LiDAR scans without meshing; denoising by MLS projection
+- 2.6.3.3 Point Cloud Registration Classic: ICP (Iterative Closest Point — Besl & McKay 1992); Variants: Point-to-Point (Classic), Point-to-Plane (Faster Convergence), Generalized ICP (Segal et al. 2009 — Probabilistic Framework)
+  - ▸ *CG use:* Scan alignment for 3D reconstruction; SLAM loop closure; multi-sensor calibration
+
+> 📚 **GitHub Repos:**
+> - [graphdeco-inria/gaussian-splatting](https://github.com/graphdeco-inria/gaussian-splatting) ![Stars](https://img.shields.io/github/stars/graphdeco-inria/gaussian-splatting?style=flat) — Original 3DGS (the reference implementation)
+> - [nerfstudio-project/nerfstudio](https://github.com/nerfstudio-project/nerfstudio) ![Stars](https://img.shields.io/github/stars/nerfstudio-project/nerfstudio?style=flat) — Unified NeRF/3DGS training framework
+> - [PointCloudLibrary/pcl](https://github.com/PointCloudLibrary/pcl) ![Stars](https://img.shields.io/github/stars/PointCloudLibrary/pcl?style=flat) — Comprehensive point cloud processing library
+>
+> 📖 **Textbooks:** *Point-Based Graphics* — Gross & Pfister (The classic reference); 3DGS related: Read Kerbl et al. SIGGRAPH 2023 paper directly
+
+---
+
+### 2.7 Voxels, Grids & Discrete Representations
+
+#### 2.7.1 Voxel Data Structures
+- 2.7.1.1 Uniform Grid: Simple 3D Array of Values; O(n³) Memory; Direct Index Access; GPU-Friendly (3D Texture)
+  - ▸ *CG use:* GPU-based fluid simulation (MAC grid); medical CT/MRI volume rendering; SDF storage for collision queries
+- 2.7.1.2 Sparse Voxel Octree (SVO): 8-Child Pointer Tree; Only Refine Non-Empty Regions; Memory = O(surface_area × log resolution) Instead of O(volume); Morton Code Linearization
+  - ▸ *CG use:* UE5 sparse volume textures; NVIDIA GVDB; high-resolution SDF representation; voxel cone tracing GI
+- 2.7.1.3 OpenVDB (DreamWorks, now Academy Software Foundation): Hierarchical Grid of Blocks (Typically 8³ Voxels); B+ Tree Structure on Blocks; Fast Random Access + Iteration + Sparse Storage
+  - ▸ *CG use:* Film-quality volumetric effects (smoke, fire, clouds) in all major VFX studios; level set fluid simulation; geometry processing
+- 2.7.1.4 Clipmaps (Tanner et al. 1998): Mipmap of Nested Toroidal Grids; Coarser Levels Cover Larger Area; Updates Only at Boundary; Virtual Texture Analogy for Geometry
+  - ▸ *CG use:* Large terrain heightfield rendering; GPU geometry clipmaps (Hoppe 2004); planetary-scale rendering
+
+#### 2.7.2 Volume Representations & Applications
+- 2.7.2.1 Adaptively Sampled Distance Fields (ADFs — Frisken et al. 2000): K-d Tree Subdivision of Distance Field; Finer Subdivision Near Surface; C⁰ Discontinuities at Cell Boundaries (Refined)
+  - ▸ *CG use:* Font representation (character SDF stored as ADF); collision detection acceleration
+- 2.7.2.2 VDB File Format & Tools: NanoVDB (GPU-Optimized, Header-Only C++ Library); OpenVDB Points (Particle Storage); OpenVDB AX (Expression Language for Volume Processing)
+  - ▸ *CG use:* Houdini volume exchange; Arnold/Mantra/RenderMan volume rendering; Universal Scene Description volume binding
+- 2.7.2.3 Signed Distance Field Voxelization: Windowing Number for Robust Inside/Outside; Sweep Algorithm; GPU Parallel (Atomic Min for Distance); Multi-Pass Refinement
+  - ▸ *CG use:* Ray-traced soft shadows (UE5 distance field shadows); SDF-based ambient occlusion; conservative collision detection
+
+> 📚 **GitHub Repos:**
+> - [AcademySoftwareFoundation/openvdb](https://github.com/AcademySoftwareFoundation/openvdb) ![Stars](https://img.shields.io/github/stars/AcademySoftwareFoundation/openvdb?style=flat) — Industry-standard sparse volume library
+> - [NVIDIAGameWorks/nanovdb](https://github.com/NVIDIAGameWorks/nanovdb) ![Stars](https://img.shields.io/github/stars/NVIDIAGameWorks/nanovdb?style=flat) — GPU-optimized VDB subset (header-only)
+>
+> 📖 **Textbooks:** *Fluid Simulation for Computer Graphics* — Bridson (Voxel/Particle methods); *OpenVDB Cookbook* — online documentation
+
+---
+
+### 2.8 Constructive Solid Geometry (CSG)
+
+#### 2.8.1 CSG Foundations
+- 2.8.1.1 CSG Tree: Binary Tree of Boolean Operations on Solid Primitives; Each Leaf = Primitive (Cube, Sphere, Cylinder, Cone, Torus, Extrusion); Each Internal Node = Boolean Op (∪, ∩, \, Δ); Root = Final Solid
+  - ▸ *CG use:* CAD modeling paradigm (SolidWorks feature tree); rapid prototyping of mechanical parts; real-time CSG via SDF in Shadertoy
+- 2.8.1.2 Boundary Evaluation: Convert CSG Tree to B-Rep (Boundary Representation); Classify Each Primitive Face Against Other Primitives (Inside/Outside/On); Compute Intersection Curves; Trim and Sew Faces
+  - ▸ *CG use:* CAD kernel core operation (Parasolid, ACIS); manufacturing-format export (STEP, IGES from CSG)
+- 2.8.1.3 Point Membership Classification (PMC): For Any Point x, Determine if x is IN, OUT, or ON the CSG Solid; Recursive Evaluation Down CSG Tree; Ray Casting Method (Count Intersections)
+  - ▸ *CG use:* Collision detection with complex assemblies; virtual machining simulation; 3D printing slicer
+
+#### 2.8.2 CSG on Contemporary Representations
+- 2.8.2.1 SDF CSG: Boolean Operations Exact on SDF (min/max Operations); Smooth Blend via Polynomial Smooth Minimum (Quilez); Multiple Material IDs via Composed Fields
+  - ▸ *CG use:* Real-time CSG rendering via ray marching; Shadertoy demoscene art; procedural game level generation
+- 2.8.2.2 Mesh CSG: Triangle Mesh Boolean via BSP-Assisted Computation; Robustness Challenges (Coplanar Faces, Near-Degenerate Intersections); Exact Arithmetic Solutions (CGAL Nef Polyhedra)
+  - ▸ *CG use:* 3D modeling software Boolean tools (Blender Boolean modifier); digital sculpting boolean operations
+- 2.8.2.3 Hybrid SDF-Mesh CSG: Convert Mesh to SDF → Perform SDF Boolean → Marching Cubes Back to Mesh; Loss of Sharp Features Without Dual Contouring
+  - ▸ *CG use:* Robust Boolean for 3D printing mesh repair; game engine procedural destruction (subtract sphere SDF from building mesh)
+
+> 📚 **GitHub Repos:**
+> - [elalish/manifold](https://github.com/elalish/manifold) ![Stars](https://img.shields.io/github/stars/elalish/manifold?style=flat) — Fast, robust mesh Boolean library (3D printing focused)
+> - [CGAL/cgal](https://github.com/CGAL/cgal) ![Stars](https://img.shields.io/github/stars/CGAL/cgal?style=flat) — Nef Polyhedra for exact CSG
+>
+> 📖 **Textbooks:** *Geometric and Solid Modeling* — Christoph Hoffmann; *An Introduction to Solid Modeling* — Mäntylä
+
+---
+
+### 2.9 Procedural & Generative Modeling
+
+#### 2.9.1 Noise Functions — The Building Blocks of Proceduralism
+- 2.9.1.1 Perlin Noise (1985, Academy Award 1997): Lattice Gradient Noise; Smoothstep Interpolation; Octave Summation → fBm
+  - ▸ *CG use:* Texturing (marble, wood, clouds); terrain height generation; vertex displacement for organic surfaces
+- 2.9.1.2 Simplex Noise (Perlin 2001): Lower Computational Complexity in High Dimensions (O(n²) vs Perlin's O(2^n)); No Directional Artifacts; Improved Gradient Distribution
+  - ▸ *CG use:* GPU-efficient noise (fewer samples per dimension); 3D/4D noise for animated textures
+- 2.9.1.3 Worley (Voronoi/Cellular) Noise (1996): Distance to Nearest Feature Point; Closest (F1), Second-Closest (F2); Domain Warping of Feature Points
+  - ▸ *CG use:* Stone/crack textures; cell-like organic patterns; water caustics approximation; Gabor noise for anisotropic textures
+- 2.9.1.4 Curl Noise (Bridson et al. 2007): ∇ × (Vector Noise Field); Guaranteed Divergence-Free; Incompressible Flow Approximation
+  - ▸ *CG use:* Fluid velocity fields for cheap smoke/fire simulation; particle advection in games; hair/wind motion
+
+#### 2.9.2 Grammar-Based & Structural Modeling
+- 2.9.2.1 L-Systems (Lindenmayer 1968): Parallel String Rewriting System; Turtle Graphics Interpretation (Move, Rotate, Push/Pop); Stochastic, Parametric, Context-Sensitive Extensions
+  - ▸ *CG use:* Plant and tree generation (SpeedTree, XFrog); fractal modeling; biological structure simulation
+- 2.9.2.2 Shape Grammars (Stiny & Gips 1971): Replacement Rules on Labeled Shapes; Subdivision-Based Derivation; Parameterized for Variation
+  - ▸ *CG use:* Procedural architecture (CityEngine — entire cities from rules); building facade generation; video game level generation
+- 2.9.2.3 Wave Function Collapse (WFC — Gumin 2016): Constraint Satisfaction via Tile Adjacency Rules; Superposition → Observation → Propagation Cycle; Produces Locally-Similar Output to Exemplar
+  - ▸ *CG use:* Texture synthesis with structural constraints (platformer level tiles); procedural building interiors; map generation (Caves of Qud, Townscaper)
+- 2.9.2.4 Diffusion-Limited Aggregation (DLA): Random Walkers Stick on Contact; Generates Fractal Tree/Coral-Like Structures
+  - ▸ *CG use:* Lightning bolt generation; dendritic crystal growth; frost/ice pattern synthesis
+
+#### 2.9.3 Terrain & Landscape Generation
+- 2.9.3.1 Fractal Terrain: Diamond-Square (Midpoint Displacement) Algorithm; fBm Heightfield = Σ octavesⁿ × noise(2ⁱ x, 2ⁱ y); Erosion Simulation (Hydraulic + Thermal)
+  - ▸ *CG use:* Game terrain generation (Minecraft, Horizon Zero Dawn); film landscape creation; flight simulator terrain
+- 2.9.3.2 Particle-Based Erosion: SPH-Style Water Particles Advect Over Heightfield; Dissolve, Transport, Deposit Sediment; Realistic Ridge/Crater Formation
+  - ▸ *CG use:* High-quality terrain for offline rendering; World Machine, Gaea, Houdini Heightfield Erode
+- 2.9.3.3 Data-Driven Terrain: Train GAN/Diffusion Model on Real DEM (Digital Elevation Model) Data; Generate Realistic Novel Heightfields; Control via Sketch + Elevation Constraints
+  - ▸ *CG use:* Infinite realistic game worlds; film environment generation; geographic training data augmentation
+
+> 📚 **GitHub Repos:**
+> - [Auburn/FastNoise2](https://github.com/Auburn/FastNoise2) ![Stars](https://img.shields.io/github/stars/Auburn/FastNoise2?style=flat) — High-performance noise generation library (SIMD-optimized)
+> - [mxgmn/WaveFunctionCollapse](https://github.com/mxgmn/WaveFunctionCollapse) ![Stars](https://img.shields.io/github/stars/mxgmn/WaveFunctionCollapse?style=flat) — Reference WFC implementation
+>
+> 📖 **Textbooks:** *Texturing and Modeling: A Procedural Approach* — Ebert, Musgrave, Peachey, Perlin, Worley (The procedural bible); *The Algorithmic Beauty of Plants* — Prusinkiewicz & Lindenmayer (Free online)
+
+---
+
+### 2.10 Data-Driven & AI-Powered Modeling
+
+#### 2.10.1 Acquisition-Based Modeling
+- 2.10.1.1 Photogrammetry Pipeline: Image Capture → Feature Extraction (SIFT) → Feature Matching → SfM (COLMAP) → Dense MVS (PMVS/PatchMatch) → Depth Fusion → Mesh Extraction → Texture Projection
+  - ▸ *CG use:* Reality capture for VFX (environments, props); cultural heritage digitization; game asset creation from real objects (Quixel Megascans)
+- 2.10.1.2 Depth Sensor Fusion: TSDF Volume (Curless & Levoy 1996) — Weighted Running Average of Signed Distance; KinectFusion (Newcombe et al. 2011) — Real-Time GPU TSDF
+  - ▸ *CG use:* Real-time 3D scanning; AR occlusion and physics; robot environment mapping
+- 2.10.1.3 Semantic & Instance Segmentation for Modeling: PointNet/PointerNet for Per-Point Classification; Mask3D/PartNet for Part Decomposition; 3D Scene Graph Construction
+  - ▸ *CG use:* Scan-to-BIM (Building Information Modeling); autonomous vehicle HD map generation; digital twin creation
+
+#### 2.10.2 AI-Generated 3D Content (3D AIGC)
+- 2.10.2.1 Text-to-3D via Score Distillation: DreamFusion (Poole et al. 2022) — SDS Loss ∇_θ = 𝔼[w(t)(ϵ̂−ϵ)∂x/∂θ] Using Frozen 2D Diffusion; ProlificDreamer (Wang et al. 2023) — VSD for Improved Quality and Diversity
+  - ▸ *CG use:* Rapid 3D prototyping from text prompts; game asset ideation; creative concept exploration
+- 2.10.2.2 Image-to-3D (Feed-Forward): Large Reconstruction Models (LRM — Hong et al. 2024): Transformer Predicts Triplane NeRF/3DGS from Single Image in < 5 Seconds; Instant3D, LGM, GRM, CRM
+  - ▸ *CG use:* E-commerce 3D from product photos; game asset from concept art; real-time AR content creation from camera
+- 2.10.2.3 Multi-View Diffusion for 3D: Zero123 (Liu et al. 2023) — View-Conditioned Diffusion; MVDream (Shi et al. 2024) — Multi-View Consistent Generation; SyncDreamer — Simultaneous Novel View Synthesis
+  - ▸ *CG use:* Consistent multi-view images for reconstruction; reduced 3D generation failures (Janus/multi-face problem)
+- 2.10.2.4 3D Generative Models: 3D GANs (EG3D, GET3D); Diffusion on Latent 3D Representations (DiffTF, NFD); Autoregressive Mesh Generation (PolyGen, MeshGPT — Pre-Trained Transformer Generates Triangle Meshes Token-by-Token)
+  - ▸ *CG use:* Direct 3D asset generation; style-controllable shape synthesis; game content population
+
+#### 2.10.3 Learning-Based Geometry Processing
+- 2.10.3.1 Neural Mesh Simplification: Train Neural Network to Predict Edge Collapse Priority/Cost; Generalizes Across Model Categories
+  - ▸ *CG use:* Content-aware LOD generation (preserve eyes on face, ignore flat back of head); streaming-optimized simplification
+- 2.10.3.2 Point Cloud Upsampling: PU-Net, PU-GCN, PU-GAN — Learn to Generate Dense Uniform Points from Sparse Input; Feature-Aware Sampling
+  - ▸ *CG use:* LiDAR scan enhancement; low-cost depth sensor quality improvement; scan-to-print pipeline
+- 2.10.3.3 Shape Completion: PointTr (Transformer for Point Completion); PCN (Point Completion Network); Diffusion-Based Completion (Conditional DDPM on Partial Scans)
+  - ▸ *CG use:* 3D scanning hole filling; robotic grasp planning on partial views; archaeological fragment reconstruction
+
+> 📚 **GitHub Repos:**
+> - [openai/shap-e](https://github.com/openai/shap-e) ![Stars](https://img.shields.io/github/stars/openai/shap-e?style=flat) — OpenAI text/image-to-3D generative model
+> - [threestudio-project/threestudio](https://github.com/threestudio-project/threestudio) ![Stars](https://img.shields.io/github/stars/threestudio-project/threestudio?style=flat) — Unified text-to-3D framework (DreamFusion, MVDream, ProlificDreamer)
+> - [autonomousvision/mipnerf](https://github.com/google/mipnerf) ![Stars](https://img.shields.io/github/stars/google/mipnerf?style=flat) — Anti-aliased NeRF for multi-scale reconstruction
+>
+> 📖 **Textbooks:** *Deep Learning for 3D Data* — survey papers; area moves fast — follow SIGGRAPH/NeurIPS proceedings
+
+---
+
+### 2.11 Scene Graphs & Hierarchical Organization
+
+#### 2.11.1 Scene Graph Architecture
+- 2.11.1.1 Tree-Structured Transform Hierarchy: Parent → Child Spatial Relationship; Local Transform (Relative to Parent) + Global Transform (Concatenated from Root)
+  - ▸ *CG use:* Every game engine and DCC tool uses scene graphs for object organization; transform dirty-flag propagation
+- 2.11.1.2 Entity-Component-System (ECS): Entity = ID; Component = Data (Transform, Mesh, Material); System = Logic (RenderSystem, PhysicsSystem); Cache-Friendly Contiguous Component Storage (Archetype/Chunk-Based)
+  - ▸ *CG use:* Unity DOTS; Unreal Mass Entity; high-performance game object management (10K+ entities); data-oriented design
+- 2.11.1.3 Spatial Partitioning in Scene Graphs: BVH per-Node; Octree/K-d Tree Scene Subdivision; Portal/Cell Systems for Indoor; Occlusion Query-Driven Dynamic Structure Updates
+  - ▸ *CG use:* Culling efficiency — transform scene graph spatial queries from O(n) to O(log n); GPU-driven culling with draw-indirect
+
+#### 2.11.2 Level of Detail (LOD) Systems
+- 2.11.2.1 Discrete LOD: Precompute Meshes at Multiple Resolutions; Switch at Distance/Pixel-Size Thresholds; Geomorph Transitions (Vertex Morphing Between LODs)
+  - ▸ *CG use:* GPU instancing with per-instance LOD selection; CPU or GPU (mesh shader) driven
+- 2.11.2.2 Continuous LOD (CLOD): Progressive Meshes (Hoppe 1996) — Any Resolution via Edge Collapse/Split Sequence; View-Dependent Refinement (Hoppe 1997) — Finer Near Silhouette, Coarser in Distance
+  - ▸ *CG use:* Terrain rendering (ROAM, GeoMipMaps); large CAD model visualization; mesh streaming over network
+- 2.11.2.3 Virtual Geometry (Nanite — UE5): Software Rasterizer for Micro-Triangles; Hierarchical LOD Cluster Tree (Group Triangles → Simplify → Group → Simplify...); On-Demand Streaming from Disk
+  - ▸ *CG use:* Film-quality assets directly in-game without manual LOD creation; automatic geometric LOD; pixel-sized triangle culling
+- 2.11.2.4 Impostors & Billboard Clouds: Render Complex Object to Texture → Display as Camera-Facing Billboard; Refresh When Camera Moves Significantly; Octahedral Impostor Mapping
+  - ▸ *CG use:* Distant trees/crowds in games; VR performance optimization; mobile rendering complexity reduction
+
+#### 2.11.3 Large-Scale World Management
+- 2.11.3.1 World Streaming: Tile-Based World Partition; Load/Unload Based on Camera Proximity; Priority-Based Async Loading; Precomputed Visibility Data (PVS)
+  - ▸ *CG use:* Open-world games (GTA, Zelda BotW, Horizon); UE5 World Partition system; seamless player experience
+- 2.11.3.2 Floating-Point Precision Handling: 32-bit Float = ~7 Digits → 1mm Precision at 10km Distance; Camera-Relative Rendering (Origin at Camera); Double Precision for Simulation; Multi-Origin (Floating Origin Shift)
+  - ▸ *CG use:* Kerbal Space Program, Star Citizen (planet-to-space transitions); large-scale open world rendering
+- 2.11.3.3 USD Composition (Pixar USD): Layers (SubLayer, Reference, Payload); Variant Sets (Switch Between Asset Variants); Inherits/Specializes; Opinions (Strongest Wins); Composition Arcs (Non-Destructive Overrides)
+  - ▸ *CG use:* VFX pipeline collaboration (hundreds of artists on same shot); game engine interchange (UE5, Unity USD plug-in); NVIDIA Omniverse
+
+> 📚 **GitHub Repos:**
+> - [PixarAnimationStudios/USD](https://github.com/PixarAnimationStudios/USD) ![Stars](https://img.shields.io/github/stars/PixarAnimationStudios/USD?style=flat) — Universal Scene Description (the industry standard)
+> - [AcademySoftwareFoundation/MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX) ![Stars](https://img.shields.io/github/stars/AcademySoftwareFoundation/MaterialX?style=flat) — Standard material definition (companion to USD)
+>
+> 📖 **Textbooks:** *Game Engine Architecture* — Jason Gregory (Ch. 12-13 on scene management, streaming); *Real-Time Rendering* — Akenine-Möller et al. (Ch. 14 on acceleration algorithms)
+
+---
+
+### 2.12 Spatial Data Structures for Geometry Query
+
+#### 2.12.1 Hierarchical Spatial Indices
+- 2.12.1.1 Bounding Volume Hierarchy (BVH) — Geometry Perspective: Construction Strategies (SAH, Binned SAH, LBVH on GPU); Bottom-Up vs. Top-Down; Refit for Animated Geometry; Wide BVH (SIMD-Friendly)
+  - ▸ *CG use:* Ray tracing acceleration for complex geometry; collision detection broad phase; frustum culling; nearest neighbor for mesh processing
+- 2.12.1.2 k-d Trees for Geometry: Axis-Aligned Space Partition; Split at Object Medians for Balanced Tree; Nearest Neighbor & Range Search in O(log n); Ray Intersection
+  - ▸ *CG use:* Photon mapping (photon kd-tree); point cloud nearest-neighbor queries; ICP correspondence search
+- 2.12.1.3 Octrees & Quadtrees (Geometric Applications): Recursive 8/4-Way Subdivision; Adaptive Depth (Refine Where Data Exists); Morton (Z-Order) Codes for Linear Storage
+  - ▸ *CG use:* Sparse voxel grids (OpenVDB); GPU particle neighbor search; adaptive distance field storage; frustum culling
+
+#### 2.12.2 Proximity & Neighborhood Queries
+- 2.12.2.1 Nearest Neighbor Search: k-d Tree (Exact, O(log n) Average), HNSW (Approximate, Graph-Based, State-of-the-Art Speed/Recall Trade-off), LSH (Locality Sensitive Hashing — Sublinear for High Dimensions)
+  - ▸ *CG use:* Point cloud registration (nearest neighbor correspondence); texture synthesis (patch matching); geometry repair (nearest valid vertex)
+- 2.12.2.2 Range Search & Radius Queries: Fixed-Radius Near Neighbors (FRNN); SPH Kernel Support Radius Query; BVH/Grid Acceleration
+  - ▸ *CG use:* Fluid simulation neighbor search (SPH kernel radius); collision detection (check only nearby objects); mesh smoothing (vertex neighborhood)
+- 2.12.2.3 Spatial Joins & Self-Collision Detection: Bounding Volume Traversal Tree (BVTT) for Pairwise Proximity; Sweep-and-Prune (Sort and Sweep) for AABB Overlap Pairs
+  - ▸ *CG use:* Cloth self-collision detection; deformable body contact resolution; multi-body physics broad phase
+
+#### 2.12.3 GPU-Accelerated Spatial Query
+- 2.12.3.1 GPU BVH Construction (PLOC, LBVH): Morton Code Sort + Hierarchy Extraction → O(n log n) on GPU; HLBVH (Hybrid: Top-Level LBVH + Per-Leaf SAH); PLOC (Parallel Locally-Ordered Clustering)
+  - ▸ *CG use:* Real-time ray tracing BVH builds for dynamic geometry (DXR/Vulkan RT — TLAS/BLAS two-level model)
+- 2.12.3.2 Spatial Hashing on GPU: Infinite Grid Hash; Lock-Free Concurrent Insertion via Atomic CAS; Spatial Coherence Exploitation
+  - ▸ *CG use:* Instant NGP multi-resolution hash; GPU particle simulation (neighbor lists); real-time cloth self-collision
+- 2.12.3.3 Learned Spatial Indices: Neural Network as Bounding Volume; Occupancy/SDF Proxy for Conservative Culling; Reinforcement Learning for Traversal Policy
+  - ▸ *CG use:* Next-gen ray tracing acceleration (neural BVH research — SIGGRAPH 2024); learned LOD selection
+
+> 📚 **GitHub Repos:**
+> - [embree/embree](https://github.com/embree/embree) ![Stars](https://img.shields.io/github/stars/embree/embree?style=flat) — World-class BVH construction and traversal kernels
+> - [nmslib/hnswlib](https://github.com/nmslib/hnswlib) ![Stars](https://img.shields.io/github/stars/nmslib/hnswlib?style=flat) — Fast approximate nearest neighbor (HNSW)
+> - [CGAL/cgal](https://github.com/CGAL/cgal) ![Stars](https://img.shields.io/github/stars/CGAL/cgal?style=flat) — k-d tree, octree, AABB tree spatial searching
+>
+> 📖 **Textbooks:** *Real-Time Collision Detection* — Christer Ericson (Essential spatial structures for games); *Foundations of Multidimensional and Metric Data Structures* — Hanan Samet (Exhaustive reference)
+
+---
+
 
 ## Chapter 3 · Appearance, Materials & Textures
 
