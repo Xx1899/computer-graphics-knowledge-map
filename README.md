@@ -6,7 +6,8 @@
 
 ---
 
-## Chapter 1 · Mathematical Foundations
+
+## Chapter 1 · Mathematical & Physical Foundations
 
 > 💡 **Top Picks:**
 > - [ericjang/awesome-graphics](https://github.com/ericjang/awesome-graphics) ![Stars](https://img.shields.io/github/stars/ericjang/awesome-graphics?style=flat) — Curated list of CG tutorials, books, math & programming resources
@@ -526,7 +527,65 @@
 
 ---
 
-## Chapter 2 · Modeling
+
+
+### 1.11 Color Science & Visual Perception
+
+#### 1.11.1 Photometry & Colorimetry Fundamentals
+- 6.1.1 Visible Spectrum & Radiometry Review
+- 6.1.2 Photometric Units (Lumen lm, Candela cd, Lux lx, Nit cd/m²)
+- 6.1.3 Human Visual System Characteristics (Photoreceptors: Cones/Rods, Spectral Sensitivity)
+
+#### 1.11.2 Color Spaces
+- 6.2.1 CIE 1931 XYZ Color Space
+- 6.2.2 CIE xy Chromaticity Diagram
+- 6.2.3 CIE 1976 L\*a\*b\* (CIELAB) Color Space: Perceptual Uniformity
+- 6.2.4 CIE L\*u\*v\* Color Space
+- 6.2.5 CIE LCh (Lightness, Chroma, Hue) Color Space
+- 6.2.6 sRGB: Primaries, White Point, Gamma Curve, Linear vs. Encoded Values
+- 6.2.7 DCI-P3, Display P3
+- 6.2.8 Adobe RGB, ProPhoto RGB
+- 6.2.9 Rec.709 (HDTV), Rec.2020 (UHD/HDR)
+- 6.2.10 ACES (Academy Color Encoding System): ACES2065-1, ACEScg, ACEScct
+- 6.2.11 ICtCp (ITU-R BT.2100)
+- 6.2.12 Wide Color Gamut (WCG)
+- 6.2.13 OKLab / OKLCH (Perceptually Uniform Color Spaces)
+
+#### 1.11.3 Gamma, Transfer Functions & Tone Mapping
+- 6.3.1 Gamma Encoding & Correction (Gamma 2.2, sRGB EOTF/OETF)
+- 6.3.2 Transfer Functions (OETF / EOTF)
+- 6.3.3 PQ (Perceptual Quantizer, ST.2084 / SMPTE 2084)
+- 6.3.4 HLG (Hybrid Log-Gamma)
+- 6.3.5 Scene-Referred vs. Display-Referred Pipelines
+- 6.3.6 Tone Mapping Operators (Review 3.7.1)
+- 6.3.7 HDR-to-SDR Dynamic Range Adaptation
+
+#### 1.11.4 Color Appearance Models
+- 6.4.1 CIECAM02 / CIECAM16
+- 6.4.2 iCAM06 (HDR Image Appearance Model)
+- 6.4.3 Chromatic Adaptation Transforms (von Kries, Bradford, CAT02/16)
+
+#### 1.11.5 Visual Perception Models
+- 6.5.1 Contrast Sensitivity Function (CSF)
+- 6.5.2 Just Noticeable Difference (JND)
+- 6.5.3 Visual Masking Effects: Luminance Masking, Texture Masking, Temporal Masking
+- 6.5.4 Perceptual Metrics (SSIM, MS-SSIM, FSIM, LPIPS, DISTS, ST-LPIPS)
+- 6.5.5 Visual Attention Models (Saliency Maps, Itti-Koch Model, Deep Gaze Prediction)
+- 6.5.6 Perception-Driven Rendering Optimization (Foveated Rendering)
+
+#### 1.11.6 High Dynamic Range Imaging
+- 6.6.1 HDR Image Formats (OpenEXR, Radiance HDR, PFM, JPEG-XL HDR, AVIF HDR)
+- 6.6.2 Multi-Exposure HDR Merging (Debevec & Malik Method, Robertson Method)
+- 6.6.3 Ghost Removal
+- 6.6.4 HDR Display Technologies (OLED, Mini-LED, Micro-LED Backlight)
+- 6.6.5 HDR Environment Map Capture & Processing
+
+---
+
+
+---
+
+## Chapter 2 · Geometry & Shape Representation
 
 ### 2.1 Explicit Representations
 
@@ -641,7 +700,14 @@
 
 ---
 
-## Chapter 3 · Rendering
+
+---
+
+## Chapter 3 · Appearance, Materials & Textures
+
+*This chapter covers the theoretical foundations of how light interacts with matter — radiometry, BRDF/BSDF theory, materials, and the rendering equation — the "what" before the "how" of rendering.*
+
+*This chapter covers the theoretical foundations of how light interacts with matter — radiometry, BRDF/BSDF theory, materials, and the rendering equation — the "what" before the "how" of rendering.*
 
 ### 3.1 Rendering Equation & Theoretical Foundations
 
@@ -678,7 +744,15 @@
 - 3.1.3.5 Operator Form & Neumann Series Expansion
 - 3.1.3.6 Adjoint Equation & Importance Function
 
-### 3.2 Rasterization Rendering
+---
+
+
+---
+
+## Chapter 4 · Light Transport & Rendering
+
+
+### 4.1 Rasterization Rendering
 
 #### 3.2.1 Graphics Pipeline Overview
 - 3.2.1.1 Application Stage (CPU): Scene Management, Visibility Determination, Draw Calls
@@ -959,7 +1033,15 @@
 - 3.7.4.5 Checkerboard Rendering
 - 3.7.4.6 Variable Rate Shading (VRS) + Super-Resolution Synergy
 
-### 3.8 Differentiable Rendering
+---
+
+
+---
+
+## Chapter 5 · Neural, Differentiable & Inverse Rendering
+
+
+### 5.1 Differentiable Rendering
 - 3.8.1 Differentiable Rasterization: Forward & Backward Propagation
 - 3.8.2 Differentiable Path Tracing: Edge Sampling, Reparameterization Tricks
 - 3.8.3 Differentiable Volume Rendering (Gradients in NeRF Volume Rendering)
@@ -971,7 +1053,7 @@
   - 3.8.6.3 Joint Inverse Rendering (Simultaneous Estimation of Geometry, Materials & Lighting)
 - 3.8.7 Differentiable Rendering Frameworks (Mitsuba 3, Redner, PSDR-CUDA, Nvdiffrast, Slang.D)
 
-### 3.9 Neural Rendering
+### 5.2 Neural Rendering
 - 3.9.1 Neural Radiance Field (NeRF): Positional Encoding, Hierarchical Sampling, Coarse-to-Fine
 - 3.9.2 NeRF Acceleration (Instant NGP, TensoRF, Plenoxels, DIVeR, MERF, SMERF)
 - 3.9.3 Few-View NeRF (PixelNeRF, MVSNeRF, RegNeRF, FreeNeRF)
@@ -991,7 +1073,10 @@
 
 ---
 
-## Chapter 4 · Animation
+
+---
+
+## Chapter 6 · Animation & Physics Simulation
 
 ### 4.1 Keyframe Animation
 - 4.1.1 Keyframes & Interpolation Curves
@@ -1212,7 +1297,10 @@
 
 ---
 
-## Chapter 5 · Geometry Processing
+
+---
+
+## Chapter 7 · Geometry Processing & Shape Analysis
 
 ### 5.1 Mesh Data Structures & Basic Operations
 - 5.1.1 Mesh Data Structures Overview (Face Sets, Winged-Edge, Half-Edge, Directed-Edge, Corner Table)
@@ -1318,60 +1406,74 @@
 
 ---
 
-## Chapter 6 · Color Science & Visual Perception
-
-### 6.1 Photometry & Colorimetry Fundamentals
-- 6.1.1 Visible Spectrum & Radiometry Review
-- 6.1.2 Photometric Units (Lumen lm, Candela cd, Lux lx, Nit cd/m²)
-- 6.1.3 Human Visual System Characteristics (Photoreceptors: Cones/Rods, Spectral Sensitivity)
-
-### 6.2 Color Spaces
-- 6.2.1 CIE 1931 XYZ Color Space
-- 6.2.2 CIE xy Chromaticity Diagram
-- 6.2.3 CIE 1976 L\*a\*b\* (CIELAB) Color Space: Perceptual Uniformity
-- 6.2.4 CIE L\*u\*v\* Color Space
-- 6.2.5 CIE LCh (Lightness, Chroma, Hue) Color Space
-- 6.2.6 sRGB: Primaries, White Point, Gamma Curve, Linear vs. Encoded Values
-- 6.2.7 DCI-P3, Display P3
-- 6.2.8 Adobe RGB, ProPhoto RGB
-- 6.2.9 Rec.709 (HDTV), Rec.2020 (UHD/HDR)
-- 6.2.10 ACES (Academy Color Encoding System): ACES2065-1, ACEScg, ACEScct
-- 6.2.11 ICtCp (ITU-R BT.2100)
-- 6.2.12 Wide Color Gamut (WCG)
-- 6.2.13 OKLab / OKLCH (Perceptually Uniform Color Spaces)
-
-### 6.3 Gamma, Transfer Functions & Tone Mapping
-- 6.3.1 Gamma Encoding & Correction (Gamma 2.2, sRGB EOTF/OETF)
-- 6.3.2 Transfer Functions (OETF / EOTF)
-- 6.3.3 PQ (Perceptual Quantizer, ST.2084 / SMPTE 2084)
-- 6.3.4 HLG (Hybrid Log-Gamma)
-- 6.3.5 Scene-Referred vs. Display-Referred Pipelines
-- 6.3.6 Tone Mapping Operators (Review 3.7.1)
-- 6.3.7 HDR-to-SDR Dynamic Range Adaptation
-
-### 6.4 Color Appearance Models
-- 6.4.1 CIECAM02 / CIECAM16
-- 6.4.2 iCAM06 (HDR Image Appearance Model)
-- 6.4.3 Chromatic Adaptation Transforms (von Kries, Bradford, CAT02/16)
-
-### 6.5 Visual Perception Models
-- 6.5.1 Contrast Sensitivity Function (CSF)
-- 6.5.2 Just Noticeable Difference (JND)
-- 6.5.3 Visual Masking Effects: Luminance Masking, Texture Masking, Temporal Masking
-- 6.5.4 Perceptual Metrics (SSIM, MS-SSIM, FSIM, LPIPS, DISTS, ST-LPIPS)
-- 6.5.5 Visual Attention Models (Saliency Maps, Itti-Koch Model, Deep Gaze Prediction)
-- 6.5.6 Perception-Driven Rendering Optimization (Foveated Rendering)
-
-### 6.6 High Dynamic Range Imaging
-- 6.6.1 HDR Image Formats (OpenEXR, Radiance HDR, PFM, JPEG-XL HDR, AVIF HDR)
-- 6.6.2 Multi-Exposure HDR Merging (Debevec & Malik Method, Robertson Method)
-- 6.6.3 Ghost Removal
-- 6.6.4 HDR Display Technologies (OLED, Mini-LED, Micro-LED Backlight)
-- 6.6.5 HDR Environment Map Capture & Processing
 
 ---
 
-## Chapter 7 · Hardware Architecture & Systems
+## Chapter 8 · 3D Vision, Reconstruction & Computational Photography
+
+
+### 9.1 Camera Models & Geometry
+- 9.1.1 Pinhole Camera Model
+- 9.1.2 Intrinsic Matrix (Focal Length, Principal Point, Distortion Parameters)
+- 9.1.3 Extrinsic Matrix (Rotation R + Translation t)
+- 9.1.4 Radial & Tangential Distortion Models (Brown-Conrady Model)
+- 9.1.5 Fisheye Lens Models (Equidistant Projection, Equisolid Angle Projection, FOV Model)
+- 9.1.6 Dual-Camera Models & Panoramic Stitching
+- 9.1.7 Light Field / Plenoptic Function
+
+### 9.2 Multi-View Geometry
+- 9.2.1 Epipolar Geometry
+- 9.2.2 Essential Matrix (E) & Fundamental Matrix (F)
+- 9.2.3 Homography (H) & Planar Scenes
+- 9.2.4 Triangulation
+- 9.2.5 Structure from Motion (SfM):
+  - 9.2.5.1 Incremental SfM (COLMAP Style)
+  - 9.2.5.2 Global SfM
+  - 9.2.5.3 Hierarchical SfM
+- 9.2.6 Simultaneous Localization and Mapping (SLAM):
+  - 9.2.6.1 Visual SLAM (ORB-SLAM3, DSO, VINS-Mono)
+  - 9.2.6.2 Visual-Inertial SLAM (VIO)
+  - 9.2.6.3 Dense SLAM (KinectFusion, ElasticFusion, BundleFusion)
+  - 9.2.6.4 NeRF / 3DGS-Based SLAM
+
+### 9.3 Depth Estimation
+- 9.3.1 Binocular Stereo Matching:
+  - 9.3.1.1 Local Matching: SAD, NCC, Census Transform
+  - 9.3.1.2 Global Matching: Graph Cuts, Semi-Global Matching (SGM)
+  - 9.3.1.3 Deep-Learning-Based Stereo Matching (PSMNet, RAFT-Stereo, CREStereo)
+- 9.3.2 Monocular Depth Estimation:
+  - 9.3.2.1 Cue-Based (Defocus, Linear Perspective, Relative Size)
+  - 9.3.2.2 Deep-Learning-Based (MiDaS, DPT, ZoeDepth, Depth Anything)
+- 9.3.3 Time-of-Flight (ToF): Modulated Continuous-Wave, Pulsed
+- 9.3.4 Structured Light (Encoded Structured Light, Random Speckle: Kinect v1)
+
+### 9.4 3D Reconstruction
+- 9.4.1 Multi-View Stereo (MVS):
+  - 9.4.1.1 Voxel Coloring & Space Carving
+  - 9.4.1.2 Patch-Based (PatchMatch / PMVS / ACMM)
+  - 9.4.1.3 Depth-Map-Fusion-Based (COLMAP MVS, OpenMVS)
+- 9.4.2 Photometric Stereo
+- 9.4.3 Shape-from-X (Shape from Shading, Defocus, Polarization, Texture)
+- 9.4.4 Deep-Learning-Based MVS (MVSNet, CasMVSNet, PatchMatchNet)
+- 9.4.5 Neural Implicit Reconstruction (NeuS, VolSDF, Neuralangelo, BakedSDF)
+
+### 9.5 Computational Photography
+- 9.5.1 HDR Capture & Fusion
+- 9.5.2 Panorama Stitching (Image Registration, Seam Optimization, Gain Compensation)
+- 9.5.3 Image / Video Stabilization
+- 9.5.4 Portrait Mode (Depth Estimation + Bokeh Rendering)
+- 9.5.5 Super-Resolution (Single-Image / Multi-Frame Fusion)
+- 9.5.6 Low-Light Enhancement (Multi-Frame Denoising & Fusion)
+- 9.5.7 Computational Illumination (Flash/Ambient Decomposition & Re-lighting)
+- 9.5.8 Reflection & Obstruction Removal
+
+---
+
+
+---
+
+## Chapter 9 · Graphics Systems, Hardware & Engineering
+
 
 ### 7.1 GPU Architecture
 
@@ -1536,110 +1638,7 @@
 
 ---
 
-## Chapter 8 · Display & Human-Computer Interaction
 
-### 8.1 Display Technologies
-- 8.1.1 LCD, OLED, Mini-LED, Micro-LED, QLED
-- 8.1.2 Refresh Rate, Response Time, Input Lag
-- 8.1.3 V-Sync, Adaptive Sync (G-Sync / FreeSync), VRR
-- 8.1.4 Multi-Monitor Stitching & CAVE Environments
-- 8.1.5 Color Calibration & Color Management (ICC Profiles / Display Calibration Workflow)
-
-### 8.2 Virtual Reality (VR)
-- 8.2.1 VR Rendering Pipeline (Stereoscopic Rendering: Binocular Disparity, IPD)
-- 8.2.2 Lens Distortion Correction (Inverse Barrel Distortion)
-- 8.2.3 Chromatic Aberration Correction
-- 8.2.4 Asynchronous Time Warp (ATW)
-- 8.2.5 Asynchronous Space Warp (ASW)
-- 8.2.6 Foveated Rendering (Fixed / Dynamic, Eye Tracking)
-- 8.2.7 Latency Sensitivity & Motion-to-Photon Latency Optimization
-- 8.2.8 Single-Pass Stereo / Instanced Stereo
-- 8.2.9 VR Input & Tracking (6DOF Controllers, Hand Tracking)
-
-### 8.3 Augmented Reality (AR) & Mixed Reality (MR)
-- 8.3.1 See-Through AR (Optical / Video See-Through) Rendering
-- 8.3.2 Lighting Consistency (Environmental Light Estimation, Environment Probes / IBL)
-- 8.3.3 Occlusion Consistency (Real-Time Occlusion Estimation & Segmentation)
-- 8.3.4 Plane Detection & Anchoring (ARCore / ARKit / HoloLens Spatial Mapping)
-- 8.3.5 Real-Time Semantic Segmentation & Depth Estimation
-
-### 8.4 3D Displays
-- 8.4.1 Stereoscopic Displays (Active Shutter / Passive Polarized 3D)
-- 8.4.2 Autostereoscopic Displays (Glasses-Free 3D / Lenticular Lens, Parallax Barrier)
-- 8.4.3 Light Field Displays
-- 8.4.4 Volumetric Displays
-- 8.4.5 Holographic Display Concepts
-
-### 8.5 User Interaction & 3D UI
-- 8.5.1 3D Picking: Ray Casting, Pixel-ID-Based Color Encoding
-- 8.5.2 3D Manipulators (Gizmo / Manipulator): Translation, Rotation, Scaling
-- 8.5.3 3D Camera Controls (Orbit, FPS, Trackball, Arcball)
-- 8.5.4 Gesture & Motion Interaction (Leap Motion, Kinect, Vision-Based Hand Tracking)
-- 8.5.5 Haptic Feedback (Haptic Rendering)
-- 8.5.6 Gaze-Based Interaction
-
----
-
-## Chapter 9 · 3D Vision & Computational Photography
-
-### 9.1 Camera Models & Geometry
-- 9.1.1 Pinhole Camera Model
-- 9.1.2 Intrinsic Matrix (Focal Length, Principal Point, Distortion Parameters)
-- 9.1.3 Extrinsic Matrix (Rotation R + Translation t)
-- 9.1.4 Radial & Tangential Distortion Models (Brown-Conrady Model)
-- 9.1.5 Fisheye Lens Models (Equidistant Projection, Equisolid Angle Projection, FOV Model)
-- 9.1.6 Dual-Camera Models & Panoramic Stitching
-- 9.1.7 Light Field / Plenoptic Function
-
-### 9.2 Multi-View Geometry
-- 9.2.1 Epipolar Geometry
-- 9.2.2 Essential Matrix (E) & Fundamental Matrix (F)
-- 9.2.3 Homography (H) & Planar Scenes
-- 9.2.4 Triangulation
-- 9.2.5 Structure from Motion (SfM):
-  - 9.2.5.1 Incremental SfM (COLMAP Style)
-  - 9.2.5.2 Global SfM
-  - 9.2.5.3 Hierarchical SfM
-- 9.2.6 Simultaneous Localization and Mapping (SLAM):
-  - 9.2.6.1 Visual SLAM (ORB-SLAM3, DSO, VINS-Mono)
-  - 9.2.6.2 Visual-Inertial SLAM (VIO)
-  - 9.2.6.3 Dense SLAM (KinectFusion, ElasticFusion, BundleFusion)
-  - 9.2.6.4 NeRF / 3DGS-Based SLAM
-
-### 9.3 Depth Estimation
-- 9.3.1 Binocular Stereo Matching:
-  - 9.3.1.1 Local Matching: SAD, NCC, Census Transform
-  - 9.3.1.2 Global Matching: Graph Cuts, Semi-Global Matching (SGM)
-  - 9.3.1.3 Deep-Learning-Based Stereo Matching (PSMNet, RAFT-Stereo, CREStereo)
-- 9.3.2 Monocular Depth Estimation:
-  - 9.3.2.1 Cue-Based (Defocus, Linear Perspective, Relative Size)
-  - 9.3.2.2 Deep-Learning-Based (MiDaS, DPT, ZoeDepth, Depth Anything)
-- 9.3.3 Time-of-Flight (ToF): Modulated Continuous-Wave, Pulsed
-- 9.3.4 Structured Light (Encoded Structured Light, Random Speckle: Kinect v1)
-
-### 9.4 3D Reconstruction
-- 9.4.1 Multi-View Stereo (MVS):
-  - 9.4.1.1 Voxel Coloring & Space Carving
-  - 9.4.1.2 Patch-Based (PatchMatch / PMVS / ACMM)
-  - 9.4.1.3 Depth-Map-Fusion-Based (COLMAP MVS, OpenMVS)
-- 9.4.2 Photometric Stereo
-- 9.4.3 Shape-from-X (Shape from Shading, Defocus, Polarization, Texture)
-- 9.4.4 Deep-Learning-Based MVS (MVSNet, CasMVSNet, PatchMatchNet)
-- 9.4.5 Neural Implicit Reconstruction (NeuS, VolSDF, Neuralangelo, BakedSDF)
-
-### 9.5 Computational Photography
-- 9.5.1 HDR Capture & Fusion
-- 9.5.2 Panorama Stitching (Image Registration, Seam Optimization, Gain Compensation)
-- 9.5.3 Image / Video Stabilization
-- 9.5.4 Portrait Mode (Depth Estimation + Bokeh Rendering)
-- 9.5.5 Super-Resolution (Single-Image / Multi-Frame Fusion)
-- 9.5.6 Low-Light Enhancement (Multi-Frame Denoising & Fusion)
-- 9.5.7 Computational Illumination (Flash/Ambient Decomposition & Re-lighting)
-- 9.5.8 Reflection & Obstruction Removal
-
----
-
-## Chapter 10 · File Formats & Data Exchange
 
 ### 10.1 3D File Formats
 - 10.1.1 OBJ: Meshes, Normals, Texture Coordinates, Material Libraries (MTL)
@@ -1685,7 +1684,55 @@
 
 ---
 
-## Chapter 11 · Application Domains
+
+---
+
+## Chapter 10 · Display, Interaction & Professional Practice
+
+
+### 8.1 Display Technologies
+- 8.1.1 LCD, OLED, Mini-LED, Micro-LED, QLED
+- 8.1.2 Refresh Rate, Response Time, Input Lag
+- 8.1.3 V-Sync, Adaptive Sync (G-Sync / FreeSync), VRR
+- 8.1.4 Multi-Monitor Stitching & CAVE Environments
+- 8.1.5 Color Calibration & Color Management (ICC Profiles / Display Calibration Workflow)
+
+### 8.2 Virtual Reality (VR)
+- 8.2.1 VR Rendering Pipeline (Stereoscopic Rendering: Binocular Disparity, IPD)
+- 8.2.2 Lens Distortion Correction (Inverse Barrel Distortion)
+- 8.2.3 Chromatic Aberration Correction
+- 8.2.4 Asynchronous Time Warp (ATW)
+- 8.2.5 Asynchronous Space Warp (ASW)
+- 8.2.6 Foveated Rendering (Fixed / Dynamic, Eye Tracking)
+- 8.2.7 Latency Sensitivity & Motion-to-Photon Latency Optimization
+- 8.2.8 Single-Pass Stereo / Instanced Stereo
+- 8.2.9 VR Input & Tracking (6DOF Controllers, Hand Tracking)
+
+### 8.3 Augmented Reality (AR) & Mixed Reality (MR)
+- 8.3.1 See-Through AR (Optical / Video See-Through) Rendering
+- 8.3.2 Lighting Consistency (Environmental Light Estimation, Environment Probes / IBL)
+- 8.3.3 Occlusion Consistency (Real-Time Occlusion Estimation & Segmentation)
+- 8.3.4 Plane Detection & Anchoring (ARCore / ARKit / HoloLens Spatial Mapping)
+- 8.3.5 Real-Time Semantic Segmentation & Depth Estimation
+
+### 8.4 3D Displays
+- 8.4.1 Stereoscopic Displays (Active Shutter / Passive Polarized 3D)
+- 8.4.2 Autostereoscopic Displays (Glasses-Free 3D / Lenticular Lens, Parallax Barrier)
+- 8.4.3 Light Field Displays
+- 8.4.4 Volumetric Displays
+- 8.4.5 Holographic Display Concepts
+
+### 8.5 User Interaction & 3D UI
+- 8.5.1 3D Picking: Ray Casting, Pixel-ID-Based Color Encoding
+- 8.5.2 3D Manipulators (Gizmo / Manipulator): Translation, Rotation, Scaling
+- 8.5.3 3D Camera Controls (Orbit, FPS, Trackball, Arcball)
+- 8.5.4 Gesture & Motion Interaction (Leap Motion, Kinect, Vision-Based Hand Tracking)
+- 8.5.5 Haptic Feedback (Haptic Rendering)
+- 8.5.6 Gaze-Based Interaction
+
+---
+
+
 
 ### 11.1 Games & Real-Time Interaction
 - 11.1.1 AAA Game Rendering (High-End Graphics Pipeline)
@@ -1732,7 +1779,7 @@
 
 ---
 
-## Chapter 12 · Frontiers & Interdisciplinary Directions
+
 
 ### 12.1 Neural Rendering & Generation
 - 12.1.1 Neural Scene Representations (NeRF, 3DGS, NGP, Triplane)
