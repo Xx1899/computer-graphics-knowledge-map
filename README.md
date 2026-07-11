@@ -10,173 +10,521 @@
 
 > 💡 **Top Picks:**
 > - [ericjang/awesome-graphics](https://github.com/ericjang/awesome-graphics) ![Stars](https://img.shields.io/github/stars/ericjang/awesome-graphics?style=flat) — Curated list of CG tutorials, books, math & programming resources
-> - [zheng95z/fun-with-computer-graphics](https://github.com/zheng95z/fun-with-computer-graphics) ![Stars](https://img.shields.io/github/stars/zheng95z/fun-with-computer-graphics?style=flat) — Massive collection of CG courses, books, & tutorials (Chinese-friendly)
+> - [zheng95z/fun-with-computer-graphics](https://github.com/zheng95z/fun-with-computer-graphics) ![Stars](https://img.shields.io/github/stars/zheng95z/fun-with-computer-graphics?style=flat) — Massive collection of CG courses, books, & tutorials
 > - [ssloy/tinyrenderer](https://github.com/ssloy/tinyrenderer) ![Stars](https://img.shields.io/github/stars/ssloy/tinyrenderer?style=flat) — Learn CG math by building a software rasterizer from scratch (~500 lines C++)
 > - [Apress/mathematics-for-computer-graphics](https://github.com/Apress/mathematics-for-computer-graphics) — Code companion for *Mathematics for Computer Graphics* (Vince)
+> - [mml-book/mml-book.github.io](https://github.com/mml-book/mml-book.github.io) ![Stars](https://img.shields.io/github/stars/mml-book/mml-book.github.io?style=flat) — *Mathematics for Machine Learning* — comprehensive modern math foundation
 
-### 1.1 Linear Algebra
-- 1.1.1 Scalars, Vectors & Vector Spaces
-- 1.1.2 Vector Operations (Dot Product, Cross Product, Tensor Product, Mixed Product)
-- 1.1.3 Matrices & Matrix Operations (Addition, Multiplication, Transpose, Inverse, Pseudoinverse)
-- 1.1.4 Determinant & Rank
-- 1.1.5 Linear Transformations (Scaling, Rotation, Shear, Reflection, Projection)
-- 1.1.6 Homogeneous Coordinates & Affine Spaces
-- 1.1.7 Eigenvalues & Eigenvectors
-- 1.1.8 Singular Value Decomposition (SVD)
-- 1.1.9 Principal Component Analysis (PCA)
-- 1.1.10 Quaternions (Definition, Operations, Interpolation, Conversion to Rotation Matrices)
-- 1.1.11 Dual Quaternions
-- 1.1.12 Rotation Groups SO(3), SE(3) & Lie Algebras
-- 1.1.13 Fundamentals of Tensor Algebra
-- 1.1.14 Sparse Matrices & Iterative Solvers
+---
 
-> 📚 **Resources:**
-> - [MIT 18.06 Linear Algebra (Gilbert Strang)](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/) — Classic linear algebra course
-> - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Jupyter book + high-performance numerical LA
-> - [kenjihiranabe/The-Art-of-Linear-Algebra](https://github.com/kenjihiranabe/The-Art-of-Linear-Algebra) ![Stars](https://img.shields.io/github/stars/kenjihiranabe/The-Art-of-Linear-Algebra?style=flat) — Visual graphic notes on key LA concepts
-> - [3b1b/manim](https://github.com/3b1b/manim) ![Stars](https://img.shields.io/github/stars/3b1b/manim?style=flat) — Mathematical animation engine for visualizing linear algebra
-> - [mml-book/mml-book.github.io](https://github.com/mml-book/mml-book.github.io) ![Stars](https://img.shields.io/github/stars/mml-book/mml-book.github.io?style=flat) — *Mathematics for Machine Learning* companion (Ch.2-5 cover LA)
+### 1.1 Linear Algebra & Tensor Methods
 
-### 1.2 Calculus
-- 1.2.1 Limits, Continuity & Differentiability
-- 1.2.2 Derivatives & Partial Derivatives (Single-variable & Multivariable)
-- 1.2.3 Gradient, Divergence, Curl
-- 1.2.4 Jacobian Matrix & Hessian Matrix
-- 1.2.5 Chain Rule & Automatic Differentiation (Forward / Reverse Mode)
-- 1.2.6 Taylor Expansion & Function Approximation
-- 1.2.7 Definite & Indefinite Integrals
-- 1.2.8 Multiple Integrals (Double, Triple)
-- 1.2.9 Line Integrals & Surface Integrals
-- 1.2.10 Integral Transforms (Fourier Series, Fourier Transform, Laplace Transform)
-- 1.2.11 Spherical Harmonics
-- 1.2.12 Wavelet Transform Fundamentals
-- 1.2.13 Calculus of Variations & Function Spaces
-- 1.2.14 Differential Forms & Exterior Algebra Fundamentals
+#### 1.1.1 Fundamentals
+- 1.1.1.1 Vector Spaces, Subspaces, Span, Linear Independence, Basis & Dimension
+- 1.1.1.2 Inner Products, Norms (l₁, l₂, lₚ, Frobenius, Nuclear), Metric Spaces
+- 1.1.1.3 Outer Products, Tensor Products, Kronecker Products, Khatri-Rao Products
+- 1.1.1.4 Linear Maps, Range, Nullspace, Fundamental Theorem of Linear Algebra
+- 1.1.1.5 Matrix Decompositions: LU, QR, Cholesky, LDLᵀ, Schur
+- 1.1.1.6 Eigenvalue Decomposition: Spectral Theorem, Rayleigh Quotient, Gershgorin Circles
+- 1.1.1.7 Singular Value Decomposition (SVD): Thin SVD, Truncated SVD, Schmidt Approximation Theorem
+- 1.1.1.8 Condition Number, Ill-posed Problems, Tikhonov Regularization
+- 1.1.1.9 Moore-Penrose Pseudoinverse, Least-Squares & Minimum-Norm Solutions
+
+#### 1.1.2 Transformations & Geometry
+- 1.1.2.1 Linear Transformations in ℝ², ℝ³: Rotation, Scaling, Shear, Reflection, Projection
+- 1.1.2.2 Homogeneous Coordinates, Affine Transformations, Projective Geometry
+- 1.1.2.3 Rigid Body Motion: SO(3), SE(3), Exponential Map, Rodrigues' Rotation Formula
+- 1.1.2.4 Perspective & Orthographic Projection Matrices, NDC Transform
+- 1.1.2.5 Coordinate Frame Change: World → View → Clip → Screen
+- 1.1.2.6 Quaternions (S³): Hamilton Product, Conjugate, Inverse, Slerp, Squad
+- 1.1.2.7 Dual Quaternions (DQ): Rigid Transformation Unification, Screw Theory, DQB (Dual Quaternion Blending)
+- 1.1.2.8 Lie Groups & Lie Algebras: so(3), se(3), Exponential Map, Logarithm, Adjoint Representation
+- 1.1.2.9 Clifford Algebra / Geometric Algebra: Bivectors, Rotors, PGA (Projective Geometric Algebra), CGA (Conformal GA)
+
+#### 1.1.3 Advanced Topics
+- 1.1.3.1 Tensor Decompositions: CP, Tucker, Tensor Train (TT), Tensor Ring — applications in neural scene compression (TensoRF)
+- 1.1.3.2 Randomized Linear Algebra: Randomized SVD, Sketching, Nyström Approximation, Subsampled Randomized Hadamard Transform
+- 1.1.3.3 Low-Rank & Sparse Decompositions: RPCA, Non-negative Matrix Factorization (NMF)
+- 1.1.3.4 Grassmann & Stiefel Manifolds: Subspace Optimization in Computer Vision
+- 1.1.3.5 Reproducing Kernel Hilbert Spaces (RKHS) & the Kernel Trick in Graphics
+- 1.1.3.6 Sparse Representations & Dictionary Learning: K-SVD, OMP, application to BRDF compression
+- 1.1.3.7 Dimensionality Reduction: PCA, t-SNE, UMAP, Isomap — visualization & data preprocessing for 3D data
 
 > 📚 **Resources:**
-> - [3Blue1Brown Essence of Calculus (YouTube)](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr) — Visual, intuitive calculus explanations
-> - [ageron/handson-ml3](https://github.com/ageron/handson-ml3) ![Stars](https://img.shields.io/github/stars/ageron/handson-ml3?style=flat) — Hands-On ML book covering calculus, gradient descent, autodiff
-> - [dair-ai/ML-Course-Notes](https://github.com/dair-ai/ML-Course-Notes) ![Stars](https://img.shields.io/github/stars/dair-ai/ML-Course-Notes?style=flat) — Curated calculus & ML math notes from top courses
-> - [sympy/sympy](https://github.com/sympy/sympy) ![Stars](https://img.shields.io/github/stars/sympy/sympy?style=flat) — Python symbolic math for derivatives, integrals, transforms
+> - [MIT 18.06 (Gilbert Strang)](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/) — Classic LA course; see also [18.065 Matrix Methods](https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/)
+> - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Randomized SVD, iterative Krylov solvers, PCA on large data
+> - [kenjihiranabe/The-Art-of-Linear-Algebra](https://github.com/kenjihiranabe/The-Art-of-Linear-Algebra) ![Stars](https://img.shields.io/github/stars/kenjihiranabe/The-Art-of-Linear-Algebra?style=flat) — Visual graphic notes on all key LA matrix-vector operations
+> - [3b1b/manim](https://github.com/3b1b/manim) ![Stars](https://img.shields.io/github/stars/3b1b/manim?style=flat) — 3Blue1Brown's math animation engine (Essence of Linear Algebra series)
+> - [bivector/Liber-Demysthen](https://github.com/bivector/Liber-Demysthen) — Introduction to Geometric/Clifford Algebra for 3D graphics
+> - [dmodes_public/matrix-cookbook](https://www.math.uwaterloo.ca/~hwolkowi/matrixcookbook.pdf) — The Matrix Cookbook: exhaustive reference for matrix identities
+
+---
+
+### 1.2 Calculus & Analysis
+
+#### 1.2.1 Foundations
+- 1.2.1.1 Limits, Continuity, Uniform Continuity, Lipschitz Continuity
+- 1.2.1.2 Derivatives: Total Derivative, Directional Derivative, Gâteaux & Fréchet Derivatives
+- 1.2.1.3 Gradient, Divergence, Curl, Laplacian — Physical Interpretation & Identities
+- 1.2.1.4 Jacobian Matrix (Dₓf), Hessian Matrix (∇²f), Vector-valued & Matrix-valued Functions
+- 1.2.1.5 Taylor Expansion: First-order, Second-order, Higher-order, Big-O Remainder Forms
+- 1.2.1.6 Mean Value Theorem, Implicit Function Theorem, Inverse Function Theorem
+- 1.2.1.7 Definite/Indefinite Integrals, Multiple Integrals, Change of Variables, Fubini's Theorem
+- 1.2.1.8 Line, Surface & Volume Integrals; Green's, Gauss's (Divergence) & Stokes' Theorems
+
+#### 1.2.2 Automatic Differentiation
+- 1.2.2.1 Forward-Mode AD (Dual Numbers, Tangent Propagation) vs. Reverse-Mode AD (Adjoint/Cotangent)
+- 1.2.2.2 Computational Graph Representation, Wengert Tape, Checkpointing
+- 1.2.2.3 Higher-Order Differentiation & Hessian-Vector Products (HVP/VP)
+- 1.2.2.4 Implicit Differentiation: Adjoint State Method, Deep Equilibrium Models
+- 1.2.2.5 Differentiating Through Physical Simulators (DiffTaichi, Warp, ∇-Sim)
+- 1.2.2.6 Discontinuity Handling: Edge Sampling, Reparameterization Tricks, REINFORCE/Score-Function Estimators
+- 1.2.2.7 GPU AD Frameworks: JAX, PyTorch Autograd, Enzyme (LLVM-level), Slang.D
+
+#### 1.2.3 Transform Methods
+- 1.2.3.1 Fourier Series (Real & Complex Forms), Gibbs Phenomenon, Parseval's Identity
+- 1.2.3.2 Continuous Fourier Transform (FT): Properties, Convolution Theorem, Uncertainty Principle
+- 1.2.3.3 Discrete Fourier Transform (DFT), Fast Fourier Transform (FFT: Cooley-Tukey, Radix-2)
+- 1.2.3.4 Laplace Transform, Z-Transform — Solving Linear ODEs & Difference Equations
+- 1.2.3.5 Spherical Harmonics (SH): Real SH Basis, Orthogonality, Rotation Invariance, Addition Theorem, Product Projection
+- 1.2.3.6 Zonal Harmonics, H-Basis, Anisotropic Spherical Gaussians — Real-time Light Transport
+- 1.2.3.7 Wavelet Transforms: Continuous (CWT), Discrete (DWT), Haar, Daubechies, Lifting Scheme
+
+#### 1.2.4 Functional Analysis & PDE Foundations
+- 1.2.4.1 Function Spaces: Lᵖ, Sobolev Hᵏ, Hölder — crucial for FEM error analysis
+- 1.2.4.2 Calculus of Variations: Euler-Lagrange Equations, Gateaux Derivatives, Weak Formulation
+- 1.2.4.3 Elliptic PDEs: Laplace/Poisson Equation (pressure solve, geometry smoothing, diffusion curves)
+- 1.2.4.4 Parabolic PDEs: Heat Equation (heat kernel signature, spectral geometry)
+- 1.2.4.5 Hyperbolic PDEs: Wave Equation (sound simulation), Transport/Advection Equation
+- 1.2.4.6 Variational Principles in Physics: Principle of Least Action, Hamiltonian Mechanics
+- 1.2.4.7 Sobolev Training & Neural Tangent Kernel (NTK) — implicit regularization in neural fields
+
+> 📚 **Resources:**
+> - [3Blue1Brown Essence of Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr) — Visual, intuitive calculus foundations
+> - [google/jax](https://github.com/google/jax) ![Stars](https://img.shields.io/github/stars/google/jax?style=flat) — Composable transforms of Python+NumPy: autodiff, JIT, vectorization
+> - [EnzymeAD/Enzyme](https://github.com/EnzymeAD/Enzyme) ![Stars](https://img.shields.io/github/stars/EnzymeAD/Enzyme?style=flat) — High-performance AD at the LLVM level for C++, Rust, Julia, Fortran
+> - [sympy/sympy](https://github.com/sympy/sympy) ![Stars](https://img.shields.io/github/stars/sympy/sympy?style=flat) — Python symbolic calculus: derivatives, integrals, limits, transforms
+> - [greenw07/spherical-harmonics](https://github.com/greenw07/spherical-harmonics) — Practical SH implementation and visualization
+
+---
 
 ### 1.3 Differential Geometry
-- 1.3.1 Curve Theory: Arc-length Parameterization, Frenet Frame (Tangent, Normal, Binormal)
-- 1.3.2 Curve Theory: Curvature & Torsion
-- 1.3.3 Surface Theory: First Fundamental Form (Metric Tensor)
-- 1.3.4 Surface Theory: Second Fundamental Form (Shape Operator)
-- 1.3.5 Surface Theory: Normal Curvature, Principal Curvature, Gaussian Curvature, Mean Curvature
-- 1.3.6 Geodesics & Geodesic Distance
-- 1.3.7 Isometric Transformations, Conformal Mapping
-- 1.3.8 Laplace-Beltrami Operator on Surfaces
-- 1.3.9 Manifold Fundamentals
-- 1.3.10 Riemannian Metrics & Riemannian Geometry Fundamentals
-- 1.3.11 Exterior Differentiation & Stokes' Theorem
-- 1.3.12 Discrete Differential Geometry (DDG)
+
+#### 1.3.1 Classical Curve & Surface Theory
+- 1.3.1.1 Curves: Arc-length Parameterization, Frenet-Serret Frame (T, N, B), Curvature κ, Torsion τ
+- 1.3.1.2 Surfaces: Parameterized Patches, Tangent Space TₚM, First Fundamental Form I (Metric Tensor g)
+- 1.3.1.3 Second Fundamental Form II: Shape Operator S = −dN, Weingarten Map
+- 1.3.1.4 Normal Curvature κₙ, Principal Curvatures κ₁, κ₂, Gaussian Curvature K = κ₁κ₂, Mean Curvature H = (κ₁+κ₂)/2
+- 1.3.1.5 Gauss's Theorema Egregium: Gaussian Curvature is Intrinsic
+- 1.3.1.6 Gauss-Bonnet Theorem: ∫K dA + ∮κ_g ds = 2πχ(M) — Topology-Geometry Bridge
+- 1.3.1.7 Minimal Surfaces (H=0): Mean Curvature Flow, Soap Film Analogies
+- 1.3.1.8 Conformal Maps & Isothermal Coordinates, Uniformization Theorem
+
+#### 1.3.2 Riemannian Geometry
+- 1.3.2.1 Smooth Manifolds, Charts, Atlases, Transition Maps
+- 1.3.2.2 Tangent Bundles, Vector Fields, Lie Brackets, Lie Derivatives
+- 1.3.2.3 Riemannian Metrics, Geodesics, Geodesic Equation (∇ᵧ̇ᵧ̇=0), Exponential Map
+- 1.3.2.4 Covariant Derivatives, Levi-Civita Connection, Christoffel Symbols Γⁱⱼₖ
+- 1.3.2.5 Riemann Curvature Tensor Rⁱⱼₖₗ, Ricci Curvature, Scalar Curvature
+- 1.3.2.6 Parallel Transport, Holonomy Groups
+- 1.3.2.7 Laplace-Beltrami Operator Δ = div ∘ grad = d\*d: Spectrum, Eigenfunctions
+- 1.3.2.8 Hodge Theory: k-forms, Hodge Star ⋆, Exterior Derivative d, Codifferential δ = ⋆d⋆, Hodge Laplacian Δ = dδ+δd
+
+#### 1.3.3 Discrete Differential Geometry (DDG)
+- 1.3.3.1 Discrete Curves: Discrete Frenet Frame, Discrete Curvature & Torsion
+- 1.3.3.2 Discrete Surfaces: Triangle Meshes as Simplicial Complexes
+- 1.3.3.3 Discrete Metric: Edge Lengths lᵢⱼ; Discrete Gaussian Curvature: Angle Deficit
+- 1.3.3.4 Discrete Mean Curvature: Cotangent Formula, Normal Defined via Area Gradient
+- 1.3.3.5 Discrete Laplace-Beltrami: Cotan Laplacian, Mass Matrix, FEM View
+- 1.3.3.6 Discrete Conformal Maps: Circle Patterns, CETM (Conformal Equivalence of Triangle Meshes)
+- 1.3.3.7 Discrete Exterior Calculus (DEC): Discrete k-forms, Discrete Hodge Star, Discrete Exterior Derivative
+- 1.3.3.8 Discrete Shells: Discrete Bending Energy, Isometric Bending Model
+- 1.3.3.9 Spin Transformations & Quaternionic Dirac Operators on Meshes
+
+#### 1.3.4 Optimal Transport Geometry
+- 1.3.4.1 Monge Problem vs. Kantorovich Relaxation: Primal & Dual Formulations
+- 1.3.4.2 Wasserstein Distance (Earth Mover's Distance): W₁, W₂ Metrics, Properties
+- 1.3.4.3 Sinkhorn Algorithm: Entropy-Regularized OT, Scalable GPU Implementation
+- 1.3.4.4 Semidiscrete Optimal Transport: Power Diagrams, Laguerre Cells
+- 1.3.4.5 Applications: Blue Noise Sampling, Shape Interpolation, BRDF Transfer, Fluid Advection Correction, GAN Training
+
+#### 1.3.5 Information Geometry (Selected)
+- 1.3.5.1 Statistical Manifold: Fisher Information Metric, Exponential & Mixture Families
+- 1.3.5.2 Natural Gradient Descent (NGD): Fisher-Rao Gradient, KL-Divergence Geometry
+- 1.3.5.3 Applications: Bayesian Inference for BRDF, Policy Optimization in Graphics RL
 
 > 📚 **Resources:**
-> - [geometry-central/geometry-central](https://github.com/nmwsharp/geometry-central) ![Stars](https://img.shields.io/github/stars/nmwsharp/geometry-central?style=flat) — Modern C++ library for surface mesh geometry & DDG
-> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Swiss-army-knife geometry processing library
-> - [Discrete Differential Geometry (Keenan Crane, CMU)](https://www.cs.cmu.edu/~kmcrane/Projects/DDG/) — Freely available notes, slides & videos
-> - [alecjacobson/geometry-processing](https://github.com/alecjacobson/geometry-processing) — Course assignments & code (Gaussian curvature, geodesics, Laplace-Beltrami)
+> - [geometry-central/geometry-central](https://github.com/nmwsharp/geometry-central) ![Stars](https://img.shields.io/github/stars/nmwsharp/geometry-central?style=flat) — Modern C++ library for surface mesh geometry with DEC operators
+> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Swiss-army-knife geometry processing library (cotan Laplacian, curvature, geodesics)
+> - [CMU DDG Course (Keenan Crane)](https://www.cs.cmu.edu/~kmcrane/Projects/DDG/) — Free notes, slides & video lectures on discrete differential geometry
+> - [alecjacobson/geometry-processing](https://github.com/alecjacobson/geometry-processing) — Grad-level course with MATLAB/C++: curvature, parameterization, deformation
+> - [Peyré/Cuturi — Computational Optimal Transport (Book + Code)](https://github.com/Peyre/bookOT) — The standard reference for OT methods with Python notebooks
 
-### 1.4 Computational Geometry
-- 1.4.1 Convex Hull: Graham Scan, QuickHull
-- 1.4.2 Delaunay Triangulation
-- 1.4.3 Constrained Delaunay Triangulation (CDT)
-- 1.4.4 Voronoi Diagram
-- 1.4.5 Polygon Triangulation (Ear Clipping, Trapezoidal Decomposition)
-- 1.4.6 Boolean Operations (Polygon Clipping, Polyhedron Boolean)
-- 1.4.7 Bounding Volume Hierarchies (AABB, OBB, Bounding Sphere, k-DOP)
-- 1.4.8 Spatial Partitioning: BVH, k-d Tree, Octree, BSP Tree
-- 1.4.9 Nearest Neighbor Search & Range Queries
-- 1.4.10 Point-to-Geometry Distance Computation
-- 1.4.11 Geometric Intersection: Line Segments, Planes, Triangles, Polyhedra
-- 1.4.12 Scanline Algorithms & Plane Sweep
-- 1.4.13 Robust Geometric Computation (Floating-Point Error Handling, Exact Arithmetic)
+---
 
-> 📚 **Resources:**
-> - [CGAL/cgal](https://github.com/CGAL/cgal) ![Stars](https://img.shields.io/github/stars/CGAL/cgal?style=flat) — C++ Computational Geometry Algorithms Library (the gold standard)
-> - [Habrador/Computational-geometry](https://github.com/Habrador/Computational-geometry) ![Stars](https://img.shields.io/github/stars/Habrador/Computational-geometry?style=flat) — Unity/C# implementations of 2D/3D CG algorithms
-> - [Turfjs/turf](https://github.com/Turfjs/turf) ![Stars](https://img.shields.io/github/stars/Turfjs/turf?style=flat) — JavaScript spatial analysis & computational geometry
-> - [locationtech/jts](https://github.com/locationtech/jts) ![Stars](https://img.shields.io/github/stars/locationtech/jts?style=flat) — Java Topology Suite, core algorithms in Java
+### 1.4 Computational Geometry & Spatial Data Structures
 
-### 1.5 Probability & Statistics
-- 1.5.1 Probability Spaces & Random Variables
-- 1.5.2 Common Distributions (Uniform, Normal, Poisson, Exponential, Beta, Gamma)
-- 1.5.3 Conditional Probability & Bayes' Theorem
-- 1.5.4 Expectation, Variance, Covariance
-- 1.5.5 Markov Chains & Markov Random Fields (MRF)
-- 1.5.6 Gaussian Processes
-- 1.5.7 Monte Carlo Methods (Importance Sampling, Stratified Sampling, Latin Hypercube)
-- 1.5.8 Markov Chain Monte Carlo (MCMC) & Metropolis-Hastings
-- 1.5.9 Quasi-Monte Carlo Methods (QMC)
-- 1.5.10 Multiple Importance Sampling (MIS)
-- 1.5.11 Resampled Importance Sampling (RIS / ReSTIR)
-- 1.5.12 Information Theory Fundamentals: Entropy, KL Divergence, Mutual Information
+#### 1.4.1 Core Algorithms
+- 1.4.1.1 Convex Hull in 2D: Graham Scan (O(n log n)), Jarvis March (O(nh)); 3D: QuickHull, Chan's Algorithm
+- 1.4.1.2 Delaunay Triangulation: Empty Circumcircle Criterion, Lawson Flip, Bowyer-Watson Incremental (O(n²) worst, O(n log n) average)
+- 1.4.1.3 Constrained DT (CDT): Steiner Points, Conforming DT, Quality Meshing (Ruppert's Algorithm)
+- 1.4.1.4 Voronoi Diagram: Relation to Delaunay Duality, Fortune's Sweep-Line (O(n log n)), Power Diagram, Centroidal Voronoi Tessellation (CVT)
+- 1.4.1.5 Polygon Triangulation: Ear Clipping (O(n²)), Monotone Decomposition (O(n log n)), Seidel's Randomized (O(n log\* n))
+- 1.4.1.6 Boolean Operations on Polygons: Weiler-Atherton, Greiner-Hormann, Martinez-Rueda; Polyhedra: BSP-based, Exact Arithmetic
+- 1.4.1.7 Arrangements: Sweep Line, Zone Theorem, CGAL Arrangement_2 Traits
+- 1.4.1.8 Medial Axis, Straight Skeleton, Offset Curves — 3D printing, font rendering
 
-> 📚 **Resources:**
-> - [CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers](https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers) ![Stars](https://img.shields.io/github/stars/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers?style=flat) — Full book + code: Bayesian stats, MCMC from scratch
-> - [chi-feng/mcmc-demo](https://github.com/chi-feng/mcmc-demo) ![Stars](https://img.shields.io/github/stars/chi-feng/mcmc-demo?style=flat) — Interactive browser-based MCMC visualization (MH, HMC, NUTS)
-> - [probml/pml-book](https://github.com/probml/pml-book) ![Stars](https://img.shields.io/github/stars/probml/pml-book?style=flat) — *Probabilistic Machine Learning* by Kevin Murphy (full book + code)
-> - [graykode/distribution-is-all-you-need](https://github.com/graykode/distribution-is-all-you-need) ![Stars](https://img.shields.io/github/stars/graykode/distribution-is-all-you-need?style=flat) — Visual cheatsheet of common probability distributions
+#### 1.4.2 Intersection & Proximity
+- 1.4.2.1 Segment-Segment Intersection: Orientation Test, Bentley-Ottmann Sweep (O((n+k) log n))
+- 1.4.2.2 Ray-Triangle Intersection: Möller-Trumbore, Watertight Variants, Back-face Culling
+- 1.4.2.3 Ray-AABB: Slab Method (Kay-Kajiya); Ray-OBB, Ray-Sphere, Ray-Cylinder
+- 1.4.2.4 Ray-Polygon: Winding Number vs. Even-Odd, PNPoly, Crossings Test
+- 1.4.2.5 Bounding Volume Hierarchies (BVH): Surface Area Heuristic (SAH), Binned SAH, HLBVH, PLOC, Refit
+- 1.4.2.6 Spatial Hashing, Grids, Nested Grids: Infinite Grid, Hashed Grid, Multi-level Grid
+- 1.4.2.7 k-d Tree, BSP Tree: Construction Strategies, SAH, Traversal Optimization
+- 1.4.2.8 Octree, Quadtree: Morton Codes (Z-order), Linear/Breadth-first Layout
+- 1.4.2.9 Nearest Neighbor Search: Exact kNN, ε-Approximate, FLANN, HNSW, LSH
 
-### 1.6 Numerical Analysis
-- 1.6.1 Floating-Point Representation & IEEE 754 Standard
-- 1.6.2 Numerical Error Analysis (Rounding, Truncation, Ill-conditioning)
-- 1.6.3 Solving Linear Systems (Gaussian Elimination, LU/Cholesky Decomposition)
-- 1.6.4 Iterative Methods (Jacobi, Gauss-Seidel, Conjugate Gradient, Multigrid)
-- 1.6.5 Interpolation (Linear, Polynomial, Spline, Radial Basis Functions RBF)
-- 1.6.6 Function Approximation (Least Squares, Moving Least Squares MLS)
-- 1.6.7 Numerical Integration (Newton-Cotes, Gauss Quadrature, Adaptive Integration)
-- 1.6.8 Numerical Solution of ODEs (Euler, Runge-Kutta, Verlet, Implicit Integration)
-- 1.6.9 Numerical Solution of PDEs (Finite Difference FDM, Finite Element FEM, Finite Volume FVM)
-- 1.6.10 Boundary Element Method (BEM) & Meshless Methods
-- 1.6.11 Numerical Solution of Eigenvalue Problems
-- 1.6.12 Preconditioners for Sparse Linear Systems
-- 1.6.13 Optimization Fundamentals (Gradient Descent, Newton's Method, Quasi-Newton, Conjugate Gradient)
+#### 1.4.3 GPU-Accelerated & Learned Data Structures
+- 1.4.3.1 GPU-parallel BVH Construction: Linear BVH (LBVH), TRBVH, PLOC on GPU
+- 1.4.3.2 Two-Level Acceleration Structures (TLAS + BLAS) — DXR/Vulkan RT model
+- 1.4.3.3 Compressed Wide BVH (8-wide, 16-wide), Quantized Nodes, Traversal Intrinsics
+- 1.4.3.4 GPU Hash Tables & Lock-Free Data Structures for Spatial Queries
+- 1.4.3.5 Learned Spatial Indices: Neural Bounding Volume, Learned Proxies (SDF, Occupancy)
+- 1.4.3.6 Radix Sort, Bitonic Sort for GPU Morton Code Generation
+
+#### 1.4.4 Robustness & Exact Arithmetic
+- 1.4.4.1 Floating-Point Pitfalls: Cancellation, Degeneracy, Snap-rounding, ε-tweaking
+- 1.4.4.2 Exact Predicates: Shewchuk's Adaptive Precision, Filtered Predicates, Interval Arithmetic
+- 1.4.4.3 Exact Geometric Computation (EGC): CGAL Kernel Philosophy, GMP/MPFR
+- 1.4.4.4 Robust Line Segment Intersection via Rational Arithmetic
+- 1.4.4.5 Symbolic Perturbation (SoS — Simulation of Simplicity) for Degeneracy Resolution
 
 > 📚 **Resources:**
-> - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Iterative solvers, SVD, QR, LU decomposition in Python
-> - [SciML/DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl) ![Stars](https://img.shields.io/github/stars/SciML/DifferentialEquations.jl?style=flat) — Julia suite for numerical ODE/PDE solvers
-> - [scientific-python/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — Python's standard library for numerical integration, optimization, interpolation
-> - [JuliaMath](https://github.com/JuliaMath) — Julia packages for numerical analysis (FFT, linear solve, special functions)
+> - [CGAL/cgal](https://github.com/CGAL/cgal) ![Stars](https://img.shields.io/github/stars/CGAL/cgal?style=flat) — Gold-standard C++ library: triangulation, BVH, arrangements, exact arithmetic kernels
+> - [Habrador/Computational-geometry](https://github.com/Habrador/Computational-geometry) ![Stars](https://img.shields.io/github/stars/Habrador/Computational-geometry?style=flat) — Unity/C# implementations of 2D/3D CG algorithms with interactive demos
+> - [Turfjs/turf](https://github.com/Turfjs/turf) ![Stars](https://img.shields.io/github/stars/Turfjs/turf?style=flat) — Advanced geospatial & computational geometry in JavaScript
+> - [locationtech/jts](https://github.com/locationtech/jts) ![Stars](https://img.shields.io/github/stars/locationtech/jts?style=flat) — Java Topology Suite, robust 2D geometry engine (basis for GEOS C++)
+> - [embree/embree](https://github.com/embree/embree) ![Stars](https://img.shields.io/github/stars/embree/embree?style=flat) — Intel's high-performance ray tracing kernels: world-class BVH construction & traversal
 
-### 1.7 Signal & Image Processing
-- 1.7.1 Continuous / Discrete Signals & Systems
-- 1.7.2 Sampling Theorem (Nyquist-Shannon)
-- 1.7.3 Aliasing & Anti-aliasing
-- 1.7.4 Discrete Fourier Transform (DFT) & Fast Fourier Transform (FFT)
-- 1.7.5 Filtering (Low-pass, High-pass, Band-pass, Band-stop)
-- 1.7.6 Convolution & Correlation
-- 1.7.7 Reconstruction Kernels (Box, Tent, Lanczos, Mitchell-Netravali, Gaussian)
-- 1.7.8 Multi-resolution Analysis (Image Pyramids, Wavelet Decomposition, Mipmap)
-- 1.7.9 Image Gradients (Sobel, Prewitt, Scharr)
-- 1.7.10 Edge Detection (Canny, Marr-Hildreth)
-- 1.7.11 Histogram Processing & Equalization
-- 1.7.12 Morphological Operations (Dilation, Erosion, Opening/Closing)
+---
+
+### 1.5 Probability, Statistics & Stochastic Processes
+
+#### 1.5.1 Foundations
+- 1.5.1.1 Probability Space (Ω, ℱ, ℙ), Random Variables, Distribution Functions (CDF, PDF, PMF)
+- 1.5.1.2 Expectation, Variance, Covariance, Correlation, Higher-Order Moments, Cumulants
+- 1.5.1.3 Conditional Probability, Bayes' Theorem, Law of Total Probability
+- 1.5.1.4 Common Continuous Distributions: Uniform, Gaussian (Univariate/Multivariate), Exponential, Gamma, Beta, Dirichlet, Wishart
+- 1.5.1.5 Common Discrete Distributions: Bernoulli, Binomial, Poisson, Multinomial, Categorical
+- 1.5.1.6 Exponential Family: Natural Parameter, Sufficient Statistic, Log-Partition, Conjugate Priors
+- 1.5.1.7 Information Theory: Entropy (Shannon, Differential, Relative/KL), Mutual Information, Cross-Entropy, Rate-Distortion Theory
+
+#### 1.5.2 Monte Carlo Methods for Graphics
+- 1.5.2.1 Classical Monte Carlo: Law of Large Numbers, Central Limit Theorem, Error ∝ 1/√N
+- 1.5.2.2 Variance Reduction: Importance Sampling (IS), Control Variates, Antithetic Variates, Rao-Blackwellization
+- 1.5.2.3 Stratified Sampling, Latin Hypercube, jittered sampling, N-Rooks sampling
+- 1.5.2.4 Quasi-Monte Carlo (QMC): Low-Discrepancy Sequences (Halton, Sobol', Faure), Discrepancy, Koksma-Hlawka Inequality
+- 1.5.2.5 Randomized QMC (RQMC): Owen's Scrambling, Cranley-Patterson Rotation, Practical Blue-noise QMC
+- 1.5.2.6 Multiple Importance Sampling (MIS): Balance Heuristic, Power Heuristic (β=2), One-Sample MIS
+- 1.5.2.7 Resampled Importance Sampling (RIS / ReSTIR): Reservoir Sampling, Spatiotemporal Reuse, Visibility Reuse
+- 1.5.2.8 Adaptive Sampling: Variance-based, Contrast-based, Stein's Unbiased Risk Estimate (SURE)
+
+#### 1.5.3 Markov Chain Monte Carlo (MCMC)
+- 1.5.3.1 Markov Chain Theory: Transition Kernel, Stationary Distribution, Ergodicity, Detailed Balance, Mixing Time
+- 1.5.3.2 Metropolis-Hastings (MH): Proposal Distributions, Acceptance Ratio, Random Walk MH
+- 1.5.3.3 Gibbs Sampling, Slice Sampling, Reversible Jump MCMC
+- 1.5.3.4 Hamiltonian Monte Carlo (HMC): Leapfrog Integrator, No-U-Turn Sampler (NUTS)
+- 1.5.3.5 MCMC in Rendering: Metropolis Light Transport (MLT), Primary Sample Space MLT (PSSMLT), Manifold Exploration (MNEE)
+- 1.5.3.6 Langevin Monte Carlo (SGLD, SGHMC) & Connections to DDPM/Score-based Diffusion
+
+#### 1.5.4 Stochastic Differential Equations & Diffusion Models
+- 1.5.4.1 Brownian Motion (Wiener Process), Itô Calculus, Itô's Lemma
+- 1.5.4.2 Forward SDE (Noising Process): Ornstein-Uhlenbeck, Variance-Preserving (VP SDE), Variance-Exploding (VE SDE)
+- 1.5.4.3 Reverse-Time SDE: Anderson's Theorem, Score Function ∇ₓ log p_t(x)
+- 1.5.4.4 Denoising Score Matching (DSM), Sliced Score Matching, Implicit Score Matching
+- 1.5.4.5 Denoising Diffusion Probabilistic Models (DDPM): Forward/Reverse Markov Chain, ϵ-Prediction vs. x₀-Prediction
+- 1.5.4.6 Flow Matching / Rectified Flow / Stochastic Interpolants — Continuous Normalizing Flows
+- 1.5.4.7 Applications in Graphics: 3D Generation (DreamFusion/ProlificDreamer), Texture Synthesis, Inverse Rendering Priors, Motion Diffusion
+
+#### 1.5.5 Bayesian Inference & Gaussian Processes
+- 1.5.5.1 Bayesian Framework: Prior, Likelihood, Posterior, Marginal Likelihood (Evidence)
+- 1.5.5.2 Conjugate Priors, Beta-Binomial, Gaussian-Gaussian, Normal-Inverse-Wishart
+- 1.5.5.3 Variational Inference (VI): Evidence Lower Bound (ELBO), Mean-Field VI, Reparameterization Trick
+- 1.5.5.4 Gaussian Processes (GP): Kernel/Covariance Functions (RBF, Matérn, Periodic, Spectral Mixture), GP Regression
+- 1.5.5.5 Sparse GPs: Inducing Points, FITC, SVGP — scalable to large 3D datasets
+- 1.5.5.6 Bayesian Optimization: Acquisition Functions (EI, UCB, Thompson Sampling) — material design, rendering parameter tuning
+
+#### 1.5.6 Random Fields & Spatial Statistics
+- 1.5.6.1 Markov Random Fields (MRF), Gibbs Distribution, Hammersley-Clifford Theorem
+- 1.5.6.2 Conditional Random Fields (CRF), Graph Cuts (α-Expansion, αβ-Swap) — segmentation, stereo, matting
+- 1.5.6.3 Gaussian Random Fields (GRF), Matérn Fields, Stochastic PDE Approach (Lindgren 2011) — procedural terrain, textures
+- 1.5.6.4 Noise Models: White Noise, Blue Noise (Poisson Disk Sampling, Fattal's Method, Bridson's Algorithm), Pink Noise (1/f)
+- 1.5.6.5 Procedural Noise Spectrum Analysis: Power Spectral Density, fBm, Domain Warping
 
 > 📚 **Resources:**
-> - [scikit-image/scikit-image](https://github.com/scikit-image/scikit-image) ![Stars](https://img.shields.io/github/stars/scikit-image/scikit-image?style=flat) — Python image processing algorithms & tutorials
-> - [opencv/opencv](https://github.com/opencv/opencv) ![Stars](https://img.shields.io/github/stars/opencv/opencv?style=flat) — Industry-standard computer vision library (filtering, FFT, edge detection)
-> - [mikound/awesome-signal-processing](https://github.com/mikound/awesome-signal-processing) — Curated list of signal processing resources
-> - [AllenDowney/ThinkDSP](https://github.com/AllenDowney/ThinkDSP) ![Stars](https://img.shields.io/github/stars/AllenDowney/ThinkDSP?style=flat) — *Think DSP* book + code: signals, FFT, convolution, filters
+> - [probml/pml-book](https://github.com/probml/pml-book) ![Stars](https://img.shields.io/github/stars/probml/pml-book?style=flat) — *Probabilistic Machine Learning* by Kevin Murphy: exhaustive probability + ML reference
+> - [CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers](https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers) ![Stars](https://img.shields.io/github/stars/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers?style=flat) — Full book + PyMC code: MCMC, Bayesian stats from scratch
+> - [chi-feng/mcmc-demo](https://github.com/chi-feng/mcmc-demo) ![Stars](https://img.shields.io/github/stars/chi-feng/mcmc-demo?style=flat) — Interactive browser-based MCMC visualization (MH, HMC, NUTS, SVGD)
+> - [yang-song/score_sde](https://github.com/yang-song/score_sde) ![Stars](https://img.shields.io/github/stars/yang-song/score_sde?style=flat) — Score-based generative modeling through SDEs (theoretical foundation)
+> - [huggingface/diffusers](https://github.com/huggingface/diffusers) ![Stars](https://img.shields.io/github/stars/huggingface/diffusers?style=flat) — State-of-the-art diffusion models (DDPM, Stable Diffusion, flow matching) in PyTorch
+> - [graykode/distribution-is-all-you-need](https://github.com/graykode/distribution-is-all-you-need) ![Stars](https://img.shields.io/github/stars/graykode/distribution-is-all-you-need?style=flat) — Visual cheatsheet of all common probability distributions
+
+---
+
+### 1.6 Numerical Analysis & Scientific Computing
+
+#### 1.6.1 Floating Point & Error Analysis
+- 1.6.1.1 IEEE 754: Binary32 (float), Binary64 (double), Subnormals, Inf, NaN, Rounding Modes
+- 1.6.1.2 FP16 (half), BF16 (bfloat16), TensorFloat-32 (TF32) for GPU ML workloads
+- 1.6.1.3 Error Types: Absolute/Relative Error, Forward/Backward Error, Condition Number, Stability
+- 1.6.1.4 Catastrophic Cancellation, Compensated Summation (Kahan), Pairwise Summation
+- 1.6.1.5 Interval Arithmetic, Affine Arithmetic — robust geometric predicates
+
+#### 1.6.2 Linear Systems
+- 1.6.2.1 Direct Methods: Gaussian Elimination, LU, Cholesky (SPD), LDLᵀ, QR (Householder, Givens)
+- 1.6.2.2 Iterative Methods: Jacobi, Gauss-Seidel, SOR, Symmetric SOR (SSOR)
+- 1.6.2.3 Krylov Subspace Methods: Conjugate Gradient (CG), MINRES, GMRES, BiCGSTAB, LSQR
+- 1.6.2.4 Multigrid Methods (GMG, AMG): V-cycle, W-cycle, Full Multigrid (FMG) — optimal O(n) for Poisson
+- 1.6.2.5 Domain Decomposition: Schwarz Alternating, Schur Complement, FETI
+- 1.6.2.6 Preconditioners: Jacobi, ILU(k), AMG, Polynomial, Sparse Approximate Inverse (SPAI)
+- 1.6.2.7 Randomized Linear Solvers: Randomized Kaczmarz, Sketch-and-Precondition, Blendenpik
+
+#### 1.6.3 Eigenvalue & SVD Computation
+- 1.6.3.1 Power Iteration, Inverse Iteration, Rayleigh Quotient Iteration (cubic convergence)
+- 1.6.3.2 QR Algorithm, Francis Shift, Implicit Q Theorem
+- 1.6.3.3 Lanczos & Arnoldi for Large Sparse Matrices
+- 1.6.3.4 Randomized SVD / Nyström: Prototype for Sketching, Power Iteration Enhancement
+- 1.6.3.5 GPU-Parallel Eigenvalue Solvers: Divide-and-Conquer, MRRR, Jacobi-Davidson
+
+#### 1.6.4 Function Approximation & Interpolation
+- 1.6.4.1 Polynomial Interpolation: Lagrange, Newton Divided Differences, Runge Phenomenon, Chebyshev Nodes
+- 1.6.4.2 Spline Interpolation: Cubic (Natural, Clamped, Not-a-knot), Hermite (Catmull-Rom, Kochanek-Bartels/TCB), B-Spline
+- 1.6.4.3 Radial Basis Functions (RBF): Gaussian, Multiquadric, Thin-Plate Spline, Wendland's Compactly Supported
+- 1.6.4.4 Moving Least Squares (MLS): Point Set Surfaces, Implicit MLS Surfaces
+- 1.6.4.5 Bézier Curves (de Casteljau) & B-Splines as Numerical Approximation Tools
+- 1.6.4.6 Least-Squares Approximation: Normal Equations (AᵀA), QR Approach, Tikhonov/ℓ₂ Regularization
+- 1.6.4.7 Sparse Approximation: Basis Pursuit (ℓ₁), OMP, LASSO — compressed BRDF/light field
+
+#### 1.6.5 Numerical Integration
+- 1.6.5.1 Newton-Cotes: Trapezoid, Simpson's 1/3, Simpson's 3/8, Boole's Rule
+- 1.6.5.2 Gauss-Legendre Quadrature: Nodes, Weights, n-point Rules ⇒ polynomials up to degree 2n−1 exact
+- 1.6.5.3 Adaptive Quadrature: Error Estimation, Richardson Extrapolation, Romberg Integration
+- 1.6.5.4 Sparse Grids (Smolyak) for High-Dimensional Integration — overcome curse of dimensionality
+- 1.6.5.5 Cubature for Triangles & Tetrahedra: Dunavant Rules, Grundmann-Möller, Stroud Conical
+- 1.6.5.6 Monte Carlo Integration (see §1.5.2) — unique advantage in high dimensions
+
+#### 1.6.6 ODE & PDE Numerical Methods
+- 1.6.6.1 ODE Time Steppers: Explicit Euler, RK4, Dormand-Prince (DOPRI5/DP5), Adams-Bashforth-Moulton (Predictor-Corrector)
+- 1.6.6.2 Symplectic Integrators: Verlet, Leapfrog, Implicit Midpoint — for Hamiltonian systems (physics simulation)
+- 1.6.6.3 Implicit Methods: Backward Euler, BDF, Radau IIA — stiff ODEs (cloth, FEM with stiff materials)
+- 1.6.6.4 Finite Difference Method (FDM): Forward/Backward/Central Difference, Stencils, Stability (CFL, von Neumann), Consistency, Convergence
+- 1.6.6.5 Finite Element Method (FEM): Weak Form, Galerkin, Test/Trial Spaces, Assembly, Quadrature, Nédélec/RT Elements
+- 1.6.6.6 Finite Volume Method (FVM): Flux Balance, Conservative Form, Godunov, MUSCL — fluid simulation
+- 1.6.6.7 Spectral Methods: Fourier Spectral, Chebyshev, Spectral Element Method — high-accuracy PDEs
+- 1.6.6.8 Particle Methods: SPH, MPM, FLIP, PIC, APIC — mesh-free PDE simulation
+- 1.6.6.9 Neural Operators (DeepONet, FNO, PINNs) — learned PDE surrogates for real-time simulation
+
+#### 1.6.7 Optimization in Numerical Context
+- 1.6.7.1 Line Search Methods: Backtracking (Armijo), Wolfe Conditions, Strong Wolfe, Goldstein
+- 1.6.7.2 Trust Region Methods: Dogleg, Subproblem Solution, Conjugate Gradient-Steihaug
+- 1.6.7.3 Newton-Raphson for Nonlinear Systems: Jacobian Assembly, Globalization Strategies
+- 1.6.7.4 Fixed-Point Iteration, Banach Fixed-Point Theorem, Contraction Mappings
+- 1.6.7.5 Continuation (Homotopy) Methods — robust solving for difficult nonlinear problems
+
+> 📚 **Resources:**
+> - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Randomized SVD, Krylov solvers, PCA; Jupyter + PyTorch
+> - [SciML/DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl) ![Stars](https://img.shields.io/github/stars/SciML/DifferentialEquations.jl?style=flat) — Comprehensive Julia suite: adaptive ODE/PDE solvers, DDEs, SDEs, neural ODEs
+> - [scipy/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — `scipy.linalg`, `scipy.sparse.linalg`, `scipy.integrate`, `scipy.interpolate`
+> - [JuliaMath](https://github.com/JuliaMath) — Julia ecosystem: FFTW.jl, SpecialFunctions.jl, LinearSolve.jl, Krylov.jl
+> - [certik/fortran-utils](https://github.com/certik/fortran-utils) — LAPACK & modern Fortran numerical libraries reference
+> - [lululxvi/deepxde](https://github.com/lululxvi/deepxde) ![Stars](https://img.shields.io/github/stars/lululxvi/deepxde?style=flat) — Deep learning library for solving forward/inverse PDEs (PINNs, DeepONet)
+
+---
+
+### 1.7 Signal Processing & Harmonic Analysis
+
+#### 1.7.1 Classical Signal Processing
+- 1.7.1.1 Continuous-Time Signals: Time & Frequency Domain, Fourier Transform Properties
+- 1.7.1.2 Linear Time-Invariant (LTI) Systems: Impulse Response, Convolution, Transfer Function, Stability
+- 1.7.1.3 Sampling & Reconstruction:
+  - 1.7.1.3.1 Nyquist-Shannon Sampling Theorem, Bandlimited Signals, Aliasing (Time & Frequency View)
+  - 1.7.1.3.2 Ideal Reconstruction (Sinc Interpolation), Practical Non-ideal Reconstruction
+  - 1.7.1.3.3 Oversampling, Undersampling, Supersampling, Multisampling
+  - 1.7.1.3.4 Generalized Sampling Theory: Non-uniform, Compressive Sensing, NUS (Non-uniform Sampling)
+- 1.7.1.4 Filter Design: FIR vs. IIR, Window Method (Hamming, Blackman, Kaiser), Remez Exchange
+- 1.7.1.5 Z-Transform, Poles & Zeros, Stability Analysis
+
+#### 1.7.2 Discrete Signal Processing
+- 1.7.2.1 Discrete-Time Fourier Transform (DTFT), Discrete Fourier Transform (DFT), Circular Convolution
+- 1.7.2.2 Fast Fourier Transform: Cooley-Tukey (Radix-2 DIT/DIF), Mixed Radix, Split-Radix, Real-valued FFT, Rader's, Bluestein's (Chirp Z)
+- 1.7.2.3 GPU FFT: cuFFT, rocFFT, VkFFT — batched FFT, convolution via FFT
+- 1.7.2.4 Discrete Cosine Transform (DCT), Discrete Sine Transform (DST) — image/video compression (JPEG, H.264/H.265)
+- 1.7.2.5 Convolution Theorem: Fast Convolution, Deconvolution, Wiener Filter — image deblurring
+
+#### 1.7.3 Filter Banks & Multi-Resolution Analysis
+- 1.7.3.1 Filter Banks: Analysis/Synthesis, Perfect Reconstruction, Quadrature Mirror Filter (QMF), Conjugate Quadrature Filter (CQF)
+- 1.7.3.2 Wavelet Transform:
+  - 1.7.3.2.1 Continuous Wavelet Transform (CWT): Scale-Translation Plane, Wavelet Admissibility Condition
+  - 1.7.3.2.2 Discrete Wavelet Transform (DWT): Mallat Algorithm (à Trous), Subband Coding, Daubechies Wavelets
+  - 1.7.3.2.3 Lifting Scheme: Predict & Update Steps, Integer-to-Integer Wavelets — lossless compression
+  - 1.7.3.2.4 Second-Generation Wavelets on Irregular Meshes (Spherical Wavelets, Mesh Wavelets)
+- 1.7.3.3 Laplacian & Gaussian Pyramids: Burt-Adelson (1983), Redundancy, Collapse/Expand Operations
+- 1.7.3.4 Mipmapping & Anisotropic Filtering: Box, Kaiser, Lanczos Kernels, Elliptical Weighted Average (EWA)
+- 1.7.3.5 Steerable Pyramids, Oriented Filters (Gabor, Complex Wavelets), Curvelets, Contourlets
+
+#### 1.7.4 Image Processing
+- 1.7.4.1 Image Gradients: Sobel, Prewitt, Scharr, Roberts Cross; Higher-order (Laplacian of Gaussian)
+- 1.7.4.2 Edge Detection: Canny (Gradient + NMS + Hysteresis), Marr-Hildreth (LoG), Holistically-Nested Edge Detection (HED)
+- 1.7.4.3 Morphological Operators: Dilation, Erosion, Opening, Closing, Top-hat, Watershed, Distance Transform
+- 1.7.4.4 Bilateral Filter, Guided Filter, Joint Bilateral Filter — edge-preserving smoothing (denoising, tone mapping, detail enhancement)
+- 1.7.4.5 Non-Local Means (NLM), BM3D — image denoising benchmarks
+- 1.7.4.6 Total Variation (TV) Denoising: ROF Model, Primal-Dual Algorithm (Chambolle-Pock) — mesh smoothing, inverse rendering
+
+#### 1.7.5 Harmonic Analysis on Manifolds & Graphs
+- 1.7.5.1 Spectral Graph Theory: Graph Laplacian, Eigenvalues, Spectral Gap, Cheeger Inequality
+- 1.7.5.2 Graph Fourier Transform (GFT), Spectral Filtering on Graphs — mesh signal processing
+- 1.7.5.3 Spherical Harmonics (SH): Rotation via Wigner D-Matrices, Fast SH Rotation, Product Projection — real-time IBL
+- 1.7.5.4 Zonal Harmonics, H-Basis, Anisotropic Spherical Gaussians (ASG), Bingham Distributions — compact lighting models
+- 1.7.5.5 Wavelet & Pyramid on Meshes: Spherical Wavelets, Geometry Images (Gu 2002), Mesh Compression
+
+#### 1.7.6 Neural Signal Representations
+- 1.7.6.1 Fourier Feature Networks / Positional Encoding (NeRF, Tancik 2020): Spectral Bias of MLPs
+- 1.7.6.2 Multi-Resolution Hash Encoding (Instant NGP): Learned Feature Grids, Coarse-to-Fine
+- 1.7.6.3 SIREN (Sitzmann 2020): Periodic Activation Functions, Implicit Neural Representations
+- 1.7.6.4 Wavelet-based Neural Representations: WIRE, WaveNeRF, Multi-level Wavelet Decomposition
+- 1.7.6.5 Gaussian & Triplane Representations: 3DGS, TensoRF — signal processing view of 3D representations
+- 1.7.6.6 Neural Fields as Continuous Signal Representations: Occupancy, SDF, Radiance, BRDF fields
+
+> 📚 **Resources:**
+> - [scikit-image/scikit-image](https://github.com/scikit-image/scikit-image) ![Stars](https://img.shields.io/github/stars/scikit-image/scikit-image?style=flat) — Comprehensive Python image processing library with tutorials
+> - [opencv/opencv](https://github.com/opencv/opencv) ![Stars](https://img.shields.io/github/stars/opencv/opencv?style=flat) — Industry-standard CV library: filtering, FFT, morphological ops, feature detection
+> - [AllenDowney/ThinkDSP](https://github.com/AllenDowney/ThinkDSP) ![Stars](https://img.shields.io/github/stars/AllenDowney/ThinkDSP?style=flat) — *Think DSP*: interactive book on signals, FFT, convolution, filters in Python
+> - [mikound/awesome-signal-processing](https://github.com/mikound/awesome-signal-processing) — Curated list of SP books, courses, papers
+> - [NVlabs/instant-ngp](https://github.com/NVlabs/instant-ngp) ![Stars](https://img.shields.io/github/stars/NVlabs/instant-ngp?style=flat) — Multi-resolution hash encoding: how to represent signals via learned features
+> - [vincentsitzmann/siren](https://github.com/vincentsitzmann/siren) ![Stars](https://img.shields.io/github/stars/vincentsitzmann/siren?style=flat) — Implicit neural representations with periodic activations
+
+---
 
 ### 1.8 Optimization Theory
-- 1.8.1 Unconstrained Optimization (Gradient Descent, Newton's Method, L-BFGS)
-- 1.8.2 Constrained Optimization (Lagrange Multipliers, KKT Conditions)
-- 1.8.3 Linear Programming & Quadratic Programming (QP)
-- 1.8.4 Convex Optimization Fundamentals
-- 1.8.5 Global Optimization (Simulated Annealing, Genetic Algorithms, Particle Swarm)
-- 1.8.6 Alternating Direction Method of Multipliers (ADMM)
-- 1.8.7 Sparse Optimization & Compressed Sensing
-- 1.8.8 Gradient Descent Variants (SGD, Adam, RMSprop)
+
+#### 1.8.1 First-Order Methods
+- 1.8.1.1 Gradient Descent (GD): Fixed/Adaptive Step, Convergence Rates (Convex: O(1/k), Strongly-Convex: Linear)
+- 1.8.1.2 Stochastic Gradient Descent (SGD): Mini-batching, Variance Reduction, Learning Rate Schedules
+- 1.8.1.3 Momentum Methods: Polyak Heavy-Ball, Nesterov Accelerated Gradient (NAG) — optimal O(1/k²)
+- 1.8.1.4 Adaptive Methods: AdaGrad, RMSProp, Adam, AdamW (decoupled weight decay), LAMB
+- 1.8.1.5 Subgradient Methods (non-smooth convex), Proximal Gradient (ISTA, FISTA), Forward-Backward Splitting
+- 1.8.1.6 Coordinate Descent: Randomized, Cyclic, Block — massive-scale problems
+- 1.8.1.7 Variance-Reduced Methods: SVRG, SAGA, SARAH, SPIDER — bridge stochastic & deterministic rates
+
+#### 1.8.2 Second-Order & Quasi-Newton Methods
+- 1.8.2.1 Newton's Method: Local Quadratic Convergence, Hessian Modification for Non-convexity
+- 1.8.2.2 Quasi-Newton: BFGS, DFP, SR1 — Secant Equation, Rank-1/2 Updates, Sherman-Morrison
+- 1.8.2.3 Limited-Memory BFGS (L-BFGS): Double-loop Recursion, Practical Dominance in Large-Scale Smooth Optimization
+- 1.8.2.4 Gauss-Newton & Levenberg-Marquardt — nonlinear least squares (bundle adjustment, IK solving)
+- 1.8.2.5 Natural Gradient Descent: Fisher Information Matrix, Approximate Natural Gradient (K-FAC, TENGraD)
+- 1.8.2.6 Hessian-Free (Truncated Newton) Methods: Conjugate Gradient for Newton Step, Martens (2010)
+
+#### 1.8.3 Constrained & Structured Optimization
+- 1.8.3.1 Convex Optimization: Convex Sets, Convex Functions, KKT Optimality Conditions, Slater's Condition, Duality Gap
+- 1.8.3.2 Linear Programming (LP): Simplex, Interior-Point (Primal-Dual, Mehrotra Predictor-Corrector)
+- 1.8.3.3 Quadratic Programming (QP), Second-Order Cone Programming (SOCP), Semidefinite Programming (SDP)
+- 1.8.3.4 Augmented Lagrangian Methods (ALM), Alternating Direction Method of Multipliers (ADMM) — distributed & large-scale
+- 1.8.3.5 Projected Gradient, Frank-Wolfe (Conditional Gradient), Active Set Methods
+- 1.8.3.6 Interior Point Methods: Barrier Functions, Central Path, Primal-Dual Framework
+
+#### 1.8.4 Riemannian Optimization
+- 1.8.4.1 Optimization on Matrix Manifolds: Stiefel, Grassmann, Oblique, Fixed-Rank Manifolds
+- 1.8.4.2 Riemannian Gradient & Riemannian Hessian: Retraction & Vector Transport
+- 1.8.4.3 Riemannian SGD, Riemannian Trust-Region, Riemannian L-BFGS
+- 1.8.4.4 Applications: Rotation Averaging (SO(3)), Camera Pose Optimization (SE(3)), Subspace Tracking, Dictionary Learning
+
+#### 1.8.5 Bilevel & Implicit Optimization
+- 1.8.5.1 Bilevel Optimization: Outer & Inner-Level Problems, Hypergradient via Implicit Function Theorem
+- 1.8.5.2 Implicit Differentiation: Adjoint Sensitivity, Neumann Series Approximation, Conjugate Gradient Approach
+- 1.8.5.3 Applications: Meta-Learning (MAML), Hyperparameter Optimization, Inverse Graphics (differentiable renderer as inner loop)
+- 1.8.5.4 Deep Equilibrium Models (DEQ): Root-finding at Inference, Implicit Layers
+
+#### 1.8.6 Global, Discrete & Derivative-Free Optimization
+- 1.8.6.1 Evolutionary Algorithms: Genetic Algorithm (GA), Differential Evolution (DE), CMA-ES — material fitting, procedural generation
+- 1.8.6.2 Simulated Annealing, Basin Hopping, Particle Swarm Optimization (PSO)
+- 1.8.6.3 Bayesian Optimization (BO): Gaussian Process Surrogate, Expected Improvement (EI), Knowledge Gradient
+- 1.8.6.4 Combinatorial / Discrete Optimization: Branch-and-Bound, Dynamic Programming, Integer Programming, Graph Cuts (α-Expansion)
+- 1.8.6.5 Derivative-Free Methods: Nelder-Mead, Powell's Method, COBYLA, BOBYQA
+
+#### 1.8.7 Optimization in Graphics-Specific Contexts
+- 1.8.7.1 Projective Dynamics (Bouaziz 2014): Gauss-Seidel on Element-wise Quadratic Energies — real-time FEM
+- 1.8.7.2 Position-Based Dynamics (PBD, XPBD): Nonlinear Gauss-Seidel, Constraint Projection — game physics
+- 1.8.7.3 ADMM for Inverse Problems in Graphics: Deconvolution, Inpainting, Compressive Light Transport
+- 1.8.7.4 Primal-Dual Methods: Chambolle-Pock for Total Variation — denoising, mesh fairing
+- 1.8.7.5 Differentiable Physics Optimization: DiffTaichi, ∇-Sim, Warp — gradient-based design & control
+- 1.8.7.6 Neural Style Transfer as Optimization: Gatys (2015), Feature Reconstruction, Texture Synthesis
 
 > 📚 **Resources:**
-> - [epfml/OptML_course](https://github.com/epfml/OptML_course) ![Stars](https://img.shields.io/github/stars/epfml/OptML_course?style=flat) — EPFL Optimization for ML (convex, SGD, ADMM, Quasi-Newton)
-> - [cvxpy/cvxpy](https://github.com/cvxpy/cvxpy) ![Stars](https://img.shields.io/github/stars/cvxpy/cvxpy?style=flat) — Python-embedded convex optimization modeling language
-> - [scipy/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — `scipy.optimize`: gradient descent, Newton, L-BFGS, global optimization
-> - [jakevdp/PythonDataScienceHandbook](https://github.com/jakevdp/PythonDataScienceHandbook) ![Stars](https://img.shields.io/github/stars/jakevdp/PythonDataScienceHandbook?style=flat) — Clear gradient descent & optimization tutorials
+> - [epfml/OptML_course](https://github.com/epfml/OptML_course) ![Stars](https://img.shields.io/github/stars/epfml/OptML_course?style=flat) — EPFL Optimization for ML: convex, SGD, ADMM, Quasi-Newton, distributed
+> - [cvxpy/cvxpy](https://github.com/cvxpy/cvxpy) ![Stars](https://img.shields.io/github/stars/cvxpy/cvxpy?style=flat) — Python-embedded convex optimization: LP, QP, SOCP, SDP with multiple backends
+> - [scipy/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — `scipy.optimize`: L-BFGS, SLSQP, trust-region, global (differential evolution, basinhopping)
 > - [cvxgrp/cvx_short_course](https://github.com/cvxgrp/cvx_short_course) — Stanford convex optimization short course (Boyd & Vandenberghe)
+> - [jaxopt/jaxopt](https://github.com/google/jaxopt) ![Stars](https://img.shields.io/github/stars/google/jaxopt?style=flat) — Differentiable optimization in JAX: implicit differentiation, bilevel, quadratic programming
+> - [pymanopt/pymanopt](https://github.com/pymanopt/pymanopt) ![Stars](https://img.shields.io/github/stars/pymanopt/pymanopt?style=flat) — Riemannian optimization on manifolds (Stiefel, Grassmann, SO(3), SE(3))
+
+---
+
+### 1.9 [NEW] Topology for Graphics
+
+#### 1.9.1 Algebraic Topology Basics
+- 1.9.1.1 Simplicial Complexes, Cell Complexes, CW-Complexes — meshes as simplicial complexes
+- 1.9.1.2 Homology Groups Hₖ: k-chains, Boundaries, Cycles, Betti Numbers βₖ — holes, tunnels, voids
+- 1.9.1.3 Cohomology: Hᵏ, Cup Product, Applications in Vector Field Design & Parameterization
+- 1.9.1.4 Fundamental Group π₁, Covering Spaces — global parameterization, texture synthesis
+- 1.9.1.5 Morse Theory: Critical Points, Morse-Smale Complex, Reeb Graphs — shape analysis, feature detection
+
+#### 1.9.2 Persistent Homology & Topological Data Analysis (TDA)
+- 1.9.2.1 Filtration: Vietoris-Rips, Čech, Alpha Complex / Delaunay; Sublevel/Steplevel Sets
+- 1.9.2.2 Persistence Diagrams, Barcodes, Bottleneck & Wasserstein Distances — topological feature lifetime
+- 1.9.2.3 Persistence Landscapes, Persistence Images — vectorization for ML pipelines
+- 1.9.2.4 Mapper Algorithm, Reeb Graphs, Merge Trees — shape skeletonization
+- 1.9.2.5 Applications: 3D Shape Classification/Retrieval, Fluid Flow Analysis, Molecular Shape Analysis
+
+#### 1.9.3 Discrete Morse Theory
+- 1.9.3.1 Discrete Gradient Vector Fields, Discrete Morse Functions, Critical Simplex Enumeration
+- 1.9.3.2 Morse-Smale Complexes on Meshes: Quadrangulation, Vector Field Topology
+- 1.9.3.3 Simplification via Cancellation: Persistence-Guided Simplification
+
+> 📚 **Resources:**
+> - [scikit-tda/scikit-tda](https://github.com/scikit-tda/scikit-tda) — Python ecosystem for topological data analysis
+> - [giotto-ai/giotto-tda](https://github.com/giotto-ai/giotto-tda) ![Stars](https://img.shields.io/github/stars/giotto-ai/giotto-tda?style=flat) — High-performance TDA with persistent homology, Mapper
+> - [Ripser/ripser](https://github.com/Ripser/ripser) ![Stars](https://img.shields.io/github/stars/Ripser/ripser?style=flat) — Ultrafast computation of Vietoris-Rips persistence barcodes in C++
+> - [Applied Topology in Graphics (Notes & Papers)](https://graphics.stanford.edu/courses/cs468-12-spring/) — Stanford CS468: Topology for graphics
+
+---
+
+### 1.10 [NEW] Geometric & Clifford Algebra
+
+#### 1.10.1 Foundations of Geometric Algebra
+- 1.10.1.1 Exterior (Grassmann) Algebra: k-vectors, Wedge Product, Grade, k-blades, Volume Element
+- 1.10.1.2 Clifford Algebra Cl(p,q,r): Geometric Product a·b + a∧b, Signature, Basis Blades
+- 1.10.1.3 Multivectors: Scalar + Vector + Bivector + Trivector + ... — Unified Grade Representation
+- 1.10.1.4 Rotors: Sandwich Product RxR̃, Double-Sided Transformation, Relation to Quaternions
+- 1.10.1.5 Inversions, Reflections, Translations → Unified via Versors (Cartan-Dieudonné Theorem)
+
+#### 1.10.2 Projective Geometric Algebra (PGA) — Cl(3,0,1)
+- 1.10.2.1 Points, Lines, Planes as k-vectors; Join ∧ and Meet ∨ operations
+- 1.10.2.2 Euclidean Motions via Motors: Unified Rotation+Translation, No Matrices Needed
+- 1.10.2.3 Applications: Camera Transform Pipeline, Ray Casting, Collision Detection — all in a single algebra
+
+#### 1.10.3 Conformal Geometric Algebra (CGA) — Cl(4,1)
+- 1.10.3.1 Spheres, Circles, Point Pairs, Tangents as Basis Elements
+- 1.10.3.2 Conformal Versors: All Conformal Transformations (Möbius, Spherical Inversion) via a Single Operator
+- 1.10.3.3 Applications: Inverse Kinematics, Collision Detection, Skeletal Animation, Sphere Packing
+
+> 📚 **Resources:**
+> - [bivector/Liber-Demysthen](https://github.com/bivector/Liber-Demysthen) — Interactive intro to GA for CG with code examples
+> - [enkimute/ganja.js](https://github.com/enkimute/ganja.js) ![Stars](https://img.shields.io/github/stars/enkimute/ganja.js?style=flat) — Geometric Algebra for JavaScript with visualizations
+> - [projectivegeometricalgebra.org](https://projectivegeometricalgebra.org/) — PGA reference with cheat sheets and code
+> - [bivector.net](https://bivector.net) — Community hub: tutorials, tools, papers for GA/CGA/PGA
+
+---
 
 ## Chapter 2 · Modeling
 
