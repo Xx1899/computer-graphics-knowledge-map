@@ -470,7 +470,7 @@
 
 ---
 
-### 1.9 [NEW] Topology for Graphics
+### 1.9 Topology for Graphics
 
 #### 1.9.1 Algebraic Topology Basics
 - 1.9.1.1 Simplicial Complexes, Cell Complexes, CW-Complexes — meshes as simplicial complexes
@@ -499,7 +499,7 @@
 
 ---
 
-### 1.10 [NEW] Geometric & Clifford Algebra
+### 1.10 Geometric & Clifford Algebra
 
 #### 1.10.1 Foundations of Geometric Algebra
 - 1.10.1.1 Exterior (Grassmann) Algebra: k-vectors, Wedge Product, Grade, k-blades, Volume Element
