@@ -114,11 +114,19 @@
 - 1.1.9.4 Steerable Filters & Gauge-Equivariant CNNs on Meshes (GEM-CNN)
   - ▸ *CG use:* MeshCNN on curved surfaces; gauge-equivariant 3D shape learning
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [MIT 18.06 & 18.065 (Gilbert Strang)](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/) — Classic LA + Matrix Methods for Data, Signal & ML
 > - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Randomized SVD, Krylov solvers, PCA in Jupyter+PyTorch
 > - [kenjihiranabe/The-Art-of-Linear-Algebra](https://github.com/kenjihiranabe/The-Art-of-Linear-Algebra) ![Stars](https://img.shields.io/github/stars/kenjihiranabe/The-Art-of-Linear-Algebra?style=flat) — Visual graphic notes of all key matrix-vector operations
+> - [QBobWatson/gt-linalg](https://github.com/QBobWatson/gt-linalg) ![Stars](https://img.shields.io/github/stars/QBobWatson/gt-linalg?style=flat) — Interactive linear algebra textbook with Jupyter notebooks
 > - [TensoRF Project Page](https://apchenstu.github.io/TensoRF/) — Tensor decomposition for radiance fields
+>
+> 📖 **Textbooks:**
+> - *Linear Algebra and Its Applications* — Gilbert Strang (Intuition-first classic)
+> - *Matrix Computations* — Golub & Van Loan (The definitive numerical LA reference)
+> - *Numerical Linear Algebra* — Trefethen & Bau (Concise, elegant, computation-driven)
+> - *3D Math Primer for Graphics and Game Development* — Dunn & Parberry (Practical CG-focused)
+> - *Mathematics for 3D Game Programming and Computer Graphics* — Eric Lengyel (Rigorous CG math)
 
 ---
 
@@ -192,11 +200,18 @@
 - 1.2.4.6 Neural Tangent Kernel (NTK): Infinite-Width Limit; Gradient Descent in Function Space
   - ▸ *CG use:* Understanding NeRF/SIREN training dynamics; implicit regularization in coordinate MLPs
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [google/jax](https://github.com/google/jax) ![Stars](https://img.shields.io/github/stars/google/jax?style=flat) — Composable autodiff+JIT; backbone of modern diff-rendering
 > - [EnzymeAD/Enzyme](https://github.com/EnzymeAD/Enzyme) ![Stars](https://img.shields.io/github/stars/EnzymeAD/Enzyme?style=flat) — LLVM-level AD through GPU kernels and simulation codes
 > - [greenw07/spherical-harmonics](https://github.com/greenw07/spherical-harmonics) — Practical SH: rotation, projection, product
+> - [lab-cosmo/sphericart](https://github.com/lab-cosmo/sphericart) ![Stars](https://img.shields.io/github/stars/lab-cosmo/sphericart?style=flat) — High-performance spherical harmonics in C++/Python/CUDA
 > - [3Blue1Brown (YouTube)](https://www.youtube.com/@3blue1brown) — Visual intuition for calculus, Fourier, DEs
+>
+> 📖 **Textbooks:**
+> - *Calculus* — James Stewart (Standard comprehensive calculus reference)
+> - *Advanced Calculus: A Geometric View* — James Callahan (Geometric intuition for multivariable)
+> - *Inside Interesting Integrals* — Paul Nahin (Contour integration, special functions)
+> - *A Student's Guide to Fourier Transforms* — J.F. James (Accessible FT introduction)
 
 ---
 
@@ -256,11 +271,17 @@
 - 1.3.5.3 Semidiscrete OT: Power/Laguerre Diagrams; Newton on Weights; Sliced Wasserstein
   - ▸ *CG use:* Blue noise (de Goes 2012); geometry compression quantization; NPR stippling
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [geometry-central/geometry-central](https://github.com/nmwsharp/geometry-central) ![Stars](https://img.shields.io/github/stars/nmwsharp/geometry-central?style=flat) — DEC, geodesics, vector fields, parameterization in C++
-> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Cotan Laplacian, curvature, geodesics
-> - [CMU DDG (Keenan Crane)](https://www.cs.cmu.edu/~kmcrane/Projects/DDG/) — Free notes, slides, videos — gold standard
-> - [Peyré/Cuturi — Computational OT](https://github.com/Peyre/bookOT) — Standard OT reference + Python notebooks
+> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Cotan Laplacian, curvature, geodesics, parameterization
+> - [CMU DDG (Keenan Crane)](https://www.cs.cmu.edu/~kmcrane/Projects/DDG/) — Free notes, slides, videos — the gold standard
+> - [Peyré/Cuturi — Computational OT](https://github.com/Peyre/bookOT) — Standard OT reference with Python notebooks
+> - [Directional Field Design (SIGGRAPH Course)](https://github.com/avaxman/DirectionalFieldDesign) — N-RoSy fields, parameterization, quad meshing
+>
+> 📖 **Textbooks:**
+> - *Differential Geometry of Curves and Surfaces* — Manfredo do Carmo (The classic DG text)
+> - *Discrete Differential Geometry: An Applied Introduction* — Keenan Crane et al. (Free online)
+> - *A Sampler of Useful Computational Tools for Applied Geometry* — CGAL project (Practical geometry tools)
 
 ---
 
@@ -298,10 +319,16 @@
 - 1.4.4.2 Exact Geometric Computation (EGC): GMP/MPFR; CGAL Cartesian+Exact Kernel; GPU Radix Sort, ANN (HNSW, LSH)
   - ▸ *CG use:* CGAL gold standard; real-time BVH on GPU; HNSW photon lookup
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [CGAL/cgal](https://github.com/CGAL/cgal) ![Stars](https://img.shields.io/github/stars/CGAL/cgal?style=flat) — Robust Delaunay, arrangements, Boolean, exact arithmetic
 > - [embree/embree](https://github.com/embree/embree) ![Stars](https://img.shields.io/github/stars/embree/embree?style=flat) — Intel world-class BVH traversal kernels
 > - [nmslib/hnswlib](https://github.com/nmslib/hnswlib) ![Stars](https://img.shields.io/github/stars/nmslib/hnswlib?style=flat) — Fast HNSW approximate NN
+> - [Habrador/Computational-geometry](https://github.com/Habrador/Computational-geometry) ![Stars](https://img.shields.io/github/stars/Habrador/Computational-geometry?style=flat) — Unity/C# 2D/3D algorithms with interactive demos
+>
+> 📖 **Textbooks:**
+> - *Computational Geometry: Algorithms and Applications* — de Berg, Cheong, van Kreveld, Overmars (The golden textbook)
+> - *Geometric Tools for Computer Graphics* — Schneider & Eberly (Practical algorithms for CG practitioners)
+> - *Real-Time Collision Detection* — Christer Ericson (The bible for game physics intersection)
 
 ---
 
@@ -355,11 +382,19 @@
 - 1.5.5.2 MRF, CRF, Graph Cuts (α-Expansion, αβ-Swap); Noise Spectrum Engineering (White, Blue, Pink, Brown)
   - ▸ *CG use:* Texture synthesis; segmentation; stereo; Perlin/Simplex noise; blue noise dithering; fBm terrain
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [probml/pml-book](https://github.com/probml/pml-book) ![Stars](https://img.shields.io/github/stars/probml/pml-book?style=flat) — Exhaustive probability+ML (Murphy)
 > - [CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers](https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers) ![Stars](https://img.shields.io/github/stars/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers?style=flat) — MCMC+Bayesian from scratch+PyMC
 > - [yang-song/score_sde](https://github.com/yang-song/score_sde) ![Stars](https://img.shields.io/github/stars/yang-song/score_sde?style=flat) — Score-based SDEs: theoretical foundation
 > - [huggingface/diffusers](https://github.com/huggingface/diffusers) ![Stars](https://img.shields.io/github/stars/huggingface/diffusers?style=flat) — SOTA diffusion (DDPM, SD, Flow Matching)
+> - [chi-feng/mcmc-demo](https://github.com/chi-feng/mcmc-demo) ![Stars](https://img.shields.io/github/stars/chi-feng/mcmc-demo?style=flat) — Interactive browser MCMC visualization (MH, HMC, NUTS)
+> - [ctgk/PRML](https://github.com/ctgk/PRML) ![Stars](https://img.shields.io/github/stars/ctgk/PRML?style=flat) — Bishop PRML Python implementations (all chapters, Jupyter)
+>
+> 📖 **Textbooks:**
+> - *Probabilistic Machine Learning* — Kevin Murphy (Exhaustive, graphics-relevant probability+ML)
+> - *Pattern Recognition and Machine Learning* — Christopher Bishop (Classic Bayesian ML text)
+> - *Monte Carlo Statistical Methods* — Robert & Casella (Theoretical MC foundations)
+> - *Physically Based Rendering* — Pharr, Jakob, Humphreys (Free at pbr-book.org, MC rendering bible)
 
 ---
 
@@ -389,10 +424,15 @@
 - 1.6.3.3 Model Selection: AIC, BIC, MDL; Cross-Validation; Information Bottleneck min I(X;Z)−βI(Z;Y)
   - ▸ *CG use:* BRDF lobe count; 3DGS Gaussian count; compact latent scene representations
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [Cover & Thomas — Elements of Information Theory](http://staff.ustc.edu.cn/~cgong821/Wiley.Interscience.Elements.of.Information.Theory.Jul.2006.eBook-DDU.pdf) — Canonical textbook
 > - [google/draco](https://github.com/google/draco) ![Stars](https://img.shields.io/github/stars/google/draco?style=flat) — Production 3D mesh compression with entropy coding
 > - [Understanding Deep Learning (Prince)](https://udlbook.github.io/udlbook/) — Modern text covering learning theory + info theory for DL
+> - [YannDubs/InfoNCE](https://github.com/YannDubs/InfoNCE) — Practical InfoNCE & contrastive loss implementations
+>
+> 📖 **Textbooks:**
+> - *Elements of Information Theory* — Cover & Thomas (The canonical info theory text, freely available online)
+> - *Information Theory, Inference, and Learning Algorithms* — David MacKay (Free online, beautifully written)
 
 ---
 
@@ -426,10 +466,17 @@
 - 1.7.4.3 Neural Operators: DeepONet, FNO (Spectral Conv), PINNs (Collocation Residual); Randomized SVD, Sketch-and-Solve
   - ▸ *CG use:* Real-time fluid surrogate; learned cloth; fast PCA on massive meshes
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [SciML/DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl) ![Stars](https://img.shields.io/github/stars/SciML/DifferentialEquations.jl?style=flat) — Julia ODE/PDE/SDE/DDE solvers
 > - [scipy/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — linalg, sparse.linalg, integrate, interpolate
 > - [taichi-dev/taichi](https://github.com/taichi-dev/taichi) ![Stars](https://img.shields.io/github/stars/taichi-dev/taichi?style=flat) — Differentiable physics (MPM, FEM, fluid)
+> - [lululxvi/deepxde](https://github.com/lululxvi/deepxde) ![Stars](https://img.shields.io/github/stars/lululxvi/deepxde?style=flat) — PINNs, DeepONet, FNO for forward/inverse PDEs
+> - [YLiu-5/numerical_linear_algebra_notebooks](https://github.com/YLiu-5/numerical_linear_algebra_notebooks) — Trefethen & Bau textbook companion (Jupyter)
+>
+> 📖 **Textbooks:**
+> - *Numerical Linear Algebra* — Trefethen & Bau (Concise, elegant, the standard)
+> - *Scientific Computing: An Introductory Survey* — Michael Heath (Well-rounded intro)
+> - *Numerical Recipes 3rd Edition* — Press et al. (Practical, code-heavy reference, free online)
 
 ---
 
@@ -473,10 +520,17 @@
 - 1.8.4.3 Neural Fields as Universal Signal Learners: Occupancy, SDF, Radiance, BRDF Fields
   - ▸ *CG use:* Unified view: all neural rendering=learning a continuous signal from sparse pixel/ray samples
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [scikit-image/scikit-image](https://github.com/scikit-image/scikit-image) ![Stars](https://img.shields.io/github/stars/scikit-image/scikit-image?style=flat) — Python image processing with tutorials
 > - [NVlabs/instant-ngp](https://github.com/NVlabs/instant-ngp) ![Stars](https://img.shields.io/github/stars/NVlabs/instant-ngp?style=flat) — Hash encoding: learned features as signals
 > - [vincentsitzmann/siren](https://github.com/vincentsitzmann/siren) ![Stars](https://img.shields.io/github/stars/vincentsitzmann/siren?style=flat) — Periodic activations for implicit neural reps
+> - [opencv/opencv](https://github.com/opencv/opencv) ![Stars](https://img.shields.io/github/stars/opencv/opencv?style=flat) — Industry-standard CV: filtering, FFT, edge detection
+> - [AllenDowney/ThinkDSP](https://github.com/AllenDowney/ThinkDSP) ![Stars](https://img.shields.io/github/stars/AllenDowney/ThinkDSP?style=flat) — Interactive book: signals, FFT, convolution, filters in Python
+>
+> 📖 **Textbooks:**
+> - *Discrete-Time Signal Processing* — Oppenheim & Schafer (The DSP bible)
+> - *A Wavelet Tour of Signal Processing* — Stéphane Mallat (Definitive wavelet reference)
+> - *Digital Image Processing* — Gonzalez & Woods (Comprehensive image processing)
 
 ---
 
@@ -518,11 +572,18 @@
 - 1.9.5.3 Chambolle-Pock Primal-Dual for TV→Mesh Smoothing, Denoising, Inverse Rendering
 - 1.9.5.4 Differentiable Physics (∇-Sim, DiffTaichi, Warp)→Gradient-Based Design & Control
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [epfml/OptML_course](https://github.com/epfml/OptML_course) ![Stars](https://img.shields.io/github/stars/epfml/OptML_course?style=flat) — EPFL: convex, SGD, ADMM, Quasi-Newton
 > - [cvxpy/cvxpy](https://github.com/cvxpy/cvxpy) ![Stars](https://img.shields.io/github/stars/cvxpy/cvxpy?style=flat) — Python convex: LP, QP, SOCP, SDP
 > - [jaxopt/jaxopt](https://github.com/google/jaxopt) ![Stars](https://img.shields.io/github/stars/google/jaxopt?style=flat) — Differentiable optimization: implicit diff, bilevel, QP
 > - [pymanopt/pymanopt](https://github.com/pymanopt/pymanopt) ![Stars](https://img.shields.io/github/stars/pymanopt/pymanopt?style=flat) — Riemannian optimization
+> - [scipy/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — scipy.optimize: L-BFGS, SLSQP, trust-region, global methods
+> - [cvxgrp/cvx_short_course](https://github.com/cvxgrp/cvx_short_course) — Stanford convex optimization short course (Boyd & Vandenberghe)
+>
+> 📖 **Textbooks:**
+> - *Convex Optimization* — Boyd & Vandenberghe (The bible, freely available online)
+> - *Numerical Optimization* — Nocedal & Wright (Comprehensive algorithms reference)
+> - *Optimization for Machine Learning* — Sra, Nowozin, Wright (Advanced, ML-focused)
 
 ---
 
@@ -542,10 +603,15 @@
 - 1.10.2.3 Discrete Morse: Gradient Fields, Cancelation; Morse-Smale Meshes→Quadrangulation
   - ▸ *CG use:* Vector field topology-driven quad meshing; flow-guided remeshing
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [Ripser/ripser](https://github.com/Ripser/ripser) ![Stars](https://img.shields.io/github/stars/Ripser/ripser?style=flat) — Ultrafast Vietoris-Rips persistence in C++
 > - [giotto-ai/giotto-tda](https://github.com/giotto-ai/giotto-tda) ![Stars](https://img.shields.io/github/stars/giotto-ai/giotto-tda?style=flat) — High-performance TDA with Mapper
 > - [Stanford CS468: Topology for Graphics](https://graphics.stanford.edu/courses/cs468-12-spring/) — Course notes & papers
+> - [scikit-tda/scikit-tda](https://github.com/scikit-tda/scikit-tda) — Python ecosystem for topological data analysis
+>
+> 📖 **Textbooks:**
+> - *Computational Topology: An Introduction* — Edelsbrunner & Harer (The standard reference)
+> - *Algebraic Topology* — Allen Hatcher (Free online, classic algebraic topology text)
 
 ---
 
@@ -565,10 +631,15 @@
 - 1.11.2.2 CGA: Spheres/Circles/Point Pairs/Tangents as Basis; Conformal Versors (Möbius, Spherical Inversion)
   - ▸ *CG use:* Sphere packing; IK (joint limits as spheres); Möbius texture distortion; lens correction
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [bivector/Liber-Demysthen](https://github.com/bivector/Liber-Demysthen) — Interactive intro to GA for CG
 > - [enkimute/ganja.js](https://github.com/enkimute/ganja.js) ![Stars](https://img.shields.io/github/stars/enkimute/ganja.js?style=flat) — GA for JavaScript with visualizations
 > - [projectivegeometricalgebra.org](https://projectivegeometricalgebra.org/) — PGA reference + cheat sheets
+> - [bivector.net](https://bivector.net) — Community hub: tutorials, tools, papers for GA/CGA/PGA
+>
+> 📖 **Textbooks:**
+> - *Geometric Algebra for Computer Science* — Dorst, Fontijne, Mann (Definitive GA-for-CG reference)
+> - *Linear and Geometric Algebra* — Alan Macdonald (Accessible introduction)
 
 ---
 
@@ -606,13 +677,21 @@
 - 1.12.4.3 Tone Mapping: Reinhard (Photographic), Filmic (UE4 ACES), Hable, Gran Turismo; Display Mapping
   - ▸ *CG use:* HDR→SDR for consumer displays; artistic look development
 
-> 📚 **Resources:**
+> 📚 **GitHub Repos:**
 > - [PBR Book v4 (Color & Radiometry Chapters)](https://pbr-book.org/) — Definitive CG reference
 > - [colour-science/colour](https://github.com/colour-science/colour) ![Stars](https://img.shields.io/github/stars/colour-science/colour?style=flat) — Comprehensive Python color science library
 > - [richzhang/PerceptualSimilarity](https://github.com/richzhang/PerceptualSimilarity) ![Stars](https://img.shields.io/github/stars/richzhang/PerceptualSimilarity?style=flat) — LPIPS perceptual metric (standard for neural rendering)
 > - [ACES Documentation](https://acescentral.com/) — Academy Color Encoding System specs
+> - [ampas/aces-dev](https://github.com/ampas/aces-dev) ![Stars](https://img.shields.io/github/stars/ampas/aces-dev?style=flat) — Official ACES reference implementation
+>
+> 📖 **Textbooks:**
+> - *Color Science: Concepts and Methods* — Wyszecki & Stiles (The definitive color science reference)
+> - *Digital Color Management* — Giorgianni & Madden (Practical color encoding workflows)
+> - *Vision Science: Photons to Phenomenology* — Stephen Palmer (Comprehensive perception textbook)
 
 ---
+
+
 
 
 ## Chapter 2 · Geometry & Shape Representation
