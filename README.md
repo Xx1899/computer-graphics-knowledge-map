@@ -1586,292 +1586,413 @@
 
 ## Chapter 4 · Light Transport & Rendering
 
+*The complete pipeline of image synthesis — from GPU rasterization to path tracing, global illumination, and real-time rendering techniques. `▸ CG use:` links each concept to practice.*
 
-### 4.1 Rasterization Rendering
-
-#### 3.2.1 Graphics Pipeline Overview
-- 3.2.1.1 Application Stage (CPU): Scene Management, Visibility Determination, Draw Calls
-- 3.2.1.2 Geometry Processing Stage (GPU): Vertex Shader → Tessellation → Geometry Shader
-- 3.2.1.3 Rasterization Stage: Primitive Assembly, Triangle Setup, Triangle Traversal
-- 3.2.1.4 Pixel Processing Stage: Fragment Shader → Output Merger
-- 3.2.1.5 Fixed-Function Pipeline vs. Programmable Pipeline
-- 3.2.1.6 Modern GPU Pipeline (Mesh Shader / Task Shader → Simplified Geometry Pipeline)
-
-#### 3.2.2 Geometry Processing
-- 3.2.2.1 Model Transform (Model Matrix)
-- 3.2.2.2 View Transform (View Matrix / Camera Matrix)
-- 3.2.2.3 Projection Transforms: Perspective & Orthographic Projection Matrices
-- 3.2.2.4 Perspective Division & Normalized Device Coordinates (NDC)
-- 3.2.2.5 Viewport Transform
-- 3.2.2.6 Vertex Shader Programming
-- 3.2.2.7 Tessellation Shaders (Tessellation Control / Evaluation Shader)
-- 3.2.2.8 Geometry Shader
-- 3.2.2.9 Primitive Assembly (Points, Lines, Triangles, Triangle Strips/Fans)
-- 3.2.2.10 Back-Face Culling
-- 3.2.2.11 Clipping (Cohen-Sutherland, Sutherland-Hodgman, Guard Band Clipping)
-
-#### 3.2.3 Rasterization & Fragment Processing
-- 3.2.3.1 Line Rasterization (DDA Algorithm, Bresenham's Algorithm)
-- 3.2.3.2 Triangle Rasterization (Barycentric Coordinates, Edge Function Method, Scanline Fill)
-- 3.2.3.3 Perspective-Correct Interpolation
-- 3.2.3.4 Depth Testing & Depth Buffering (Z-Buffer, W-Buffer, Reverse-Z)
-- 3.2.3.5 Stencil Testing & Stencil Buffer
-- 3.2.3.6 Blending: Alpha Blending, Premultiplied Alpha, Sorting & Blend Modes
-- 3.2.3.7 Multi-Sample Anti-Aliasing (MSAA: 2×, 4×, 8×, EQAA/CSAA)
-- 3.2.3.8 Super-Sample Anti-Aliasing (SSAA), Coverage Sampling AA (CSAA)
-- 3.2.3.9 Temporal Anti-Aliasing (TAA)
-- 3.2.3.10 Deep-Learning-Based Anti-Aliasing (DLSS, FSR, XeSS)
-- 3.2.3.11 Morphological Anti-Aliasing (MLAA, SMAA, FXAA, CMAA)
-- 3.2.3.12 Fragment / Pixel Shader Programming
-- 3.2.3.13 Early-Z / Hi-Z Culling
-- 3.2.3.14 Variable Rate Shading (VRS)
-- 3.2.3.15 Conservative Rasterization
-- 3.2.3.16 Tile-Based Rendering Architecture (TBDR)
-
-#### 3.2.4 Texture Mapping
-- 3.2.4.1 Texture Coordinates (UV) & Parameterization
-- 3.2.4.2 Texture Filtering: Nearest-Neighbor, Bilinear, Trilinear
-- 3.2.4.3 Anisotropic Filtering
-- 3.2.4.4 Mipmap Generation: Per-Level Downsampling (Box, Kaiser, Lanczos Kernels)
-- 3.2.4.5 Texture Sampling & Addressing Modes (Wrap, Mirror, Clamp, Border)
-- 3.2.4.6 Compressed Texture Formats (BC1-BC7, ASTC, ETC2, PVRTC)
-- 3.2.4.7 Floating-Point Textures & HDR Textures (Half/Float, Shared Exponent Format)
-- 3.2.4.8 Cubemaps & Environment Mapping
-- 3.2.4.9 Bump Mapping: Normal Perturbation
-- 3.2.4.10 Normal Mapping: Tangent Space & Normal Compression
-- 3.2.4.11 Displacement Mapping: Vertex Displacement
-- 3.2.4.12 Parallax Mapping, Steep Parallax Mapping, Relief Mapping
-- 3.2.4.13 Procedural Textures (Checkerboard, Marble, Wood, Cloud Noise)
-- 3.2.4.14 Volume Textures (3D Textures) & Noise Volumes
-- 3.2.4.15 Texture Atlases & Array Textures
-- 3.2.4.16 Virtual Textures (MegaTexture / Tiled Resources / Sparse Textures)
-- 3.2.4.17 Bindless Textures
-- 3.2.4.18 Ptex (Per-Face Texture Mapping)
-
-#### 3.2.5 Shading Models
-- 3.2.5.1 Lighting Fundamentals: Directional, Point, Spot, Area Lights, Ambient Light
-- 3.2.5.2 Diffuse Reflection: Lambertian Shading
-- 3.2.5.3 Specular Highlights: Phong Reflection Model
-- 3.2.5.4 Blinn-Phong Reflection Model (Half-Vector Approximation)
-- 3.2.5.5 Physically-Based Rendering (PBR) Concepts: Energy Conservation, Metal/Dielectric Distinction
-- 3.2.5.6 Metallic-Roughness Workflow
-- 3.2.5.7 Specular-Glossiness Workflow
-- 3.2.5.8 Image-Based Lighting (IBL)
-- 3.2.5.9 Precomputed Diffuse Irradiance Map
-- 3.2.5.10 Prefiltered Environment Map (Specular IBL)
-- 3.2.5.11 Split-Sum Approximation
-- 3.2.5.12 Environment BRDF Lookup Table (LUT: BRDF Integration Map)
-- 3.2.5.13 Deferred Shading: G-Buffer Layout
-- 3.2.5.14 Forward+ Rendering / Tiled Forward Shading
-- 3.2.5.15 Clustered Shading (Clustered Deferred / Forward)
-- 3.2.5.16 Visibility Buffer & Deferred Materials
-
-#### 3.2.6 Shadows
-- 3.2.6.1 Planar Projected Shadows (Projective Shadows)
-- 3.2.6.2 Shadow Volumes: Stencil Buffer Method (Carmack's Reverse / Depth-Fail)
-- 3.2.6.3 Shadow Mapping: Basic Principles
-- 3.2.6.4 Perspective Shadow Maps (PSM)
-- 3.2.6.5 Cascaded Shadow Maps (CSM)
-- 3.2.6.6 Parallel-Split Shadow Maps (PSSM)
-- 3.2.6.7 Tight Frustum Culling
-- 3.2.6.8 Variance Shadow Maps (VSM)
-- 3.2.6.9 Convolution Shadow Maps (CSM)
-- 3.2.6.10 Exponential Shadow Maps (ESM)
-- 3.2.6.11 Exponential Variance Shadow Maps (EVSM)
-- 3.2.6.12 Moment Shadow Maps (MSM)
-- 3.2.6.13 Percentage Closer Soft Shadows (PCSS)
-- 3.2.6.14 Percentage Closer Filtering (PCF)
-- 3.2.6.15 Screen-Space Contact / Short-Range Ambient Occlusion Shadows
-- 3.2.6.16 Ray-Traced Shadows (DXR 1.1 / Vulkan RT)
-- 3.2.6.17 Virtual Shadow Maps (Unreal Engine 5 Style)
-- 3.2.6.18 Translucent / Colored Shadows
-
-#### 3.2.7 Environmental Effects
-- 3.2.7.1 Sky Rendering (Skybox, Atmospheric Scattering Models, Precomputed Atmospheric Scattering)
-- 3.2.7.2 Volumetric Clouds: Noise-Based, Weather Texture, Ray Marching
-- 3.2.7.3 Fog: Linear Fog, Exponential Fog, Height Fog
-- 3.2.7.4 Volumetric Light (God Rays / Light Shafts)
-- 3.2.7.5 Volumetric Fog & Participating Media
-- 3.2.7.6 Rain & Snow Effects (Particle Systems + Screen-Space Effects)
-- 3.2.7.7 Water Surface Rendering (Reflection, Refraction, Caustics, Waves, Foam, Crest)
-- 3.2.7.8 Underwater Effects (Underwater Fog / Caustics / Color Absorption)
-
-### 3.3 Ray Tracing
-
-#### 3.3.1 Baseline Ray Tracing
-- 3.3.1.1 Ray Generation (Perspective Camera, Orthographic Camera, Pinhole Model)
-- 3.3.1.2 Ray-Geometry Intersection (Sphere, Plane, Möller-Trumbore Triangle, AABB Slab Method)
-- 3.3.1.3 Ray-Parametric Surface Intersection (Newton's Iteration, Bézier Clipping)
-- 3.3.1.4 Ray-Implicit Surface Intersection (Ray Marching / Sphere Tracing)
-- 3.3.1.5 Whitted-Style Ray Tracing (Recursive Reflection + Refraction + Shadow Rays)
-- 3.3.1.6 Snell's Law of Refraction & Total Internal Reflection
-- 3.3.1.7 Fresnel Effect Handling (Schlick / Exact Fresnel)
-- 3.3.1.8 Distributed Ray Tracing (Cook et al. 1984): Soft Shadows, Motion Blur, Depth of Field, Glossy Reflections
-
-#### 3.3.2 Acceleration Structures
-- 3.3.2.1 Bounding Volume Hierarchy (BVH): Construction (SAH Binning/Bucketing, HLBVH, PLOC)
-- 3.3.2.2 BVH Traversal (Stack vs. Stackless, Compressed Wide BVH)
-- 3.3.2.3 BVH Update & Rebuild (Top-Down / Bottom-Up Rebuild, Refit)
-- 3.3.2.4 K-d Tree: Construction (SAH, Midpoint Split), Traversal
-- 3.3.2.5 Uniform Grids & Hierarchical Grids
-- 3.3.2.6 Octree Acceleration Structures
-- 3.3.2.7 Two-Level BVH (TLAS + BLAS, DXR / Vulkan RT Model)
-- 3.3.2.8 Shader Execution Reordering (SER)
-- 3.3.2.9 Acceleration Structure Quality Evaluation (SAH Cost Model, Traversal Steps, Bounding-Box Tightness)
-
-#### 3.3.3 Path Tracing & Global Illumination
-- 3.3.3.1 Path Tracing (Kajiya 1986) Basic Algorithm
-- 3.3.3.2 Monte Carlo Integration Recap & Rendering Applications
-- 3.3.3.3 Importance Sampling:
-  - 3.3.3.3.1 Cosine-Weighted Hemisphere Sampling
-  - 3.3.3.3.2 BRDF Importance Sampling (GGX/Beckmann VNDF Sampling)
-  - 3.3.3.3.3 Light Source Importance Sampling (Area Sampling, Directional Sampling)
-  - 3.3.3.3.4 Environment Map Importance Sampling
-- 3.3.3.4 Multiple Importance Sampling (MIS): Balance Heuristic, Power Heuristic
-- 3.3.3.5 One-Sample MIS
-- 3.3.3.6 Russian Roulette & Path Termination
-- 3.3.3.7 Bidirectional Path Tracing (BDPT)
-- 3.3.3.8 Vertex Merging & Photon Mapping (Photon Emission, Photon Map, Radiance Estimation)
-- 3.3.3.9 Progressive Photon Mapping (PPM)
-- 3.3.3.10 Stochastic Progressive Photon Mapping (SPPM)
-- 3.3.3.11 Unified Vertex Connection & Merging (VCM / UPS / Unified Path Sampling)
-- 3.3.3.12 Photon Beams / Photon Planes
-- 3.3.3.13 Metropolis Light Transport (MLT: Primary Sample Space MLT, Path Space MLT)
-- 3.3.3.14 Manifold Exploration / Manifold Next Event Estimation (MNEE)
-- 3.3.3.15 Path Space Regularization
-- 3.3.3.16 Progressive Rendering & Adaptive Sampling
-- 3.3.3.17 Path Guiding (Practical Path Guiding, SD-Tree/Quad-Tree Guiding)
-- 3.3.3.18 Neural Path Guiding
-
-#### 3.3.4 Real-Time & Interactive Ray Tracing
-- 3.3.4.1 Hardware-Accelerated Ray Tracing (NVIDIA RT Core, AMD Ray Accelerator, Intel Arc)
-- 3.3.4.2 DXR (DirectX Raytracing) API Fundamentals
-- 3.3.4.3 Vulkan Ray Tracing (VK_KHR_ray_tracing_pipeline)
-- 3.3.4.4 OptiX Framework
-- 3.3.4.5 Metal Ray Tracing
-- 3.3.4.6 Denoising:
-  - 3.3.4.6.1 Spatial Denoising: Bilateral Filter, Guided Filter, À-Trous Wavelets
-  - 3.3.4.6.2 Temporal Denoising: Temporal Accumulation, Motion Vectors, Rejection Sampling
-  - 3.3.4.6.3 Regression-Based Denoising (SVGF, BMFR)
-  - 3.3.4.6.4 Neural Network Denoising (OptiX Denoiser, OIDN, NRD)
-  - 3.3.4.6.5 Super-Resolution Joint Denoising (DLSS Ray Reconstruction)
-- 3.3.4.7 Importance Sampling & Path-Space Filtering
-- 3.3.4.8 LOD in Ray Tracing (Simplified BVH Geometry, Shader Substitution)
-- 3.3.4.9 ReSTIR (Reservoir-based Spatiotemporal Importance Resampling):
-  - ReSTIR DI (Direct Illumination)
-  - ReSTIR GI (Global Illumination)
-  - ReSTIR PT (Path Tracing)
-  - Generalized Resampling Theory
-- 3.3.4.10 Asynchronous Ray Tracing & Async Compute
-- 3.3.4.11 Hybrid Rendering (Raster + Ray Tracing): Hybrid Reflections, Hybrid AO, Hybrid GI
-
-#### 3.3.5 Participating Media Rendering
-- 3.3.5.1 Volume Rendering Equation (Radiative Transfer Equation, RTE)
-- 3.3.5.2 Absorption Coefficient σₐ, Scattering Coefficient σₛ, Extinction Coefficient σₜ, Phase Function
-- 3.3.5.3 Transmittance (Optical Depth)
-- 3.3.5.4 Free-Path Sampling (Woodcock Tracking / Delta Tracking)
-- 3.3.5.5 Volumetric Path Tracing
-- 3.3.5.6 Volumetric Photon Mapping
-- 3.3.5.7 Phase Functions: Isotropic, Rayleigh, Mie (Henyey-Greenstein)
-- 3.3.5.8 Null-Collision & Heterogeneous Media (Cascaded Shadow Grids, Adaptive Sampling)
-- 3.3.5.9 Atmospheric Scattering (Precomputed Atmospheric Scattering, Bruneton Model, Hillaire Real-Time Atmosphere)
-- 3.3.5.10 Cloud, Smoke, Fire, Fog Rendering
-- 3.3.5.11 Subsurface Scattering (Skin, Marble, Jade & Other Translucent Materials)
-
-### 3.4 Real-Time Global Illumination
-
-#### 3.4.1 Precomputation Methods
-- 3.4.1.1 Lightmaps: Offline Baking + Real-Time Texture Mapping
-- 3.4.1.2 Light Probes: Spherical Harmonics (SH) / Ambient Occlusion Storage
-- 3.4.1.3 Reflection Probes: Box Projection Correction, Blending
-- 3.4.1.4 Precomputed Radiance Transfer (PRT)
-- 3.4.1.5 Irradiance Volumes
-
-#### 3.4.2 Real-Time Methods
-- 3.4.2.1 Screen-Space Ambient Occlusion (SSAO, SSAO+, HBAO, GTAO, CACAO)
-- 3.4.2.2 Screen-Space Reflections (SSR): Ray Marching, Hi-Z Acceleration
-- 3.4.2.3 Screen-Space Global Illumination (SSGI)
-- 3.4.2.4 Reflective Shadow Maps (RSM): Indirect Light Source
-- 3.4.2.5 Virtual Point Lights (VPL / Instant Radiosity)
-- 3.4.2.6 Light Propagation Volumes (LPV)
-- 3.4.2.7 Cascaded Light Propagation Volumes
-- 3.4.2.8 Voxel Cone Tracing (VXGI)
-- 3.4.2.9 Surfel-Based GI: G-Buffer Surfel Generation, Hierarchical Radiosity
-- 3.4.2.10 Ray-Traced GI (RTXGI): Probe Re-lighting + Spatiotemporal Filtering
-- 3.4.2.11 Dynamic Diffuse Global Illumination (DDGI)
-- 3.4.2.12 Lumen (Unreal Engine 5): Surfel Cards + Screen-Space Tracing + Mesh SDF Tracing + Radiance Cache
-- 3.4.2.13 Signed Distance Field-Based GI (SDF Tracing)
-
-### 3.5 Participating Media & Transparent Surfaces
-- 3.5.1 Translucency & Transparency Sorting: Order-Independent Transparency (OIT)
-  - 3.5.1.1 Depth Peeling
-  - 3.5.1.2 Weighted Blended OIT
-  - 3.5.1.3 Per-Pixel Linked Lists
-  - 3.5.1.4 Moment-Based OIT
-  - 3.5.1.5 Stochastic Transparency
-- 3.5.2 Volume Rendering (Direct Volume Rendering) — Rasterization Pipeline
-- 3.5.3 Volume Ray Marching
-
-### 3.6 Non-Photorealistic Rendering (NPR)
-
-#### 3.6.1 Cartoon / Anime Style
-- 3.6.1.1 Edge / Outline Rendering: Inverted-Hull Method, Image-Processing Method, Edge-Detection Based
-- 3.6.1.2 Cel Shading / Toon Shading: Quantized Diffuse & Specular
-- 3.6.1.3 Contour Types: Contours, Creases, Material Boundaries, Silhouettes
-- 3.6.1.4 View-Dependent Line Width Variation
-
-#### 3.6.2 Artistic Styles
-- 3.6.2.1 Sketch / Hatching / Cross-Hatching (Tonal Art Maps)
-- 3.6.2.2 Watercolor-Style Rendering
-- 3.6.2.3 Oil-Painting-Style Rendering
-- 3.6.2.4 Pointillism / Mosaic Style
-- 3.6.2.5 Halftoning
-- 3.6.2.6 Line Art Rendering / Technical Illustration
-
-#### 3.6.3 Abstract & Special Effects
-- 3.6.3.1 Noise-Based Stylization (Dithering, Grain)
-- 3.6.3.2 Stroke-Based Rendering
-- 3.6.3.3 Style Transfer (Deep-Learning-Based Image/Video Stylization)
-- 3.6.3.4 Real-Time Style Transfer
-
-### 3.7 Post-Processing & Image-Space Techniques
-
-#### 3.7.1 Tone Mapping & Display
-- 3.7.1.1 Tone Mapping Operators: Reinhard, Filmic (Uncharted 2 / ACES), Hable, Gran Turismo
-- 3.7.1.2 Exposure Control: Automatic Exposure (Eye Adaptation)
-- 3.7.1.3 HDR Display Support (HDR10, Dolby Vision, scRGB)
-- 3.7.1.4 Gamut Mapping Between SDR & HDR
-
-#### 3.7.2 Color Processing
-- 3.7.2.1 White Balance
-- 3.7.2.2 Color Grading: LUTs, CDL, Curves
-- 3.7.2.3 Saturation, Contrast, Brightness Adjustments
-- 3.7.2.4 Look-Up Table (LUT) Generation & Application
-- 3.7.2.5 HDR Display Mapping / Output Transform
-
-#### 3.7.3 Lens Simulation Effects
-- 3.7.3.1 Depth of Field (DoF): Bokeh, Bokeh Shape Simulation
-- 3.7.3.2 Motion Blur: Per-Pixel Velocity Vectors, Camera/Object Blur
-- 3.7.3.3 Bloom: Downsampling Pyramid + Compositing
-- 3.7.3.4 Lens Flare: Ghosting, Glow, Diffraction Spikes
-- 3.7.3.5 Glare
-- 3.7.3.6 Chromatic Aberration
-- 3.7.3.7 Vignette
-- 3.7.3.8 Film Grain
-- 3.7.3.9 Lens Distortion (Radial, Tangential)
-
-#### 3.7.4 Super-Resolution & Image Reconstruction
-- 3.7.4.1 Spatial Super-Resolution (FSR 1.0)
-- 3.7.4.2 Temporal Super-Resolution (TAAU, DLSS 2/3/4, FSR 2/3/4, XeSS)
-- 3.7.4.3 Frame Generation (DLSS Frame Generation, FSR 3 Frame Generation)
-- 3.7.4.4 Multi Frame Generation (DLSS 4 / Multi Frame Generation)
-- 3.7.4.5 Checkerboard Rendering
-- 3.7.4.6 Variable Rate Shading (VRS) + Super-Resolution Synergy
+> 💡 **Top-Level References:**
+> - [PBR Book v4 (Free Online)](https://pbr-book.org/) — Definitive rendering theory + implementation
+> - [ssloy/tinyrenderer](https://github.com/ssloy/tinyrenderer) ![Stars](https://img.shields.io/github/stars/ssloy/tinyrenderer?style=flat) — Build a software rasterizer from scratch
+> - [mmp/pbrt-v4](https://github.com/mmp/pbrt-v4) ![Stars](https://img.shields.io/github/stars/mmp/pbrt-v4?style=flat) — Complete PBRT v4 source code (literate programming)
+> - [NVIDIAGameWorks/RTXDI](https://github.com/NVIDIAGameWorks/RTXDI) ![Stars](https://img.shields.io/github/stars/NVIDIAGameWorks/RTXDI?style=flat) — ReSTIR-based real-time direct illumination
 
 ---
 
+### 4.1 The Graphics Pipeline Architecture
+
+#### 4.1.1 Pipeline Overview
+- 4.1.1.1 Application Stage (CPU): Scene Graph Traversal, Visibility Determination, Draw Call Generation, Resource Binding
+  - ▸ *CG use:* Frustum culling, occlusion queries, LOD selection, material sorting — all before a single GPU command
+- 4.1.1.2 GPU Command Processing: Command Buffer Recording (Vulkan/D3D12) → Queue Submission → GPU Command Processor → Work Distribution to SMs/CUs
+  - ▸ *CG use:* Multi-threaded command recording; async compute overlap; GPU work graphs for GPU-driven command generation
+- 4.1.1.3 Graphics Pipeline Stages: Input Assembler → Vertex Shader → (Tessellation → Geometry Shader) → Rasterizer → Fragment Shader → Output Merger; Fixed-Function vs. Programmable
+  - ▸ *CG use:* Modern pipelines: Vertex + Fragment programmable since 2001; tessellation/geometry since ~2010; mesh shaders since 2018
+- 4.1.1.4 Mesh Shader Pipeline (Turing+ / RDNA2+): Task Shader (Work Distribution) → Mesh Shader (Output Meshlets Directly); Replaces Vertex→Tessellation→Geometry Chain
+  - ▸ *CG use:* UE5 Nanite; GPU-driven culling and LOD; 3× geometry throughput; eliminates draw-call overhead for micro-geometry
+- 4.1.1.5 Work Graphs (GPU-Driven Pipeline): GPU Generates Work for Itself; Producer→Consumer Relationship; No CPU Round-Trip
+  - ▸ *CG use:* Fully GPU-driven rendering (D3D12 Work Graphs, Vulkan Device-Generated Commands); culling→draw→post all on GPU
+
+#### 4.1.2 Immediate vs. Tile-Based Rendering
+- 4.1.2.1 Immediate-Mode Rendering (IMR): Process Primitives in Submission Order; Each Triangle Immediately Goes Through Full Pipeline; Desktop GPUs (NVIDIA, AMD Desktop)
+  - ▸ *CG use:* Low latency; predictable performance; requires large cache to hide DRAM bandwidth
+- 4.1.2.2 Tile-Based Deferred Rendering (TBDR): Bin Primitives into Screen Tiles; Process One Tile at a Time (On-Chip Tile Memory); Mobile GPUs (ARM Mali, Qualcomm Adreno, Apple GPU)
+  - ▸ *CG use:* Dramatic bandwidth savings (no off-chip framebuffer until tile is done); enables low-power mobile GPUs; requires special handling for tessellation/geometry shaders
+- 4.1.2.3 Tile-Based Immediate (NVIDIA Maxwell+): Hybrid: Tile-Binned for Rasterization + Immediate Fragment Processing
+  - ▸ *CG use:* Best of both worlds; transparent to the developer
+
+> 📖 **Textbooks:** *Real-Time Rendering* — Akenine-Möller et al. (Ch. 2-3); *GPU Zen* — Engel (Architecture deep-dives)
 
 ---
+
+### 4.2 Geometry Processing & Transform Pipeline
+
+#### 4.2.1 The Transform Chain
+- 4.2.1.1 Model Transform: Object Space → World Space; M_model = T·R·S (TRS Decomposition); Hierarchical via Scene Graph Accumulation
+  - ▸ *CG use:* Every object instance; GPU stores pre-computed world matrix or computes in vertex shader via instancing
+- 4.2.1.2 View Transform: World → Camera/View Space; M_view = [R|t]⁻¹; Camera at Origin, Looking Down −Z (OpenGL) or +Z (D3D)
+  - ▸ *CG use:* FPS camera → view matrix rebuilt each frame from camera position + rotation
+- 4.2.1.3 Projection Transform: View → Clip Space; Perspective: x_clip = (f/aspect)·x, y_clip = f·y, z_clip = (f+n)/(f−n)·z − 2fn/(f−n); Orthographic: Identity with Scale
+  - ▸ *CG use:* Perspective matrix maps frustum → cube [−1,1]³; sets up perspective division
+- 4.2.1.4 Perspective Division & NDC: (x,y,z,w)_clip → (x/w, y/w, z/w, 1)_NDC; Non-Linear Depth: z_NDC ∝ 1/z_view; Reverse-Z for Better Precision (Far=0, Near=1)
+  - ▸ *CG use:* Reverse-Z enabled by floating-point depth (close values have more precision near 0); industry standard since ~2017
+- 4.2.1.5 Viewport Transform: NDC [−1,1]² → Screen Pixels; glViewport/D3D12_VIEWPORT; Half-Pixel Offset Convention
+  - ▸ *CG use:* Maps normalized coordinates to actual framebuffer; multi-viewport for split-screen or cascaded shadow maps
+
+#### 4.2.2 Programmable Geometry Stages
+- 4.2.2.1 Vertex Shader: Per-Vertex Processing; Input: Vertex Attributes (Position, Normal, UV, Color, Bone Weights); Output: Clip-Space Position + Interpolated Attributes
+  - ▸ *CG use:* Skinning (bone matrix application); morph targets; wind animation (vertex displacement by noise); all per-vertex work
+- 4.2.2.2 Tessellation: Hull Shader (Control Points + Tess Factors) → Fixed-Function Tessellator (Generates Domain Points) → Domain Shader (Evaluates Surface at Each Point); Displacement Mapping
+  - ▸ *CG use:* Adaptive terrain tessellation; smooth LOD transitions; detailed displacement without pre-tessellated geometry
+- 4.2.2.3 Geometry Shader: Per-Primitive Processing; Can Emit/Delete Vertices; Input: Primitive (Point/Line/Triangle) → Output: Stream of Primitives
+  - ▸ *CG use:* Shadow volume extrusion; billboard generation from points; cube map rendering (one pass, 6 faces); largely superseded by mesh shaders
+
+#### 4.2.3 Primitive Assembly & Culling
+- 4.2.3.1 Primitive Assembly: Vertices → Triangles (3 Vertices), Lines (2), Points (1); Triangle Strips/Fans for Compression; Index Buffer Redundancy Elimination (Post-Transform Vertex Cache)
+  - ▸ *CG use:* Indexed drawing (16-bit or 32-bit indices); triangle strips reduce vertex processing by ~3× vs. triangle lists
+- 4.2.3.2 Back-Face Culling: Discard Triangles Facing Away from Camera (n·view_dir > 0 → Back Face); Configurable Winding Order (CW/CCW)
+  - ▸ *CG use:* Eliminates ~50% of fragments for closed surfaces; free performance; must disable for two-sided materials (cloth, leaves)
+- 4.2.3.3 Frustum Culling: AABB/Sphere Against 6 Frustum Planes; Hierarchical (BVH/Octree); GPU-Based via Compute Shader Indirect Draw
+  - ▸ *CG use:* Essential for any non-trivial scene; GPU-driven culling (cull → compact → draw indirect)
+- 4.2.3.4 Guard Band Clipping: Hardware Clips to Larger Region than Viewport; Avoids Expensive Clipping for Triangles Just Outside; Genuine Clipping Only When Beyond Guard Band
+  - ▸ *CG use:* Transparent GPU hardware optimization; developer doesn't need to think about it
+
+> 📚 **GitHub Repos:** [ssloy/tinyrenderer](https://github.com/ssloy/tinyrenderer) ![Stars](https://img.shields.io/github/stars/ssloy/tinyrenderer?style=flat) — Complete transform chain from scratch
+
+---
+
+### 4.3 Rasterization & Fragment Processing
+
+#### 4.3.1 Rasterization Algorithms
+- 4.3.1.1 Line Rasterization: DDA (Digital Differential Analyzer — Floating Point, Simple), Bresenham (Integer-Only, No Division); GPU-Specific Variants
+  - ▸ *CG use:* Wireframe rendering; line primitives for CAD visualization; Bresenham still taught for pedagogical value, GPU uses custom hardware
+- 4.3.1.2 Triangle Rasterization — Edge Function Method (Pineda 1988): For Each Screen Pixel (x,y), Evaluate E_i(x,y) = (x−x_i)(y_{i+1}−y_i) − (y−y_i)(x_{i+1}−x_i) for i=0,1,2; All E_i ≥ 0 (or All ≤ 0) → Inside
+  - ▸ *CG use:* THE algorithm used by all GPU rasterizers; trivial to parallelize; yields barycentric coordinates naturally
+- 4.3.1.3 Barycentric Coordinates (α,β,γ): α = E_1/E_total, β = E_2/E_total, γ = E_3/E_total; α+β+γ=1; α,β,γ ≥ 0 Inside Triangle
+  - ▸ *CG use:* Smooth attribute interpolation across triangle faces; texture coordinate, normal, color interpolation
+- 4.3.1.4 Perspective-Correct Interpolation: Linear Interpolation in Screen Space is WRONG (Affine Texture Mapping Error); Must Interpolate (u/z, v/z, 1/z) in Screen Space, Then Divide: u = (u/z)/(1/z)
+  - ▸ *CG use:* GPU hardware does perspective-correct interpolation automatically; classic PS1/Saturn era affine texture warping is this bug
+- 4.3.1.5 Scanline vs. Tile-Based Rasterization: Scanline (Process Triangle Row-by-Row); Tile (Binned to Screen Tiles, Process Per Tile); Hierarchical (Coarse Rasterizer → Fine Rasterizer)
+  - ▸ *CG use:* Modern GPUs use hierarchical rasterization: coarse test (entire tile inside/outside) → fine rasterization only for boundary tiles
+
+#### 4.3.2 Depth, Stencil & Blending
+- 4.3.2.1 Depth Buffer (Z-Buffer — Catmull 1974): Store Per-Pixel Depth; Before Shading: Test z_incoming < z_stored → Pass (Write Depth + Color); Opaque Objects: Front-to-Back Sort for Early-Z Optimization
+  - ▸ *CG use:* The foundation of 3D rendering; GPU Early-Z (Hi-Z) rejects fragments before expensive fragment shader execution
+- 4.3.2.2 Reverse-Z: Store 0 at Far Plane, 1 at Near; Floating-Point Depth Has More Precision Near 0 → Better Far-Plane Precision; No More Z-Fighting at Distance
+  - ▸ *CG use:* Industry standard since ~2017; games with large view distances (Battlefield, open-world) require this; requires inverted depth test (Greater instead of Less)
+- 4.3.2.3 Stencil Buffer: 8-Bit Per-Pixel Integer; Configurable Stencil Test + Stencil Operation (Keep/Zero/Replace/Incr/Decr/Invert); Separate Front/Back Face Stencil State
+  - ▸ *CG use:* Shadow volume rendering (Carmack's Reverse); outline/highlight rendering (render selection outline via stencil); decal clipping; mirrors and portals
+- 4.3.2.4 Alpha Blending: C_out = C_src · α_src + C_dst · (1−α_src); Premultiplied Alpha: C_out = C_src + C_dst·(1−α_src) (Correct Filtering + Compositing); Blend Modes (Additive, Multiply, Screen, Overlay)
+  - ▸ *CG use:* Transparent objects; particle effects; UI compositing; premultiplied alpha avoids edge artifacts in mipmapped textures
+- 4.3.2.5 Order-Independent Transparency (OIT): Weighted Blended OIT: C_accum += α · C · weight(z,α), α_accum += α; Final: C_final = C_accum/α_accum · (1−α_first); Moment-Based OIT; Per-Pixel Linked Lists
+  - ▸ *CG use:* Real-time transparency without expensive object sorting; glass buildings, holograms, particle systems
+
+#### 4.3.3 Fragment Shader Programming
+- 4.3.3.1 Fragment Shader Input: Interpolated Attributes (UV, Normal, World Position, Color); Output: One or More Color Values (Multiple Render Targets — MRT)
+  - ▸ *CG use:* G-Buffer in deferred shading (each render target = one material property); up to 8 MRTs on modern GPUs
+- 4.3.3.2 Early Fragment Tests: Early-Z (Before Shader — Reject If Occluded), Early-Stencil; Can Be Disabled (discard in Shader, Writing gl_FragDepth, Alpha-to-Coverage)
+  - ▸ *CG use:* Opaque pass: enable Early-Z for maximum performance; transparent pass: Early-Z disabled
+- 4.3.3.3 Conservative Rasterization (D3D12/Vulkan): Generate Fragment for ANY Pixel Touched by Triangle (Not Just Center-Covered); Overestimation (Outer Conservative) vs. Underestimation (Inner Conservative)
+  - ▸ *CG use:* Voxelization (guarantee no holes); occlusion culling (conservative depth rendering); collision detection on GPU; light culling tile classification
+
+> 📚 **GitHub Repos:** [ssloy/tinyrenderer](https://github.com/ssloy/tinyrenderer) ![Stars](https://img.shields.io/github/stars/ssloy/tinyrenderer?style=flat) — Triangle rasterization, z-buffer, perspective correction from scratch
+
+---
+
+### 4.4 Anti-Aliasing Theory & Practice
+
+#### 4.4.1 Aliasing Fundamentals
+- 4.4.1.1 Nyquist-Shannon in Rendering: Geometry Edges, Texture Details, Specular Highlights All Create Frequencies Above Pixel Nyquist (0.5 cycles/pixel); Result: Jaggies, Moiré, Flickering, Crawling Edges
+  - ▸ *CG use:* Aliasing is the single most visible rendering artifact; every AA technique addresses some aspect of this
+- 4.4.1.2 Prefiltering vs. Postfiltering: Prefilter = Bandlimit Signal Before Sampling (Mipmapping, Analytic AA); Postfilter = Reconstruct from Higher-Rate Samples (MSAA, SSAA, TAA)
+  - ▸ *CG use:* Mipmapping is the prefilter solution for textures; geometric edges require spatial supersampling (MSAA) or temporal accumulation (TAA)
+
+#### 4.4.2 Spatial Anti-Aliasing
+- 4.4.2.1 Supersampling (SSAA / FSAA): Render at Higher Resolution → Downsample with Reconstruction Filter; 2× = 4× Pixel Count; Perfect Quality but Prohibitively Expensive
+  - ▸ *CG use:* Screenshot/offline rendering; not practical for real-time games; VR requires supersampling for clarity
+- 4.4.2.2 Multisample Anti-Aliasing (MSAA): Multiple Coverage/Raster Samples per Pixel, Single Shader Evaluation; Only Edge Pixels Get Multiple Samples; 2×/4×/8× MSAA
+  - ▸ *CG use:* Standard AA for forward rendering; doesn't anti-alias shader aliasing (specular, normal map noise); inactive in deferred (G-Buffer resolves before MSAA)
+- 4.4.2.3 Coverage Sampling AA (CSAA / EQAA): More Coverage Samples Than Color/Z Samples; CSAA 16×Q = 4 Color/Z + 16 Coverage; Better Edge Quality at Lower Cost Than MSAA with Same C/Z Count
+  - ▸ *CG use:* NVIDIA Maxwell/Pascal era; largely superseded by TAA in modern pipelines
+- 4.4.2.4 Morphological AA (MLAA, SMAA, FXAA, CMAA): Post-Process Edge Detection + Blur Along Edges; No Extra Samples (Cheap); Cannot Recover Sub-Pixel Detail; May Blur Text
+  - ▸ *CG use:* FXAA (cheapest, most blurry); SMAA (best quality/speed balance for post-process AA); CMAA (conservative, less blur, sharper)
+
+#### 4.4.3 Temporal Anti-Aliasing (TAA)
+- 4.4.3.1 TAA Core Algorithm: For Frame n, Jitter Projection Matrix by Sub-Pixel Offset (Halton Sequence); Accumulate 4-8 Historical Frames via Exponential Moving Average; Reproject Using Motion Vectors; Reject Disoccluded/Changed Pixels
+  - ▸ *CG use:* The dominant AA in modern games (UE4/UE5 TAA, Unity TAA); effectively gives SSAA quality at MSAA cost; handles shader aliasing that MSAA cannot
+- 4.4.3.2 Motion Vector Computation: Per-Pixel Motion = Current Frame Screen Position − Previous Frame Screen Position (After Applying Previous Frame's Camera + Object Transform)
+  - ▸ *CG use:* From vertex shader (compute current + previous clip position); stored in G-Buffer or velocity buffer
+- 4.4.3.3 TAA Artifacts: Ghosting (Insufficient Rejection of Changed Pixels → Old Frame Bleed-Through); Flicker/Instability (Too-Aggressive Clamping → Temporal Information Lost → Aliasing Returns); Blur (Accumulation of Reconstruction Filter)
+  - ▸ *CG use:* Modern TAA: adaptive color bounding box clamping; variance-guided temporal accumulation; DLSS/FSR as super-resolution TAA variant
+- 4.4.3.4 DLSS / FSR / XeSS — Temporal Super-Resolution: Same Core as TAA but Upscales (e.g., 1080p→4K); Neural Network (DLSS/XeSS) or Analytical (FSR) Reconstruction; Frame Generation (DLSS 3/FSR 3 — Interpolate Between Rendered Frames)
+  - ▸ *CG use:* DLSS 3.5 Ray Reconstruction: combined denoising + upscaling; FSR 3: open, cross-vendor; XeSS: Intel Arc optimized, DP4a fallback
+
+#### 4.4.4 Advanced AA Techniques
+- 4.4.4.1 Variable Rate Shading (VRS): Shade at Lower Rate in Low-Contrast/Peripheral Regions; Tier 1: Per-Draw Rate; Tier 2: Per-Pixel Rate via Screen-Space Image
+  - ▸ *CG use:* VR foveated rendering (full res at gaze, reduced at periphery); content-adaptive shading (sky, flat walls → 2×2 coarse shading)
+- 4.4.4.2 Subpixel Morphological AA: For RGB Subpixel Layout (LCD Screens); Exploit Individual R,G,B Subpixel Positions for 3× Horizontal Resolution
+  - ▸ *CG use:* Font rendering (ClearType, FreeType); UI text sharpness; limited to LCD displays
+
+> 📚 **GitHub Repos:** [NVIDIAGameWorks/DLSS](https://github.com/NVIDIA/DLSS) — DLSS Super Resolution SDK; [GPUOpen-Effects/FidelityFX-FSR2](https://github.com/GPUOpen-Effects/FidelityFX-FSR2) ![Stars](https://img.shields.io/github/stars/GPUOpen-Effects/FidelityFX-FSR2?style=flat) — FSR 2 open-source
+>
+> 📖 **Textbooks:** *Real-Time Rendering* — Ch. 5 (Visual Appearance), Ch. 21 (Post-Processing)
+
+---
+
+### 4.5 Shading Models & Image-Based Lighting
+
+#### 4.5.1 Real-Time Shading Techniques
+- 4.5.1.1 Deferred Shading: Geometry Pass (G-Buffer: Albedo, Normal, Roughness/Metalness, Depth) → Lighting Pass (Full-Screen Quad: For Each Light, Sample G-Buffer, Compute BRDF); Decouples Geometry Complexity from Lighting
+  - ▸ *CG use:* Dominant for scenes with many dynamic lights; G-Buffer bandwidth is the bottleneck; transparent objects require separate forward pass
+- 4.5.1.2 Forward+ (Tiled Forward Shading): Screen Divided into Tiles (e.g., 16×16 pixels); Compute Shader: Per-Tile Light List (Test Light AABB Against Tile Depth Range) → Store in Light Grid → Fragment Shader Iterates Only Visible Lights
+  - ▸ *CG use:* Combines forward rendering benefits (MSAA, transparency, varied materials) with many-light support; Unity HDRP uses Clustered Forward
+- 4.5.1.3 Clustered Shading: 3D Subdivision of View Frustum (Screen Tiles × Depth Slices); Light Assignment to Clusters; More Fine-Grained Culling than Forward+
+  - ▸ *CG use:* Clustered Deferred (UE5) or Clustered Forward; handles very deep scenes better than 2D tiled
+- 4.5.1.4 Visibility Buffer (V-Buffer): Instead of Material Properties, Store Only Triangle ID + Barycentrics; Material Evaluation Deferred via Lookup from ID; Texture Fetch in Lighting Pass Instead of G-Buffer
+  - ▸ *CG use:* Reduces G-Buffer bandwidth; enables arbitrary material complexity in deferred context; UE5 Nanite uses visibility buffer
+
+#### 4.5.2 Image-Based Lighting (IBL)
+- 4.5.2.1 Environment Map Representation: Cubemap (6 Faces, Omnidirectional) or Equirectangular (2:1, HDR); Captured via 360° Camera or Rendered
+  - ▸ *CG use:* Realistic outdoor lighting without explicit sky model; indoor lighting from HDR photographs; reflective object environment mapping
+- 4.5.2.2 Diffuse IBL (Irradiance Map): E(n) = ∫_{H²} L_i(ω) max(n·ω, 0) dω; Precompute via Spherical Harmonics (Typically 3rd Order / 9 Coefficients = Good Enough for Diffuse); GPU: Convolve Cubemap to Generate Irradiance Map
+  - ▸ *CG use:* PBR ambient term; smooth indirect lighting on all surfaces; SH representation stores irradiance in just 9 floats
+- 4.5.2.3 Specular IBL (Prefiltered Environment Map): Cook-Torrance BRDF Has Two Parameters (Roughness α, View Direction Angle); Precompute at Multiple Roughness Levels (Mipmap Chain) via GGX Importance Sampling; Store in Cubemap Mip Levels
+  - ▸ *CG use:* Roughness-dependent environment reflections; glossy/mirror surfaces reflect prefiltered environment
+- 4.5.2.4 Split-Sum Approximation (Karís 2013, UE4): Separate ∫ L_i(l) f(l,v) cos θ_l dl ≈ (∫ L_i(l) D(l,v) dl) × (Precomputed BRDF LUT2D); LUT2D: Input (cos θ_v, Roughness) → Output (F₀ Scale, F₀ Bias)
+  - ▸ *CG use:* THE real-time IBL standard; separates environment prefiltering from BRDF integration; precomputed 2D LUT fits in 128×128 RG16 texture
+- 4.5.2.5 Parallax-Corrected Cubemaps: Box Projection — Reflect Ray Against Proxy Geometry (OBB around Capture Location); Corrects Local Reflections (Indoor Room Reflection Doesn't Show Sky Outside)
+  - ▸ *CG use:* Interior environment reflections (mirrors in rooms); UE5 Reflection Captures with box projection
+
+#### 4.5.3 Light Source Types
+- 4.5.3.1 Analytical Light Types: Directional (Sun, Constant Direction, No Attenuation), Point/Omni (Radial Falloff 1/(d²+1) or Smoothstep), Spot (Cone with Inner/Outer Angle + Falloff), Area/Rect Lights (Most Realistic, Estimate via LTC or Monte Carlo)
+  - ▸ *CG use:* Every game engine implements these; area lights approximated via Linearly Transformed Cosines (LTC — Heitz 2016) for real-time
+- 4.5.3.2 IES Profiles: Illuminating Engineering Society Format; Measured Real-World Light Fixture Intensity Distribution (Tabulated); Architectural Lighting Standard
+  - ▸ *CG use:* Architectural visualization; accurately reproducing real-world light fixtures in rendering
+- 4.5.3.3 Many-Light Rendering: Thousands to Millions of Dynamic Lights; ReSTIR (Direct Illumination: Spatiotemporal Reservoir Resampling — Bitterli et al. 2020); Stochastic Light Selection
+  - ▸ *CG use:* UE5 MegaLights (SIGGRAPH 2025); RTXDI; real-time dynamic lighting from emissive particles, neon signs, city lights
+
+> 📚 **GitHub Repos:** [google/filament](https://github.com/google/filament) ![Stars](https://img.shields.io/github/stars/google/filament?style=flat) — Complete PBR+IBL implementation; [NVIDIAGameWorks/RTXDI](https://github.com/NVIDIAGameWorks/RTXDI) — ReSTIR-based lighting
+>
+> 📖 **Textbooks:** *Real-Time Rendering* — Ch. 9 (PBR), Ch. 10 (IBL); *GPU Gems 3* — Ch. 14 (Split-Sum Approximation)
+
+---
+
+### 4.6 Shadow Algorithms
+
+#### 4.6.1 Shadow Mapping
+- 4.6.1.1 Standard Shadow Map: Render Depth from Light's Perspective → Store in Shadow Map Texture → For Each Visible Point, Transform to Light Space, Compare z_pixel > z_map (In Shadow) or < (Lit); Depth Bias Required to Prevent Self-Shadowing (Shadow Acne)
+  - ▸ *CG use:* Ubiquitous real-time shadow technique; aliasing on shadow edges is the primary artifact
+- 4.6.1.2 Percentage Closer Filtering (PCF — Reeves 1987): For Each Shadow Test, Sample Multiple Texels and Filter Binary Shadow Results (Percentage of Lit Samples); Soft Shadow Edges
+  - ▸ *CG use:* GPU hardware PCF (bilinear PCF on 2×2 block); softens shadow edges; noise at high filter widths
+- 4.6.1.3 Percentage Closer Soft Shadows (PCSS — Fernando 2005): Estimate Blocker Distance (Average Depth of Occluders in Search Region); Map Blocker Distance → Penumbra Size; PCF with Adaptive Kernel Size (Larger = Softer Shadow)
+  - ▸ *CG use:* Realistic soft shadows (narrow near contact point, wide far from contact); physically plausible penumbra
+- 4.6.1.4 Cascaded Shadow Maps (CSM): Multiple Shadow Maps for Different Distance Ranges; Near Cascade: High Resolution, Small Area; Far Cascade: Low Resolution, Large Area; 2-8 Cascades
+  - ▸ *CG use:* Outdoor directional light shadows (sun); every open-world game uses CSM; cascades distributed logarithmically or by PSSM (Parallel-Split Shadow Maps)
+- 4.6.1.5 Variance Shadow Maps (VSM) / Exponential SM (ESM) / Moment SM (MSM): Store Statistical Moments of Depth Distribution (Not Just Single Depth); Filterable (Can Be Blurred by Standard Texture Filtering); Light Bleeding Artifact
+  - ▸ *CG use:* VSM/ESM: soft shadows with standard mipmap+blur; MSM (4 moments = 128-bit): significantly reduces light bleeding; practical for production with MSM
+
+#### 4.6.2 Advanced Shadow Techniques
+- 4.6.2.1 Virtual Shadow Maps (UE5): 16K×16K Virtual Shadow Map Page Table; Per-Light Page Allocation; Only Render Pages Touched by Visible Geometry; Clipmap for Directional Light
+  - ▸ *CG use:* UE5 virtual shadow maps; film-quality shadows at real-time; eliminates cascade artifacts and resolution limits
+- 4.6.2.2 Ray-Traced Shadows (DXR 1.1 / Vulkan RT): Cast Shadow Ray from Surface Point Toward Light; Exact Hard Shadows; Soft Shadows via Multiple Random Rays (Stochastic Sampling) + Denoising
+  - ▸ *CG use:* Accurate contact shadows; no shadow map artifacts (no bias, no resolution limits); expensive for soft shadows
+- 4.6.2.3 Shadow Volumes (Carmack's Reverse / Depth-Fail): Extrude Silhouette Edges from Light Away from Light (Shadow Volume Geometry); Stencil Buffer: Increment for Front-Facing, Decrement for Back-Facing; Stencil ≠ 0 → In Shadow
+  - ▸ *CG use:* Doom 3 (2004) used this; perfect pixel-accurate hard shadows; extremely fill-rate intensive; largely historical now
+- 4.6.2.4 Ambient Occlusion Shadows: SSAO (Screen-Space AO — Crytek 2007): For Each Pixel, Sample Random Points in Hemisphere Above Surface, Test Depth Buffer for Occlusion; GTAO (Ground Truth AO — Jimenez 2016): Physically-Based Formulation with Cosine Weighting and Accurate Occlusion Falloff
+  - ▸ *CG use:* Contact shadows for ambient lighting; small-scale occlusion (creases, corners); complements direct shadows (which handle large occluders)
+
+> 📚 **GitHub Repos:** [GPUOpen-Effects/FidelityFX-ShadowDenoiser](https://github.com/GPUOpen-Effects) — AMD's ray-traced shadow denoiser
+>
+> 📖 **Textbooks:** *Real-Time Rendering* — Ch. 7 (Shadows); *Real-Time Shadows* — Eisemann et al.
+
+---
+
+### 4.7 Real-Time Global Illumination
+
+#### 4.7.1 Precomputed Methods
+- 4.7.1.1 Lightmaps: Bake Static Global Illumination into Textures (Offline Path Tracing → Texture Atlas → Real-Time Lookup); Binary Radiosity Lightmaps for Color + Directional Lightmaps for Specular
+  - ▸ *CG use:* Static environment lighting in virtually all games; Enlighten, Beast, and GPU Lightmass are industry-standard lightmappers
+- 4.7.1.2 Light Probes & Irradiance Volumes: Scatter Spherical Harmonic Probes Throughout Scene; Interpolate Probe Values at Runtime for Dynamic Object Lighting; Tetrahedral or Trilinear Interpolation Between Probes
+  - ▸ *CG use:* Dynamic character/object lighting that matches static environment; UE5 automatically places probes; Unity Light Probes
+- 4.7.1.3 Precomputed Radiance Transfer (PRT — Sloan et al. 2002): Precompute Light Transport Operator T (Per-Vertex or Per-Texel) as Transfer Matrix or SH Coefficients; At Runtime: Lighting_vector · T → Outgoing Radiance; Supports Dynamic Lighting, Static Geometry
+  - ▸ *CG use:* Dynamic environment lighting on static scenes; shadowed diffuse+glossy transfer; limited by precomputation time and memory
+- 4.7.1.4 Reflection Probes: Capture Cubemap at Probe Location; Apply Parallax Correction (Box Projection); Blend Between Adjacent Probes for Seamless Transitions
+  - ▸ *CG use:* Reflections on dynamic objects; UE5 Reflection Capture with box projection blending
+
+#### 4.7.2 Real-Time Methods
+- 4.7.2.1 Screen-Space Methods (SSAO, SSR, SSGI): Work Entirely in Screen Space Using Depth+Normal Buffer as Proxy Geometry; Fast but Cannot Handle Off-Screen Information
+  - ▸ *CG use:* SSAO: ubiquitous contact shadow approximation; SSR: reflections on floors/walls from visible geometry; SSGI: diffuse bounce from visible surfaces
+- 4.7.2.2 Reflective Shadow Maps (RSM — Dachsbacher & Stamminger 2005): Treat Shadow Map Texels as Virtual Point Lights (VPLs); Each Texel Emits Indirect Light in Hemisphere; Many VPLs (~Thousands) → Indirect Illumination
+  - ▸ *CG use:* First-bounce indirect from dominant light source; used in real-time games for interactive GI; basis for LPV
+- 4.7.2.3 Light Propagation Volumes (LPV — Kaplanyan 2009): Inject VPL Radiance into 3D Grid of SH Coefficients; Iterative Propagation (Diffusion) Through Grid Neighbors → Accumulated Indirect Light Distribution; Read SH at Object Position for Indirect
+  - ▸ *CG use:* CryEngine real-time GI; dynamic bounce light (explosions, moving lights affecting environment)
+- 4.7.2.4 Voxel Cone Tracing (VXGI — Crassin 2011): Voxelize Scene (Octree of Opacity+Emissive); Trace Cones (Not Rays) from Surface; Wider Cone for Diffuse (Capture More Voxels), Narrow for Specular; Mipmap Voxel Hierarchy Provides Prefiltering
+  - ▸ *CG use:* NVIDIA VXGI (2015); diffuse + specular indirect at real-time; UE5 partially superseded by Lumen
+- 4.7.2.5 DDGI (Dynamic Diffuse Global Illumination — Majercik et al. 2021): Probe-Based GI with Ray Tracing; Probes Store Irradiance + Depth (Visibility Info); Ray Trace from Probes to Update; Spatiotemporal Blending Between Probe Updates
+  - ▸ *CG use:* RTXGI (NVIDIA SDK); real-time diffuse GI with ray tracing hardware; scales well from low to high ray budgets
+- 4.7.2.6 Lumen (UE5): Hybrid GI System; Software Ray Tracing: Signed Distance Field (Mesh Distance Fields → SDF Tracing); Hardware Ray Tracing: DXR/Vulkan RT for Accuracy; Surface Cache: Cache Light on Cards (Simplified Geometry Proxy); Radiance Cache: Probe Grid for Final Gather
+  - ▸ *CG use:* UE5's production real-time GI; handles dynamic geometry, emissive materials, sky changes; ~30 FPS on consoles
+
+> 📚 **GitHub Repos:**
+> - [NVIDIAGameWorks/RTXGI](https://github.com/NVIDIAGameWorks/RTXGI) ![Stars](https://img.shields.io/github/stars/NVIDIAGameWorks/RTXGI?style=flat) — DDGI reference implementation
+> - [SlightlyMad/VolumetricLights](https://github.com/SlightlyMad/VolumetricLights) — Voxel-based GI experiments
+>
+> 📖 **Textbooks:** *Real-Time Rendering* — Ch. 11 (Global Illumination); *GPU Pro* series (multiple GI articles)
+
+---
+
+### 4.8 Ray Tracing Fundamentals
+
+#### 4.8.1 Ray Generation & Intersection
+- 4.8.1.1 Ray Generation: Camera Model → Primary Ray Direction Per Pixel; r(t) = o + t d (t > t_min); Pinhole Camera: Direction = normalize( (x·right + y·up) · tan(fov/2) + forward ); Orthographic: Origin Varies, Direction = −forward
+  - ▸ *CG use:* Ray tracing starts here; every path tracer generates ~10⁶ to 10⁹ primary rays per frame
+- 4.8.1.2 Ray-Sphere Intersection: Solve ‖o + t d − c‖² = r² → Quadratic a t² + b t + c = 0, a = d·d, b = 2 d·(o−c), c = ‖o−c‖²−r²; Discriminant < 0 → Miss; t = min(t₁,t₂) If Both > t_min
+  - ▸ *CG use:* Sphere primitives; analytic analytical; bounding sphere intersection test
+- 4.8.1.3 Möller-Trumbore Ray-Triangle (1997): Compute Barycentrics (u,v) + Distance t via Solving Linear System; Uses Cramer's Rule on Edge Vectors; Back-Face Culling via t < 0; Most Performant Triangle Intersection
+  - ▸ *CG use:* THE algorithm — GPU RT cores implement hardware-accelerated ray-triangle intersection
+- 4.8.1.4 Ray-AABB (Slab Method — Kay & Kajiya 1986): Intersect Ray with 3 Pairs of Parallel Planes (x_min, x_max, y_min, y_max, z_min, z_max); Compute t_enter = max(t_xmin, t_ymin, t_zmin), t_exit = min(t_xmax, t_ymax, t_zmax); Hit if t_enter ≤ t_exit and t_exit ≥ t_min
+  - ▸ *CG use:* BVH node intersection test; GPU RT core box intersection hardware
+- 4.8.1.5 Ray Marching (Sphere Tracing — Hart 1996): For Implicit Surface f(x)=0: x_{n+1} = x_n + f(x_n) · d; Distance f(x_n) is Conservative Lower Bound; Converges When f(x_n) < ε
+  - ▸ *CG use:* SDF rendering (Shadertoy, Dreams); volumetric ray marching; robust for complex implicit geometry
+
+#### 4.8.2 Whitted-Style & Distributed Ray Tracing
+- 4.8.2.1 Whitted (1980): Primary Ray → Hit → Reflection Ray + Refraction Ray + Shadow Ray (to Each Light) → Recurse; Perfect Specular Reflection + Refraction + Hard Shadows; First Practical Ray Tracing Algorithm
+  - ▸ *CG use:* Simple mirror+glass scenes; basis for recursive ray tracing; limited to specular transport (no diffuse interreflection)
+- 4.8.2.2 Distributed Ray Tracing (Cook et al. 1984): Sample Multiple Random Rays Per Effect: Soft Shadows (N Rays Across Light Area), Glossy Reflections (N Rays Within Reflection Cone), Motion Blur (N Rays at Random Times Within Frame), Depth of Field (N Rays Through Lens Aperture)
+  - ▸ *CG use:* The bridge from Whitted to path tracing; Monte Carlo sampling introduced to rendering; film-quality effects
+- 4.8.2.3 Fresnel at Ray Intersection: Reflectance R via Fresnel Equations (Dielectric: Full Fresnel or Schlick, Conductor: Complex IOR → Colored); Transmission T = 1−R for Dielectrics; Russian Roulette or Branching (Choose One Path, Weight by Probability)
+  - ▸ *CG use:* Glass: trace reflection OR refraction (not both — explosive recursion); Schlick for real-time, full Fresnel for offline
+
+> 📚 **GitHub Repos:** [ssloy/tinyraytracer](https://github.com/ssloy/tinyraytracer) ![Stars](https://img.shields.io/github/stars/ssloy/tinyraytracer?style=flat) — Build a ray tracer from scratch
+>
+> 📖 **Textbooks:** *Physically Based Rendering* — Ch. 3-4 (Ray tracing fundamentals); *Ray Tracing Gems* — Haines & Akenine-Möller
+
+---
+
+### 4.9 Path Tracing & Global Illumination
+
+#### 4.9.1 Path Tracing Core
+- 4.9.1.1 Random Walk Light Transport: Each Path: Camera → Random Bounce Direction (BRDF Sampling) → Next Intersection → Repeat; Terminal via Russian Roulette (Probability q, Weight 1/(1−q)); Estimate: L = Σ_{path} weight · emission_at_hit; Unbiased
+  - ▸ *CG use:* The gold standard for film/VFX rendering; converges to correct solution; noise ∝ 1/√N samples
+- 4.9.1.2 Next Event Estimation (NEE / Direct Lighting): At Each Path Vertex, Explicitly Sample Light Source (Connect to Random Light Point); Shadow Ray Test Visibility;Separate Direct (Low Variance) from Indirect (High Variance)
+  - ▸ *CG use:* Critical for efficient path tracing; without NEE, hitting small light sources by chance is nearly impossible
+- 4.9.1.3 Bidirectional Path Tracing (BDPT — Lafortune & Willems 1993, Veach & Guibas 1994): Trace Light Subpath from Light + Camera Subpath from Camera; Connect All Vertex Pairs via Visibility Test; MIS Weights for All Connection Strategies
+  - ▸ *CG use:* Better than unidirectional PT for scenes dominated by indirect light (interior with window, caustics from mirror)
+- 4.9.1.4 Photon Mapping (Jensen 1996): Two-Pass: (1) Photon Tracing: Emit Photons from Lights, Store at Diffuse Hits (Photon Map = 3D Point Set + Power), (2) Rendering: PT with Radiance Estimate from Nearest Photons (Density Estimation)
+  - ▸ *CG use:* Caustics (focused light patterns through glass/water — very difficult for PT alone); participating media; progressive photon mapping for consistent results
+
+#### 4.9.2 Advanced Light Transport
+- 4.9.2.1 Vertex Connection & Merging (VCM — Hachisuka et al. 2012): Unifies BDPT + Photon Mapping; Path Vertices Either Connected (If Distance > r → BDPT Contribution) or Merged (If Distance < r → Photon Map Contribution); MIS Across All Strategies
+  - ▸ *CG use:* Combined strengths: BDPT for smooth indirect + photon mapping for caustics + SDS paths; production renders use VCM or variants
+- 4.9.2.2 Metropolis Light Transport (MLT — Veach & Guibas 1997): MCMC Sampling of Path Space; Current Path → Mutate (Perturb Vertices, Regenerate Subpath) → Accept/Reject (Metropolis Rule); Explores Path Space Efficiently Around Important Paths
+  - ▸ *CG use:* Extreme lighting scenarios (thin beam of light through keyhole illuminating room); hard to use in production (non-uniform convergence, flickering in animations)
+- 4.9.2.3 Manifold Next Event Estimation (MNEE — Hanika et al. 2015, Zeltner et al. 2020): Find Specular Path Connecting Two Points on Diffuse Surfaces via Specular Vertices; Solve Constrained Optimization on Manifold of Valid Specular Paths (Newton's Method on Constraint Manifold)
+  - ▸ *CG use:* Efficiently find specular-diffuse-specular (SDS) paths (underwater caustics on pool floor, light through glass onto table); production rendering caustic solution
+- 4.9.2.4 Path Guiding: Learn Incident Radiance Distribution (SD-Tree or Neural Network); Use Learned Distribution for Importance Sampling at Each Bounce → Dramatically Reduce Variance; Online Learning During Rendering
+  - ▸ *CG use:* Production path tracing with path guiding (Arnold, RenderMan, Cycles); neural path guiding (Müller et al. 2020) — MLP predicts sampling distribution
+
+> 📚 **GitHub Repos:** [mmp/pbrt-v4](https://github.com/mmp/pbrt-v4) ![Stars](https://img.shields.io/github/stars/mmp/pbrt-v4?style=flat) — Complete BDPT, photon mapping, VCM, MLT implementations
+>
+> 📖 **Textbooks:** *Physically Based Rendering* — Pharr et al. (Ch. 13-16); *Advanced Global Illumination* — Dutré, Bekaert, Bala
+
+---
+
+### 4.10 Real-Time Ray Tracing Hardware & APIs
+
+#### 4.10.1 Hardware Acceleration
+- 4.10.1.1 RT Cores (NVIDIA Turing 2018 → Blackwell 2024): Fixed-Function BVH Traversal + Ray-Triangle Intersection; 1st Gen: BVH Traversal Only; 2nd Gen (Ampere): Triangle Intersection; 3rd Gen (Ada): Opacity Micromap, Displacement Micromap, SER; 4th Gen (Blackwell): Further Acceleration
+  - ▸ *CG use:* Enables real-time ray tracing (RTX); each generation approximately doubles RT throughput
+- 4.10.1.2 Two-Level Acceleration (TLAS + BLAS): Top-Level (TLAS): Instance-Level, References BLAS + Transform; Bottom-Level (BLAS): Per-Object Geometry, Static After Build; Build TLAS Once, Refit BLAS for Animation
+  - ▸ *CG use:* DXR 1.1 / Vulkan RT standard model; animated characters: refit BLAS per frame without rebuilding TLAS
+- 4.10.1.3 Shader Execution Reordering (SER — NVIDIA Ada): Reorder Divergent Ray Threads (Hit Different Materials → Different Shaders) into Coherent Groups; Avoid GPU Warp Divergence; Up to 2× Speedup for Incoherent Rays
+  - ▸ *CG use:* Path tracing with varied materials (glass, diffuse, metal all in one scene); SER groups rays by material for coherent execution
+
+#### 4.10.2 Ray Tracing APIs
+- 4.10.2.1 DXR (DirectX Raytracing): DXR 1.0 (Turing): Ray Generation + Closest-Hit + Any-Hit + Miss Shaders; Shader Table (Per-Geometry Shader Binding); DXR 1.1 (Ampere): Inline Ray Tracing (No Shader Table — Manual Traversal), ExecuteIndirect for GPU-Driven Dispatch
+  - ▸ *CG use:* Windows PC ray tracing; inline RT for simpler integration in existing compute pipelines
+- 4.10.2.2 Vulkan Ray Tracing (VK_KHR_ray_tracing_pipeline / VK_KHR_ray_query): RT Pipeline: Similar to DXR 1.0 Shader Model; Ray Query: Inline, No Separate Shader Stages → Use Inside Any Compute/Fragment Shader; Cross-Platform (Windows, Linux, Some Android)
+  - ▸ *CG use:* Steam Deck, Linux gaming, Android high-end; ray query for selective ray casting in existing shaders
+- 4.10.2.3 OptiX (NVIDIA): Higher-Level API on Top of CUDA; Automatic BVH Construction, Denoiser Integration, AI Acceleration; Used by Major Renderers (Arnold, V-Ray, Octane, Cycles, Blender)
+  - ▸ *CG use:* Production offline rendering; rapid prototyping; AI denoising integration
+- 4.10.2.4 Metal Ray Tracing (Apple): M3+ Hardware RT Acceleration; Metal RT API (Intersection Query + Raytracing Pipeline); Integrated with Apple Silicon GPU Architecture
+  - ▸ *CG use:* macOS/iOS rendering; Pro apps (Octane X, Redshift Metal); Apple Vision Pro spatial computing
+
+> 📚 **GitHub Repos:**
+> - [NVIDIAGameWorks/dxr-tutorials](https://github.com/NVIDIAGameWorks/dxr-tutorials) — DXR tutorial series
+> - [SaschaWillems/Vulkan](https://github.com/SaschaWillems/Vulkan) ![Stars](https://img.shields.io/github/stars/SaschaWillems/Vulkan?style=flat) — Comprehensive Vulkan examples including ray tracing
+> - [mmp/pbrt-v4](https://github.com/mmp/pbrt-v4) — GPU ray tracing backend
+>
+> 📖 **Textbooks:** *Ray Tracing Gems I & II* — Haines & Akenine-Möller (Practical RT techniques); *Physically Based Rendering* — GPU chapters
+
+---
+
+### 4.11 Denoising & Reconstruction
+
+#### 4.11.1 Monte Carlo Denoising
+- 4.11.1.1 The Denoising Problem: Path-Traced Images Have High-Frequency Noise (MC Variance); Denoiser Must Smooth Noise While Preserving Edges, Textures, and Specular Detail
+  - ▸ *CG use:* 1 sample-per-pixel (1 spp) path tracing + denoising ≈ 1000 spp without denoising in visual quality
+- 4.11.1.2 Spatial Denoising: Bilateral Filter (Weighted Spatial Average — Weight = spatial_distance × color_difference × normal_difference); À-Trous Wavelet (Iterative Kernel Dilation Preserves Edges); Guided Filter (Local Linear Model, O(N) Complexity)
+  - ▸ *CG use:* Fast but limited (1 frame of data); blurry loss of high-frequency detail
+- 4.11.1.3 Temporal Denoising: Accumulate Pixel History Over Multiple Frames; Reproject via Motion Vectors; Exponential Moving Average with Adaptive α Based on Disocclusion Detection; Temporal Lag (Ghosting) Is the Primary Artifact
+  - ▸ *CG use:* Dramatically increases effective sample count (8 frame history ≈ 8× more samples); must reject disoccluded pixels to prevent ghosting
+- 4.11.1.4 SVGF (Spatiotemporal Variance-Guided Filter — Schied et al. 2017): Hierarchical À-Trous Wavelet with Variance-Guided Bandwidth; Uses Temporal Color Moments (First + Second Moments) for Robust History; Fast Filtering Guided by G-Buffer
+  - ▸ *CG use:* Real-time path tracing denoising; basis for many production denoisers
+- 4.11.1.5 ReBlur / NRD (NVIDIA Real-Time Denoisers — 2021/2023): ReBlur: Physically-Based Blur Kernel Derived from MC Statistics; Relax: Advanced Spatial-Temporal Accumulation with Disocclusion Handling; SIGMA: Shadow-Specific Denoiser
+  - ▸ *CG use:* NVIDIA RTX denoising SDK; bundled with RTXGI; used in AAA games (Cyberpunk 2077 RT Overdrive, Alan Wake 2)
+
+#### 4.11.2 Neural Denoising
+- 4.11.2.1 OptiX Denoiser (NVIDIA): CNN-Based; Input: Noisy Beauty + Albedo + Normal (Optional); 2.5D U-Net Architecture; Trained on Synthetic Data; GPU-Accelerated via Tensor Cores
+  - ▸ *CG use:* Production offline rendering (Arnold, V-Ray, RenderMan); near-instant denoising of path-traced frames
+- 4.11.2.2 OIDN (Intel Open Image Denoise): CPU-Optimized CNN; Input: Beauty + Albedo + Normal; Lightweight Architecture (Fast CPU Inference); Open Source
+  - ▸ *CG use:* Blender Cycles denoising; cross-platform (no GPU required); fast enough for interactive rendering
+- 4.11.2.3 DLSS Ray Reconstruction (NVIDIA 2023): Combined Denoising + Super-Resolution; Input: Noisy Path-Traced Image + G-Buffer Features + Motion Vectors → Transformer Network → Denoised + Upscaled Output; Trained on 5× More Data Than DLSS 3
+  - ▸ *CG use:* Cyberpunk 2077 Path Tracing mode; Alan Wake 2; denoises + upscales path tracing in a single network
+
+> 📚 **GitHub Repos:**
+> - [NVIDIAGameWorks/RayTracingDenoiser](https://github.com/NVIDIAGameWorks/RayTracingDenoiser) — NRD reference implementation
+> - [OpenImageDenoise/oidn](https://github.com/OpenImageDenoise/oidn) ![Stars](https://img.shields.io/github/stars/OpenImageDenoise/oidn?style=flat) — Intel's CPU neural denoiser
+>
+> 📖 **Textbooks:** *Ray Tracing Gems* — Denoising chapters; NRD documentation
+
+---
+
+### 4.12 Post-Processing, Lens Effects & Display
+
+#### 4.12.1 Tone Mapping & HDR Display
+- 4.12.1.1 Why Tone Mapping?: HDR Rendering Produces Radiance Values [0, ∞); Display Accepts [0,1] (SDR) or [0,~10000 nits] (HDR with PQ/HLG); Tone Mapping = Compressing Dynamic Range While Preserving Perceived Contrast and Color
+  - ▸ *CG use:* Every rendered frame passes through a tone mapper; incorrect tone mapping destroys artistic intent
+- 4.12.1.2 Reinhard (2002): L_d = L/(1+L); Global Operator; Simple, Photographically Inspired; Can Desaturate at High Luminance (Fix: Apply on Luminance Only)
+  - ▸ *CG use:* Popular early HDR tone mapper; largely superseded by filmic operators
+- 4.12.1.3 Filmic Tone Mapping (ACES / Uncharted 2): S-Curve Preserving Shadows and Highlights with Smooth Roll-Off; Desaturates to White at Extreme Values; ACES RRT (Reference Rendering Transform) for Film/VFX
+  - ▸ *CG use:* ACES is the VFX industry standard; UE4 Filmic (Hable), Unity ACES; cinematic look out of the box
+- 4.12.1.4 HDR Display Pipeline (HDR10, Dolby Vision, scRGB): Authoring: Scene-Referred Linear; Grading: Display-Referred with PQ (ST.2084 — Perceptual Quantizer) or HLG; Metadata: MaxFALL, MaxCLL, Color Volume
+  - ▸ *CG use:* AAA games shipping with HDR support; Dolby Vision dynamic metadata per scene; console and PC HDR standards
+
+#### 4.12.2 Lens & Camera Effects
+- 4.12.2.1 Depth of Field (DoF): Thin Lens Model → Circle of Confusion (CoC) Radius ∝ |1/z_focus − 1/z_object|; Scatter Pixel Within CoC Disc → Physical Bokeh (Polygonal Aperture Shape via Sample Points on Polygonal Disc)
+  - ▸ *CG use:* Cinematic rendering; photography simulation; scatter-as-gather vs. accumulate methods
+- 4.12.2.2 Motion Blur: Camera Motion Blur (Per-Frame Velocity Vector, Scatter Along Motion Path); Object Motion Blur (Transform Object by Velocity × Random Time Within Exposure); Deformation Motion Blur (Interpolate Vertex Positions)
+  - ▸ *CG use:* Film rendering at 24 FPS requires motion blur for smooth motion; game rendering at 60+ FPS → per-pixel velocity buffer
+- 4.12.2.3 Bloom: Extract Bright Areas (Threshold: L > 1) → Gaussian Blur Pyramid (Multiple Sizes) → Composite Over Original; Produces Glow Around Bright Objects; Physically: Lens + Ocular Scatter
+  - ▸ *CG use:* Neon signs, sunlight through trees, car headlights at night; every game uses bloom
+- 4.12.2.4 Lens Flare: Ghost Reflections (Even-Order Bounces Between Lens Elements → Reflected Image of Aperture); Diffraction Spikes (Star Pattern from Aperture Blades); Veiling Glare (Scatter in Lens → Overall Contrast Reduction)
+  - ▸ *CG use:* Cinematic lens flare (JJ Abrams style); physical lens simulation via ray tracing through lens model
+- 4.12.2.5 Chromatic Aberration: Lateral (Transverse): Different Wavelengths Magnified Differently → Color Fringes at Image Edges; Longitudinal (Axial): Different Wavelengths Focus at Different Depths → Purple/Green Fringing in Out-of-Focus Regions
+  - ▸ *CG use:* Cinematic realism; VR lens correction; often overused as stylistic effect
+- 4.12.2.6 Vignette, Film Grain, Lens Distortion: Vignette (Edge Darkening — cos⁴ Law + Mechanical Vignetting); Film Grain (Perceptual Noise — Analog Film Emulation); Barrel/Pincushion Distortion
+  - ▸ *CG use:* Cinematic post-processing; VR pre-distortion correction; nostalgic/period-piece aesthetics
+
+#### 4.12.3 Color Grading & Final Output
+- 4.12.3.1 Color Grading: Lift/Gamma/Gain (ASC CDL); Curves (S-Curve for Contrast); HSL (Hue/Saturation/Lightness) Adjustments; LUT (Look-Up Table — 3D LUT, Typically 33³ = 35,937 Entries, Trilinear Interpolation)
+  - ▸ *CG use:* Final frame look; consistent color across shots; LUT is the standard interchange format (export from DaVinci Resolve → import into game engine)
+- 4.12.3.2 Display Output: sRGB (Fragment Shader Writes Linear, Hardware Applies sRGB EOTF via Framebuffer sRGB Format); HDR10/HLG (Metadata-Driven Display Mapping); scRGB (16-Bit Linear, No EOTF — HDR Monitor Decodes)
+  - ▸ *CG use:* Correct gamma handling throughout pipeline; linear-space rendering + final encode is mandatory for PBR
+
+> 📚 **GitHub Repos:**
+> - [GPUOpen-Effects/FidelityFX-Denoiser](https://github.com/GPUOpen-Effects) — AMD's denoising and post-processing effects
+> - [ampas/aces-dev](https://github.com/ampas/aces-dev) — Official ACES reference implementation
+>
+> 📖 **Textbooks:** *Real-Time Rendering* — Ch. 8 (Post-Processing); *High Dynamic Range Imaging* — Reinhard et al. (Tone mapping, HDR display)
+
+---
+
 
 ## Chapter 5 · Neural, Differentiable & Inverse Rendering
 
