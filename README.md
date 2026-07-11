@@ -9,581 +9,611 @@
 
 ## Chapter 1 · Mathematical & Physical Foundations
 
-> 💡 **Top Picks:**
+> 💡 **Comprehensive References:**
 > - [ericjang/awesome-graphics](https://github.com/ericjang/awesome-graphics) ![Stars](https://img.shields.io/github/stars/ericjang/awesome-graphics?style=flat) — Curated list of CG tutorials, books, math & programming resources
-> - [zheng95z/fun-with-computer-graphics](https://github.com/zheng95z/fun-with-computer-graphics) ![Stars](https://img.shields.io/github/stars/zheng95z/fun-with-computer-graphics?style=flat) — Massive collection of CG courses, books, & tutorials
 > - [ssloy/tinyrenderer](https://github.com/ssloy/tinyrenderer) ![Stars](https://img.shields.io/github/stars/ssloy/tinyrenderer?style=flat) — Learn CG math by building a software rasterizer from scratch (~500 lines C++)
-> - [Apress/mathematics-for-computer-graphics](https://github.com/Apress/mathematics-for-computer-graphics) — Code companion for *Mathematics for Computer Graphics* (Vince)
 > - [mml-book/mml-book.github.io](https://github.com/mml-book/mml-book.github.io) ![Stars](https://img.shields.io/github/stars/mml-book/mml-book.github.io?style=flat) — *Mathematics for Machine Learning* — comprehensive modern math foundation
+> - [PBR Book v4](https://pbr-book.org/) — Definitive reference connecting math to rendering theory
+> - [3b1b/manim](https://github.com/3b1b/manim) ![Stars](https://img.shields.io/github/stars/3b1b/manim?style=flat) — 3Blue1Brown's math animation engine for visual intuition
+
+> 🎯 **How to Use:** Each concept is linked to its direct CG application via `▸ CG use:` annotations.
 
 ---
 
 ### 1.1 Linear Algebra & Tensor Methods
 
-#### 1.1.1 Fundamentals
-- 1.1.1.1 Vector Spaces, Subspaces, Span, Linear Independence, Basis & Dimension
-- 1.1.1.2 Inner Products, Norms (l₁, l₂, lₚ, Frobenius, Nuclear), Metric Spaces
-- 1.1.1.3 Outer Products, Tensor Products, Kronecker Products, Khatri-Rao Products
+#### 1.1.1 Vector Spaces & Fundamental Operations
+- 1.1.1.1 Vector Spaces, Span, Linear Independence, Basis, Dimension, Change of Basis
+  - ▸ *CG use:* Coordinate frame transforms; barycentric coordinates for triangle interpolation
+- 1.1.1.2 Inner Products, Norms (ℓ₁, ℓ₂, ℓₚ, Frobenius, Nuclear), Metric Spaces
+  - ▸ *CG use:* ℓ₂ for least-squares (geometry registration, IK); Nuclear norm for low-rank light field/BRDF completion
+- 1.1.1.3 Outer Product, Tensor Product ⊗, Kronecker Product, Khatri-Rao Product
+  - ▸ *CG use:* Rank-1 BRDF factorization (outer product); structured light transport (Kronecker)
 - 1.1.1.4 Linear Maps, Range, Nullspace, Fundamental Theorem of Linear Algebra
-- 1.1.1.5 Matrix Decompositions: LU, QR, Cholesky, LDLᵀ, Schur
-- 1.1.1.6 Eigenvalue Decomposition: Spectral Theorem, Rayleigh Quotient, Gershgorin Circles
-- 1.1.1.7 Singular Value Decomposition (SVD): Thin SVD, Truncated SVD, Schmidt Approximation Theorem
-- 1.1.1.8 Condition Number, Ill-posed Problems, Tikhonov Regularization
-- 1.1.1.9 Moore-Penrose Pseudoinverse, Least-Squares & Minimum-Norm Solutions
+  - ▸ *CG use:* Nullspace of constraint Jacobians in PBD/XPBD; range of light transport matrix for inverse rendering
 
-#### 1.1.2 Transformations & Geometry
-- 1.1.2.1 Linear Transformations in ℝ², ℝ³: Rotation, Scaling, Shear, Reflection, Projection
-- 1.1.2.2 Homogeneous Coordinates, Affine Transformations, Projective Geometry
-- 1.1.2.3 Rigid Body Motion: SO(3), SE(3), Exponential Map, Rodrigues' Rotation Formula
-- 1.1.2.4 Perspective & Orthographic Projection Matrices, NDC Transform
-- 1.1.2.5 Coordinate Frame Change: World → View → Clip → Screen
-- 1.1.2.6 Quaternions (S³): Hamilton Product, Conjugate, Inverse, Slerp, Squad
-- 1.1.2.7 Dual Quaternions (DQ): Rigid Transformation Unification, Screw Theory, DQB (Dual Quaternion Blending)
-- 1.1.2.8 Lie Groups & Lie Algebras: so(3), se(3), Exponential Map, Logarithm, Adjoint Representation
-- 1.1.2.9 Clifford Algebra / Geometric Algebra: Bivectors, Rotors, PGA (Projective Geometric Algebra), CGA (Conformal GA)
+#### 1.1.2 Matrix Decompositions
+- 1.1.2.1 LU, Cholesky (SPD), LDLᵀ — Direct Linear Solvers
+  - ▸ *CG use:* Cholesky for real-time FEM (projective dynamics); mass matrix inversion
+- 1.1.2.2 QR Decomposition (Gram-Schmidt, Householder, Givens)
+  - ▸ *CG use:* Camera extrinsic calibration; orthonormal tangent space frames
+- 1.1.2.3 Eigenvalue Decomposition: Spectral Theorem, Rayleigh Quotient, Gershgorin Circles
+  - ▸ *CG use:* Spectral clustering for mesh segmentation; principal curvature directions; vibration modes (sound rendering)
+- 1.1.2.4 Singular Value Decomposition (SVD): Full, Thin, Truncated; Eckart-Young-Mirsky Optimal Low-Rank
+  - ▸ *CG use:* PCA for 3DMM face models; R=UVᵀ polar decomposition for stable ARAP; camera matrix factorization
+- 1.1.2.5 Polar Decomposition A=UP; Schur Decomposition; Generalized Eigenvalue (Av=λBv)
+  - ▸ *CG use:* ARAP rotation extraction; modal FEM analysis; constrained dynamics (λMx=Kx)
 
-#### 1.1.3 Advanced Topics
-- 1.1.3.1 Tensor Decompositions: CP, Tucker, Tensor Train (TT), Tensor Ring — applications in neural scene compression (TensoRF)
-- 1.1.3.2 Randomized Linear Algebra: Randomized SVD, Sketching, Nyström Approximation, Subsampled Randomized Hadamard Transform
-- 1.1.3.3 Low-Rank & Sparse Decompositions: RPCA, Non-negative Matrix Factorization (NMF)
-- 1.1.3.4 Grassmann & Stiefel Manifolds: Subspace Optimization in Computer Vision
-- 1.1.3.5 Reproducing Kernel Hilbert Spaces (RKHS) & the Kernel Trick in Graphics
-- 1.1.3.6 Sparse Representations & Dictionary Learning: K-SVD, OMP, application to BRDF compression
-- 1.1.3.7 Dimensionality Reduction: PCA, t-SNE, UMAP, Isomap — visualization & data preprocessing for 3D data
+#### 1.1.3 Special Matrices & Sparsity
+- 1.1.3.1 Symmetric, Skew-Symmetric [ω]×, Orthogonal, Projection Matrices
+  - ▸ *CG use:* Angular velocity via skew-symmetric; perspective/orthographic projection matrices
+- 1.1.3.2 Sparse, Banded, Block-Diagonal/Tridiagonal; CSR/CSC/BCSR Storage Formats
+  - ▸ *CG use:* FEM stiffness/mass matrices; GPU SpMV for projective dynamics; mesh Laplacian
+- 1.1.3.3 Toeplitz, Circulant, Hankel — FFT-Based Fast Matrix-Vector Product
+  - ▸ *CG use:* Fast convolution filtering (circulant); constant-velocity motion blur (Toeplitz)
+- 1.1.3.4 Condition Number κ(A), Ill-Posedness, Tikhonov (Ridge) ‖Ax−b‖²+λ‖Γx‖²; Truncated SVD Regularization
+  - ▸ *CG use:* Stable inverse rendering; robust normal estimation from noisy point clouds
+- 1.1.3.5 Moore-Penrose Pseudoinverse A⁺; Least-Squares minₓ‖Ax−b‖₂ & Minimum-Norm Solutions
+  - ▸ *CG use:* Blend shape weight computation; camera resectioning (DLT algorithm)
+
+#### 1.1.4 Geometry of Transformations
+- 1.1.4.1 2D/3D Rigid Transformations: SO(n), Matrix Exponential/Logarithm, Scaling, Shear, Reflection
+  - ▸ *CG use:* Scene graph transforms; camera animation on SE(3)
+- 1.1.4.2 Homogeneous Coordinates (ℙⁿ): Unified Affine & Projective via 4×4 Matrices
+  - ▸ *CG use:* Entire GPU vertex pipeline; hardware perspective division
+- 1.1.4.3 Graphics Viewing Pipeline: Model→World→View→Clip→NDC→Screen
+  - ▸ *CG use:* Every frame; reverse-Z for infinite far plane
+- 1.1.4.4 Camera Models: Pinhole K[R|t]; Orthographic; Weak-Perspective
+  - ▸ *CG use:* SfM; multi-view stereo projection matrix decomposition
+
+#### 1.1.5 Quaternions & Rotations
+- 1.1.5.1 Quaternion Algebra (S³ Group): Hamilton Product, Norm, Conjugate, Inverse; Unit q = Rotation
+  - ▸ *CG use:* Compact (4 floats vs 9), no gimbal lock, GPU-friendly interpolation
+- 1.1.5.2 Rotation p'=qpq⁻¹; Axis-Angle Conversion; Double Cover q≡−q of SO(3)
+  - ▸ *CG use:* Skeletal joint rotations; arcball camera
+- 1.1.5.3 SLERP (Constant ω), SQUAD (Cubic on S³), NLERP; Quaternion Averaging (Karcher Mean on SO(3))
+  - ▸ *CG use:* Keyframe rotation blending; multi-view rotation averaging in global SfM
+- 1.1.5.4 Dual Quaternions: 8D Entity Encodes Rigid Transform (R+t); Screw Motion Theory
+  - ▸ *CG use:* DQS skinning eliminates candy-wrapper; unified rigid body state
+
+#### 1.1.6 Lie Groups & Lie Algebras
+- 1.1.6.1 Lie Group: Smooth Manifold + Group; Lie Algebra 𝔤=T_eG; SO(3), SE(3), Sim(3)
+  - ▸ *CG use:* Consistent rotation/pose in optimization; bundle adjustment on SE(3)
+- 1.1.6.2 exp: 𝔤→G, log: G→𝔤; BCH Formula (Non-commutative Addition)
+  - ▸ *CG use:* Small pose updates in Gauss-Newton; camera trajectory interpolation
+- 1.1.6.3 so(3): 3×3 Skew-Symmetric↭3-Vector via ∧/∨; Basis Generators; se(3): 6D Twist (v,ω); Adjoint Ad_{[R|t]}
+  - ▸ *CG use:* Rigid body angular velocity integration; robot kinematics; character animation
+- 1.1.6.4 Derivatives on SO(3)/SE(3): Jacobians w.r.t. Lie Algebra (Tangent Space) Parameters
+  - ▸ *CG use:* Gauss-Newton pose optimization; differentiable articulated rendering
+
+#### 1.1.7 Tensor Methods for Compact Representation
+- 1.1.7.1 Tensor Decompositions: CP (CANDECOMP/PARAFAC), Tucker (HOSVD), Tensor Train (TT), Tensor Ring
+  - ▸ *CG use:* TensoRF (CP+VM→100× radiance field compression); TT for neural BRDF compression
+- 1.1.7.2 Tensor Contraction (Einstein Summation), Mode-n Product, Matricization/Unfolding
+  - ▸ *CG use:* GPU tensor cores accelerate contractions (cuBLAS, Triton); neural renderer forward ops
+- 1.1.7.3 Low-Rank Tensor Completion: Nuclear Norm Minimization; Riemannian Optimization on Tensor Manifolds
+  - ▸ *CG use:* Compressive light transport (4D/6D light fields from sparse measurements)
+- 1.1.7.4 VM (Vector-Matrix) Decomposition for Factorized Feature Grids
+  - ▸ *CG use:* TensoRF (Chen et al. ECCV 2022); Instant NGP-style factorization; factorized neural SDF
+
+#### 1.1.8 Randomized & Approximate Linear Algebra
+- 1.1.8.1 Randomized SVD: Random Projection+QR+Power Iteration — O(mn log k)
+  - ▸ *CG use:* Fast PCA on million-vertex meshes; rapid SVBRDF material decomposition
+- 1.1.8.2 Random Sketching: JL Lemma, CountSketch, SRHT; Nyström Approximation (Landmark-Based Low-Rank)
+  - ▸ *CG use:* Light transport matrix sketching; scalable GP for radiance field interpolation
+- 1.1.8.3 Randomized Kaczmarz & Stochastic Iterative Methods for Overdetermined LS
+  - ▸ *CG use:* Fast CT/mesh reconstruction; real-time projector-camera calibration
+
+#### 1.1.9 Group Theory & Equivariance (Geometric DL Foundations)
+- 1.1.9.1 Group Theory: Groups, Subgroups, Cosets, Group Actions, Orbits, Stabilizers
+  - ▸ *CG use:* SE(3)-equivariant point cloud networks; symmetry-aware texture synthesis
+- 1.1.9.2 Group Representations: Linear Representations, Irreducible Representations (Irreps), Characters, Schur's Lemma
+  - ▸ *CG use:* Spherical CNNs (SO(3) irreps); Tensor Field Networks for molecular/point cloud data
+- 1.1.9.3 Wigner D-Matrices: Rotation of SH; Clebsch-Gordan Tensor Product for Combining Irreps
+  - ▸ *CG use:* SE(3)-transformers; equivariant 3D reconstruction; rotation-invariant shape descriptors
+- 1.1.9.4 Steerable Filters & Gauge-Equivariant CNNs on Meshes (GEM-CNN)
+  - ▸ *CG use:* MeshCNN on curved surfaces; gauge-equivariant 3D shape learning
 
 > 📚 **Resources:**
-> - [MIT 18.06 (Gilbert Strang)](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/) — Classic LA course; see also [18.065 Matrix Methods](https://ocw.mit.edu/courses/18-065-matrix-methods-in-data-analysis-signal-processing-and-machine-learning-spring-2018/)
-> - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Randomized SVD, iterative Krylov solvers, PCA on large data
-> - [kenjihiranabe/The-Art-of-Linear-Algebra](https://github.com/kenjihiranabe/The-Art-of-Linear-Algebra) ![Stars](https://img.shields.io/github/stars/kenjihiranabe/The-Art-of-Linear-Algebra?style=flat) — Visual graphic notes on all key LA matrix-vector operations
-> - [3b1b/manim](https://github.com/3b1b/manim) ![Stars](https://img.shields.io/github/stars/3b1b/manim?style=flat) — 3Blue1Brown's math animation engine (Essence of Linear Algebra series)
-> - [bivector/Liber-Demysthen](https://github.com/bivector/Liber-Demysthen) — Introduction to Geometric/Clifford Algebra for 3D graphics
-> - [dmodes_public/matrix-cookbook](https://www.math.uwaterloo.ca/~hwolkowi/matrixcookbook.pdf) — The Matrix Cookbook: exhaustive reference for matrix identities
+> - [MIT 18.06 & 18.065 (Gilbert Strang)](https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/) — Classic LA + Matrix Methods for Data, Signal & ML
+> - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Randomized SVD, Krylov solvers, PCA in Jupyter+PyTorch
+> - [kenjihiranabe/The-Art-of-Linear-Algebra](https://github.com/kenjihiranabe/The-Art-of-Linear-Algebra) ![Stars](https://img.shields.io/github/stars/kenjihiranabe/The-Art-of-Linear-Algebra?style=flat) — Visual graphic notes of all key matrix-vector operations
+> - [TensoRF Project Page](https://apchenstu.github.io/TensoRF/) — Tensor decomposition for radiance fields
 
 ---
 
-### 1.2 Calculus & Analysis
+### 1.2 Calculus, Automatic Differentiation & Analysis
 
-#### 1.2.1 Foundations
-- 1.2.1.1 Limits, Continuity, Uniform Continuity, Lipschitz Continuity
-- 1.2.1.2 Derivatives: Total Derivative, Directional Derivative, Gâteaux & Fréchet Derivatives
-- 1.2.1.3 Gradient, Divergence, Curl, Laplacian — Physical Interpretation & Identities
-- 1.2.1.4 Jacobian Matrix (Dₓf), Hessian Matrix (∇²f), Vector-valued & Matrix-valued Functions
-- 1.2.1.5 Taylor Expansion: First-order, Second-order, Higher-order, Big-O Remainder Forms
-- 1.2.1.6 Mean Value Theorem, Implicit Function Theorem, Inverse Function Theorem
-- 1.2.1.7 Definite/Indefinite Integrals, Multiple Integrals, Change of Variables, Fubini's Theorem
-- 1.2.1.8 Line, Surface & Volume Integrals; Green's, Gauss's (Divergence) & Stokes' Theorems
+#### 1.2.1 Foundations of Real Analysis
+- 1.2.1.1 Limits, Continuity, Lipschitz (‖f(x)−f(y)‖≤L‖x−y‖); ϵ-δ Formalism
+  - ▸ *CG use:* Lipschitz SDF guarantees sphere-tracing convergence; neural field smoothness bounds
+- 1.2.1.2 Differentiability: Fréchet (Total) Derivative, Gâteaux (Directional) Derivative
+  - ▸ *CG use:* Variational image processing; rendering equation operator analysis
+- 1.2.1.3 Gradient ∇f, Divergence ∇·F, Curl ∇×F, Laplacian Δf — Geometric & Physical Meanings
+  - ▸ *CG use:* Curl noise for incompressible flow; Laplacian mesh smoothing; Poisson image editing
+- 1.2.1.4 Jacobian J_f, Hessian H=∇²f; Vector-Jacobian (VJP) & Jacobian-Vector Products (JVP)
+  - ▸ *CG use:* VJPs/JVPs are THE fundamental ops of autodiff (PyTorch backward() = VJP accumulation)
+- 1.2.1.5 Taylor's Theorem: f(x+h)=f(x)+∇f·h+½hᵀHh+O(‖h‖³); Lagrange & Integral Remainders
+  - ▸ *CG use:* Trust-region IK; Newton convergence analysis; FEM integration error bounds
+- 1.2.1.6 Implicit Function Theorem: F(x,y)=0⇒y=g(x) with g'(x)=−[∂F/∂y]⁻¹∂F/∂x
+  - ▸ *CG use:* Implicit layer differentiation (DEQ); constraint forces in physics simulation
+- 1.2.1.7 Integration: Riemann, Lebesgue; Fubini; Change of Variables (Jacobian Determinant)
+  - ▸ *CG use:* Path integral formulation of light transport; BRDF IS transform method (uniform→target PDF)
 
-#### 1.2.2 Automatic Differentiation
-- 1.2.2.1 Forward-Mode AD (Dual Numbers, Tangent Propagation) vs. Reverse-Mode AD (Adjoint/Cotangent)
-- 1.2.2.2 Computational Graph Representation, Wengert Tape, Checkpointing
-- 1.2.2.3 Higher-Order Differentiation & Hessian-Vector Products (HVP/VP)
-- 1.2.2.4 Implicit Differentiation: Adjoint State Method, Deep Equilibrium Models
-- 1.2.2.5 Differentiating Through Physical Simulators (DiffTaichi, Warp, ∇-Sim)
-- 1.2.2.6 Discontinuity Handling: Edge Sampling, Reparameterization Tricks, REINFORCE/Score-Function Estimators
-- 1.2.2.7 GPU AD Frameworks: JAX, PyTorch Autograd, Enzyme (LLVM-level), Slang.D
+#### 1.2.2 Automatic Differentiation — Engine of Modern Graphics
+- 1.2.2.1 Computational Graph: Primal Ops, Adjoint Ops; Topological Reverse-Order Traversal
+  - ▸ *CG use:* All modern differentiable renderers built on AD
+- 1.2.2.2 Forward-Mode AD: Dual Numbers (a+bε, ε²=0); JVP; Cost∝#Inputs
+  - ▸ *CG use:* Gauss-Newton Jacobians (small input→forward mode); directional derivatives for specular paths
+- 1.2.2.3 Reverse-Mode AD: Adjoint Sensitivity; VJP Chain; Wengert Tape; Cost∝#Outputs
+  - ▸ *CG use:* Gradient of scalar loss w.r.t. millions of scene params in NeRF/3DGS training
+- 1.2.2.4 Checkpointing: Compute-Memory Trade-off; Binomial Optimal Schedule
+  - ▸ *CG use:* Training 3DGS with millions of Gaussians under GPU memory limits
+- 1.2.2.5 Higher-Order: HVP via Forward-over-Reverse
+  - ▸ *CG use:* 2nd-order optimization for camera+geometry; Laplace approximation for rendering uncertainty
+- 1.2.2.6 Discontinuity Handling: Dirac Gradients at Visibility Boundaries; Edge Sampling; Reparameterization (Path→Primary Sample Space); Warp-Area
+  - ▸ *CG use:* THE core challenge of diff-rendering; Li et al. 2018, Loubet et al. 2019
+- 1.2.2.7 REINFORCE (Score-Function) Estimator ∇_θ𝔼_{x~p_θ}[f(x)]=𝔼[f(x)∇_θ log p_θ]; Unbiased, High Variance
+  - ▸ *CG use:* Black-box differentiable rasterization; NeRF coarse sampling gradient
+- 1.2.2.8 Reparameterization Trick: ∇_θ𝔼_{x~p_θ}[f(x)]=∇_θ𝔼_{z~q}[f(T(z,θ))]; Lower Variance When T Exists
+  - ▸ *CG use:* VAE texture latents; 3DGS (sampling≈reparameterization of 2D Gaussians)
+- 1.2.2.9 Adjoint State Method for ODE/PDE-Constrained Optimization; Continuous vs. Discrete Adjoint
+  - ▸ *CG use:* Differentiable fluid simulation (∇-Sim, PhiFlow); gradient-based design optimization
 
-#### 1.2.3 Transform Methods
-- 1.2.3.1 Fourier Series (Real & Complex Forms), Gibbs Phenomenon, Parseval's Identity
-- 1.2.3.2 Continuous Fourier Transform (FT): Properties, Convolution Theorem, Uncertainty Principle
-- 1.2.3.3 Discrete Fourier Transform (DFT), Fast Fourier Transform (FFT: Cooley-Tukey, Radix-2)
-- 1.2.3.4 Laplace Transform, Z-Transform — Solving Linear ODEs & Difference Equations
-- 1.2.3.5 Spherical Harmonics (SH): Real SH Basis, Orthogonality, Rotation Invariance, Addition Theorem, Product Projection
-- 1.2.3.6 Zonal Harmonics, H-Basis, Anisotropic Spherical Gaussians — Real-time Light Transport
-- 1.2.3.7 Wavelet Transforms: Continuous (CWT), Discrete (DWT), Haar, Daubechies, Lifting Scheme
+#### 1.2.3 Integral Transforms & Spherical Harmonics
+- 1.2.3.1 Fourier Series (Real & Complex), Parseval; Gibbs Phenomenon, Dirichlet Kernel
+  - ▸ *CG use:* FFT ocean surface; periodic texture synthesis; antialiasing theory
+- 1.2.3.2 Fourier Transform (1D,2D,nD): Shift, Convolution (ℱ{f∗g}=ℱ{f}·ℱ{g}), Scaling, Derivative Theorems
+  - ▸ *CG use:* Fast convolution filtering; frequency-domain BRDF analysis
+- 1.2.3.3 DFT & FFT (Cooley-Tukey Radix-2): O(N log N); GPU via cuFFT/rocFFT
+  - ▸ *CG use:* Ocean wave simulation; frequency-space fluids; fast convolution via FFT
+- 1.2.3.4 Laplace Transform, Z-Transform: LTI ODE/Difference Equation Solving
+  - ▸ *CG use:* Viscoelastic material relaxation; character animation control theory
+- 1.2.3.5 Spherical Harmonics Yₗᵐ: Complete Orthonormal Basis on S²; Legendre Pₗᵐ; Real SH Basis
+  - ▸ *CG use:* IBL irradiance (SH projection); PRT; ambient occlusion SH (Ramamoorthi 2001)
+- 1.2.3.6 SH Rotation (Wigner D), SH Product (Clebsch-Gordan), Triple Product (Gaunt)
+  - ▸ *CG use:* Rotating environment maps without re-projection; fast SH-based glossy BRDF
+- 1.2.3.7 Zonal Harmonics, Anisotropic Spherical Gaussians (ASG), Bingham
+  - ▸ *CG use:* Compact specular models; real-time anisotropic environment lighting
+- 1.2.3.8 Wavelet Transform (CWT,DWT): Haar, Daubechies, Mallat Algorithm, Subband Coding
+  - ▸ *CG use:* JPEG 2000; geometry images; à-trous wavelet MC denoising
 
-#### 1.2.4 Functional Analysis & PDE Foundations
-- 1.2.4.1 Function Spaces: Lᵖ, Sobolev Hᵏ, Hölder — crucial for FEM error analysis
-- 1.2.4.2 Calculus of Variations: Euler-Lagrange Equations, Gateaux Derivatives, Weak Formulation
-- 1.2.4.3 Elliptic PDEs: Laplace/Poisson Equation (pressure solve, geometry smoothing, diffusion curves)
-- 1.2.4.4 Parabolic PDEs: Heat Equation (heat kernel signature, spectral geometry)
-- 1.2.4.5 Hyperbolic PDEs: Wave Equation (sound simulation), Transport/Advection Equation
-- 1.2.4.6 Variational Principles in Physics: Principle of Least Action, Hamiltonian Mechanics
-- 1.2.4.7 Sobolev Training & Neural Tangent Kernel (NTK) — implicit regularization in neural fields
+#### 1.2.4 Variational Calculus, PDEs & SDEs
+- 1.2.4.1 Euler-Lagrange ∂L/∂f−d/dx(∂L/∂f')=0; Natural BCs; First & Second Variation
+  - ▸ *CG use:* Geodesic computation; minimal surface generation; Mumford-Shah segmentation
+- 1.2.4.2 Weak Formulations, Sobolev Hᵏ, Lax-Milgram; Galerkin
+  - ▸ *CG use:* FEM for elastic solids; Poisson surface reconstruction
+- 1.2.4.3 Elliptic (Laplace, Poisson), Parabolic (Heat), Hyperbolic (Wave, Transport) PDEs
+  - ▸ *CG use:* Harmonic deformation; heat method geodesics; fluid advection; sound propagation
+- 1.2.4.4 Heat Kernel K_t=Σe^{−λₖt}φₖ(x)φₖ(y); Connection to Laplace-Beltrami
+  - ▸ *CG use:* HKS for shape matching; geodesic distance via short-time heat (Crane et al. 2013)
+- 1.2.4.5 Stochastic Differential Equations: Itô Process dX=μdt+σdW; Fokker-Planck; Generator
+  - ▸ *CG use:* Score-based 3D generation (reverse SDE=denoising); Langevin MCMC for PT; stochastic texture
+- 1.2.4.6 Neural Tangent Kernel (NTK): Infinite-Width Limit; Gradient Descent in Function Space
+  - ▸ *CG use:* Understanding NeRF/SIREN training dynamics; implicit regularization in coordinate MLPs
 
 > 📚 **Resources:**
-> - [3Blue1Brown Essence of Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr) — Visual, intuitive calculus foundations
-> - [google/jax](https://github.com/google/jax) ![Stars](https://img.shields.io/github/stars/google/jax?style=flat) — Composable transforms of Python+NumPy: autodiff, JIT, vectorization
-> - [EnzymeAD/Enzyme](https://github.com/EnzymeAD/Enzyme) ![Stars](https://img.shields.io/github/stars/EnzymeAD/Enzyme?style=flat) — High-performance AD at the LLVM level for C++, Rust, Julia, Fortran
-> - [sympy/sympy](https://github.com/sympy/sympy) ![Stars](https://img.shields.io/github/stars/sympy/sympy?style=flat) — Python symbolic calculus: derivatives, integrals, limits, transforms
-> - [greenw07/spherical-harmonics](https://github.com/greenw07/spherical-harmonics) — Practical SH implementation and visualization
+> - [google/jax](https://github.com/google/jax) ![Stars](https://img.shields.io/github/stars/google/jax?style=flat) — Composable autodiff+JIT; backbone of modern diff-rendering
+> - [EnzymeAD/Enzyme](https://github.com/EnzymeAD/Enzyme) ![Stars](https://img.shields.io/github/stars/EnzymeAD/Enzyme?style=flat) — LLVM-level AD through GPU kernels and simulation codes
+> - [greenw07/spherical-harmonics](https://github.com/greenw07/spherical-harmonics) — Practical SH: rotation, projection, product
+> - [3Blue1Brown (YouTube)](https://www.youtube.com/@3blue1brown) — Visual intuition for calculus, Fourier, DEs
 
 ---
 
-### 1.3 Differential Geometry
+### 1.3 Differential Geometry & Manifold Theory
 
 #### 1.3.1 Classical Curve & Surface Theory
-- 1.3.1.1 Curves: Arc-length Parameterization, Frenet-Serret Frame (T, N, B), Curvature κ, Torsion τ
-- 1.3.1.2 Surfaces: Parameterized Patches, Tangent Space TₚM, First Fundamental Form I (Metric Tensor g)
-- 1.3.1.3 Second Fundamental Form II: Shape Operator S = −dN, Weingarten Map
-- 1.3.1.4 Normal Curvature κₙ, Principal Curvatures κ₁, κ₂, Gaussian Curvature K = κ₁κ₂, Mean Curvature H = (κ₁+κ₂)/2
-- 1.3.1.5 Gauss's Theorema Egregium: Gaussian Curvature is Intrinsic
-- 1.3.1.6 Gauss-Bonnet Theorem: ∫K dA + ∮κ_g ds = 2πχ(M) — Topology-Geometry Bridge
-- 1.3.1.7 Minimal Surfaces (H=0): Mean Curvature Flow, Soap Film Analogies
-- 1.3.1.8 Conformal Maps & Isothermal Coordinates, Uniformization Theorem
+- 1.3.1.1 Curves: Arc-Length s=∫‖γ'‖du; Frenet-Serret {T,N,B}; Curvature κ, Torsion τ
+  - ▸ *CG use:* Uniform path sampling; camera path smoothing; sweep surface generation
+- 1.3.1.2 Surfaces: Parameterized x(u,v); Tangent Basis {x_u,x_v}; Normal n
+  - ▸ *CG use:* Tangent space for texture/normal mapping; displacement along normals
+- 1.3.1.3 First Fundamental Form I=E du²+2F du dv+G dv² (Metric g); Intrinsic Geometry
+  - ▸ *CG use:* Length/area/angle on surfaces; texture distortion metrics; bending-invariant geometry
+- 1.3.1.4 Second Fundamental Form II; Shape Operator S=I⁻¹II (Weingarten Map)
+  - ▸ *CG use:* Surface curvature for segmentation/features; NPR suggestive contours
+- 1.3.1.5 Principal κ₁,κ₂ (Eigenvalues of S); Gaussian K=κ₁κ₂; Mean H=(κ₁+κ₂)/2
+  - ▸ *CG use:* Mean curvature flow smoothing; Gaussian curvature type classification (elliptic/hyperbolic/parabolic)
+- 1.3.1.6 Gauss Theorema Egregium (K Intrinsic); Gauss-Bonnet ∫KdA+∫κ_g ds=2πχ(M)
+  - ▸ *CG use:* Developable surface flattening (K=0); topology verification
+- 1.3.1.7 Geodesics ∇_γ'γ'=0; Exponential Map; Minimal Surfaces H≡0
+  - ▸ *CG use:* Heat method geodesics; stretch-minimizing parameterization; surface fairing
 
-#### 1.3.2 Riemannian Geometry
-- 1.3.2.1 Smooth Manifolds, Charts, Atlases, Transition Maps
-- 1.3.2.2 Tangent Bundles, Vector Fields, Lie Brackets, Lie Derivatives
-- 1.3.2.3 Riemannian Metrics, Geodesics, Geodesic Equation (∇ᵧ̇ᵧ̇=0), Exponential Map
-- 1.3.2.4 Covariant Derivatives, Levi-Civita Connection, Christoffel Symbols Γⁱⱼₖ
-- 1.3.2.5 Riemann Curvature Tensor Rⁱⱼₖₗ, Ricci Curvature, Scalar Curvature
-- 1.3.2.6 Parallel Transport, Holonomy Groups
-- 1.3.2.7 Laplace-Beltrami Operator Δ = div ∘ grad = d\*d: Spectrum, Eigenfunctions
-- 1.3.2.8 Hodge Theory: k-forms, Hodge Star ⋆, Exterior Derivative d, Codifferential δ = ⋆d⋆, Hodge Laplacian Δ = dδ+δd
+#### 1.3.2 Riemannian Geometry & Manifolds
+- 1.3.2.1 Smooth Manifolds, Charts/Atlases, Tangent Bundle TM; Induced Metric
+  - ▸ *CG use:* SO(3)/SE(3) manifold optimization; shape spaces for statistical analysis
+- 1.3.2.2 Riemannian Metric g_p; Covariant Derivative ∇_XY; Levi-Civita Connection; Christoffels Γᵏ_{ij}
+  - ▸ *CG use:* Anisotropic meshing (prescribed metric); parallel transport for direction fields
+- 1.3.2.3 Riemann Curvature R(X,Y)Z; Sectional, Ricci, Scalar; Parallel Transport & Holonomy
+  - ▸ *CG use:* Ricci flow mesh processing; N-RoSy direction field design
 
-#### 1.3.3 Discrete Differential Geometry (DDG)
-- 1.3.3.1 Discrete Curves: Discrete Frenet Frame, Discrete Curvature & Torsion
-- 1.3.3.2 Discrete Surfaces: Triangle Meshes as Simplicial Complexes
-- 1.3.3.3 Discrete Metric: Edge Lengths lᵢⱼ; Discrete Gaussian Curvature: Angle Deficit
-- 1.3.3.4 Discrete Mean Curvature: Cotangent Formula, Normal Defined via Area Gradient
-- 1.3.3.5 Discrete Laplace-Beltrami: Cotan Laplacian, Mass Matrix, FEM View
-- 1.3.3.6 Discrete Conformal Maps: Circle Patterns, CETM (Conformal Equivalence of Triangle Meshes)
-- 1.3.3.7 Discrete Exterior Calculus (DEC): Discrete k-forms, Discrete Hodge Star, Discrete Exterior Derivative
-- 1.3.3.8 Discrete Shells: Discrete Bending Energy, Isometric Bending Model
-- 1.3.3.9 Spin Transformations & Quaternionic Dirac Operators on Meshes
+#### 1.3.3 Hodge Theory & Exterior Calculus
+- 1.3.3.1 k-Forms, Wedge ∧, Exterior d (d²=0), de Rham Complex
+  - ▸ *CG use:* Helmholtz-Hodge decomposition for fluid simulation (any field = curl-free + div-free + harmonic)
+- 1.3.3.2 Hodge Star ⋆, Codifferential δ=⋆d⋆, Hodge Laplacian Δ=dδ+δd; Harmonic Forms
+  - ▸ *CG use:* DEC for structure-preserving fluid; Hodge decomposition on meshes
+- 1.3.3.3 Discrete Exterior Calculus (DEC): Discrete k-Forms; Discrete d & ⋆
+  - ▸ *CG use:* Robust geometric PDE solving on meshes; exact divergence-free fluid constraint
+- 1.3.3.4 Laplace-Beltrami Δ=−div_M∘∇_M; Δφ_k=λ_kφ_k (Manifold Fourier Basis)
+  - ▸ *CG use:* ShapeDNA; spectral mesh compression; functional maps for shape correspondence
 
-#### 1.3.4 Optimal Transport Geometry
-- 1.3.4.1 Monge Problem vs. Kantorovich Relaxation: Primal & Dual Formulations
-- 1.3.4.2 Wasserstein Distance (Earth Mover's Distance): W₁, W₂ Metrics, Properties
-- 1.3.4.3 Sinkhorn Algorithm: Entropy-Regularized OT, Scalable GPU Implementation
-- 1.3.4.4 Semidiscrete Optimal Transport: Power Diagrams, Laguerre Cells
-- 1.3.4.5 Applications: Blue Noise Sampling, Shape Interpolation, BRDF Transfer, Fluid Advection Correction, GAN Training
+#### 1.3.4 Discrete Differential Geometry (DDG) on Meshes
+- 1.3.4.1 Discrete Gaussian Curvature: K(v_i)=2π−Σⱼθᵢⱼ (Angle Deficit); Discrete Gauss-Bonnet
+  - ▸ *CG use:* Mesh quality metrics; feature detection; curvature-driven remeshing
+- 1.3.4.2 Discrete Mean Curvature (Cotangent): Hn_i=(1/2A_i)Σⱼ(cotα+cotβ)(v_j−v_i)
+  - ▸ *CG use:* Mean curvature flow smoothing; Laplacian mesh editing; discrete shell bending
+- 1.3.4.3 Cotangent Laplacian L_{ij}=½(cotα+cotβ); Mass M; Lφ=λMφ (Generalized Eigenproblem)
+  - ▸ *CG use:* Heat method geodesics; spectral mesh filtering; functional maps
+- 1.3.4.4 Discrete Conformal Maps: Circle Patterns, CETM, LSCM (Lévy 2002)
+  - ▸ *CG use:* High-quality UV unwrapping; surface flattening
+- 1.3.4.5 Discrete Shells (Grinspun 2003): Bending via Dihedral Change; N-RoSy Direction Fields; Spin Transforms
+  - ▸ *CG use:* Cloth with bending; quad remeshing; seamless global parameterization; NPR orientation
 
-#### 1.3.5 Information Geometry (Selected)
-- 1.3.5.1 Statistical Manifold: Fisher Information Metric, Exponential & Mixture Families
-- 1.3.5.2 Natural Gradient Descent (NGD): Fisher-Rao Gradient, KL-Divergence Geometry
-- 1.3.5.3 Applications: Bayesian Inference for BRDF, Policy Optimization in Graphics RL
+#### 1.3.5 Optimal Transport Geometry
+- 1.3.5.1 Monge→Kantorovich Relaxation; Wasserstein-p W_p; Earth Mover's (W₁); Metric on ℙ
+  - ▸ *CG use:* BRDF IS via OT map; shape interpolation; point set registration
+- 1.3.5.2 Entropic OT: Sinkhorn O(n² log n) GPU; Fully Differentiable
+  - ▸ *CG use:* Differentiable point cloud registration; neural rendering OT-regularized losses
+- 1.3.5.3 Semidiscrete OT: Power/Laguerre Diagrams; Newton on Weights; Sliced Wasserstein
+  - ▸ *CG use:* Blue noise (de Goes 2012); geometry compression quantization; NPR stippling
 
 > 📚 **Resources:**
-> - [geometry-central/geometry-central](https://github.com/nmwsharp/geometry-central) ![Stars](https://img.shields.io/github/stars/nmwsharp/geometry-central?style=flat) — Modern C++ library for surface mesh geometry with DEC operators
-> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Swiss-army-knife geometry processing library (cotan Laplacian, curvature, geodesics)
-> - [CMU DDG Course (Keenan Crane)](https://www.cs.cmu.edu/~kmcrane/Projects/DDG/) — Free notes, slides & video lectures on discrete differential geometry
-> - [alecjacobson/geometry-processing](https://github.com/alecjacobson/geometry-processing) — Grad-level course with MATLAB/C++: curvature, parameterization, deformation
-> - [Peyré/Cuturi — Computational Optimal Transport (Book + Code)](https://github.com/Peyre/bookOT) — The standard reference for OT methods with Python notebooks
+> - [geometry-central/geometry-central](https://github.com/nmwsharp/geometry-central) ![Stars](https://img.shields.io/github/stars/nmwsharp/geometry-central?style=flat) — DEC, geodesics, vector fields, parameterization in C++
+> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Cotan Laplacian, curvature, geodesics
+> - [CMU DDG (Keenan Crane)](https://www.cs.cmu.edu/~kmcrane/Projects/DDG/) — Free notes, slides, videos — gold standard
+> - [Peyré/Cuturi — Computational OT](https://github.com/Peyre/bookOT) — Standard OT reference + Python notebooks
 
 ---
 
-### 1.4 Computational Geometry & Spatial Data Structures
+### 1.4 Computational Geometry & Spatial Acceleration
 
-#### 1.4.1 Core Algorithms
-- 1.4.1.1 Convex Hull in 2D: Graham Scan (O(n log n)), Jarvis March (O(nh)); 3D: QuickHull, Chan's Algorithm
-- 1.4.1.2 Delaunay Triangulation: Empty Circumcircle Criterion, Lawson Flip, Bowyer-Watson Incremental (O(n²) worst, O(n log n) average)
-- 1.4.1.3 Constrained DT (CDT): Steiner Points, Conforming DT, Quality Meshing (Ruppert's Algorithm)
-- 1.4.1.4 Voronoi Diagram: Relation to Delaunay Duality, Fortune's Sweep-Line (O(n log n)), Power Diagram, Centroidal Voronoi Tessellation (CVT)
-- 1.4.1.5 Polygon Triangulation: Ear Clipping (O(n²)), Monotone Decomposition (O(n log n)), Seidel's Randomized (O(n log\* n))
-- 1.4.1.6 Boolean Operations on Polygons: Weiler-Atherton, Greiner-Hormann, Martinez-Rueda; Polyhedra: BSP-based, Exact Arithmetic
-- 1.4.1.7 Arrangements: Sweep Line, Zone Theorem, CGAL Arrangement_2 Traits
-- 1.4.1.8 Medial Axis, Straight Skeleton, Offset Curves — 3D printing, font rendering
+#### 1.4.1 Convexity & Triangulations
+- 1.4.1.1 Convex Hull 2D: Graham O(n log n), Jarvis O(nh), Chan O(n log h); 3D: QuickHull
+  - ▸ *CG use:* GJK collision detection; V-HACD convex decomposition; alpha shapes
+- 1.4.1.2 Delaunay Triangulation: Empty Circumcircle (Max-Min Angle)↭Voronoi Duality; Bowyer-Watson O(n log n)
+  - ▸ *CG use:* High-quality mesh generation; terrain triangulation; natural neighbor interpolation
+- 1.4.1.3 CDT, Ruppert Quality Meshing; Voronoi, Power Diagram, CVT (Lloyd Relaxation), CCVT
+  - ▸ *CG use:* CAD meshing; blue noise; fracture fragments; 3D printing toolpath; optimal stippling
 
-#### 1.4.2 Intersection & Proximity
-- 1.4.2.1 Segment-Segment Intersection: Orientation Test, Bentley-Ottmann Sweep (O((n+k) log n))
-- 1.4.2.2 Ray-Triangle Intersection: Möller-Trumbore, Watertight Variants, Back-face Culling
-- 1.4.2.3 Ray-AABB: Slab Method (Kay-Kajiya); Ray-OBB, Ray-Sphere, Ray-Cylinder
-- 1.4.2.4 Ray-Polygon: Winding Number vs. Even-Odd, PNPoly, Crossings Test
-- 1.4.2.5 Bounding Volume Hierarchies (BVH): Surface Area Heuristic (SAH), Binned SAH, HLBVH, PLOC, Refit
-- 1.4.2.6 Spatial Hashing, Grids, Nested Grids: Infinite Grid, Hashed Grid, Multi-level Grid
-- 1.4.2.7 k-d Tree, BSP Tree: Construction Strategies, SAH, Traversal Optimization
-- 1.4.2.8 Octree, Quadtree: Morton Codes (Z-order), Linear/Breadth-first Layout
-- 1.4.2.9 Nearest Neighbor Search: Exact kNN, ε-Approximate, FLANN, HNSW, LSH
+#### 1.4.2 Spatial Data Structures
+- 1.4.2.1 BVH: SAH C=C_T+(SA(L)/SA(R))·C; Binned SAH O(n log n), HLBVH, PLOC
+  - ▸ *CG use:* THE dominant RT structure (DXR/Vulkan/OptiX); collision broad phase
+- 1.4.2.2 BVH Traversal: Stack/Stackless, Wide BVH (4/8/16 SIMD), Quantized Nodes; TLAS+BLAS; SER
+  - ▸ *CG use:* DXR 1.1/Vulkan RT; embree kernel-level traversal; animated scenes (refit BLAS)
+- 1.4.2.3 k-d Trees, Octrees (Morton/SVO), BSP Trees
+  - ▸ *CG use:* Photon kd-tree; OpenVDB SVO; Quake-style PVS
+- 1.4.2.4 Spatial Hashing: Infinite Grid+Hash; Lock-Free GPU Hash; Learned Spatial Indices (Neural BVH, SDF Proxy)
+  - ▸ *CG use:* Instant NGP multi-res hash; GPU particle neighbors; neural scene traversal
 
-#### 1.4.3 GPU-Accelerated & Learned Data Structures
-- 1.4.3.1 GPU-parallel BVH Construction: Linear BVH (LBVH), TRBVH, PLOC on GPU
-- 1.4.3.2 Two-Level Acceleration Structures (TLAS + BLAS) — DXR/Vulkan RT model
-- 1.4.3.3 Compressed Wide BVH (8-wide, 16-wide), Quantized Nodes, Traversal Intrinsics
-- 1.4.3.4 GPU Hash Tables & Lock-Free Data Structures for Spatial Queries
-- 1.4.3.5 Learned Spatial Indices: Neural Bounding Volume, Learned Proxies (SDF, Occupancy)
-- 1.4.3.6 Radix Sort, Bitonic Sort for GPU Morton Code Generation
+#### 1.4.3 Intersection & Proximity
+- 1.4.3.1 Ray-Triangle: Möller-Trumbore (Barycentric+Distance); Ray-AABB (Slab)
+  - ▸ *CG use:* GPU RT core hardware; most-executed instruction in modern rendering
+- 1.4.3.2 GJK+EPA (Convex Distance & Penetration); SAT (Convex Polytopes)
+  - ▸ *CG use:* Bullet, PhysX collision; continuous collision for convex shapes
+- 1.4.3.3 Bentley-Ottmann Segment Intersection O((n+k)log n); Polygon Clipping (Sutherland-Hodgman, Vatti)
+  - ▸ *CG use:* 2D Boolean; planar maps; UI clipping; CSG for CAD
 
-#### 1.4.4 Robustness & Exact Arithmetic
-- 1.4.4.1 Floating-Point Pitfalls: Cancellation, Degeneracy, Snap-rounding, ε-tweaking
-- 1.4.4.2 Exact Predicates: Shewchuk's Adaptive Precision, Filtered Predicates, Interval Arithmetic
-- 1.4.4.3 Exact Geometric Computation (EGC): CGAL Kernel Philosophy, GMP/MPFR
-- 1.4.4.4 Robust Line Segment Intersection via Rational Arithmetic
-- 1.4.4.5 Symbolic Perturbation (SoS — Simulation of Simplicity) for Degeneracy Resolution
+#### 1.4.4 Robustness & Exact Computation
+- 1.4.4.1 Adaptive Precision (Shewchuk): Filter+Interval+Exact; SoS Symbolic Perturbation
+  - ▸ *CG use:* Robust Delaunay (CGAL/TetGen); exact orient/incircle tests
+- 1.4.4.2 Exact Geometric Computation (EGC): GMP/MPFR; CGAL Cartesian+Exact Kernel; GPU Radix Sort, ANN (HNSW, LSH)
+  - ▸ *CG use:* CGAL gold standard; real-time BVH on GPU; HNSW photon lookup
 
 > 📚 **Resources:**
-> - [CGAL/cgal](https://github.com/CGAL/cgal) ![Stars](https://img.shields.io/github/stars/CGAL/cgal?style=flat) — Gold-standard C++ library: triangulation, BVH, arrangements, exact arithmetic kernels
-> - [Habrador/Computational-geometry](https://github.com/Habrador/Computational-geometry) ![Stars](https://img.shields.io/github/stars/Habrador/Computational-geometry?style=flat) — Unity/C# implementations of 2D/3D CG algorithms with interactive demos
-> - [Turfjs/turf](https://github.com/Turfjs/turf) ![Stars](https://img.shields.io/github/stars/Turfjs/turf?style=flat) — Advanced geospatial & computational geometry in JavaScript
-> - [locationtech/jts](https://github.com/locationtech/jts) ![Stars](https://img.shields.io/github/stars/locationtech/jts?style=flat) — Java Topology Suite, robust 2D geometry engine (basis for GEOS C++)
-> - [embree/embree](https://github.com/embree/embree) ![Stars](https://img.shields.io/github/stars/embree/embree?style=flat) — Intel's high-performance ray tracing kernels: world-class BVH construction & traversal
+> - [CGAL/cgal](https://github.com/CGAL/cgal) ![Stars](https://img.shields.io/github/stars/CGAL/cgal?style=flat) — Robust Delaunay, arrangements, Boolean, exact arithmetic
+> - [embree/embree](https://github.com/embree/embree) ![Stars](https://img.shields.io/github/stars/embree/embree?style=flat) — Intel world-class BVH traversal kernels
+> - [nmslib/hnswlib](https://github.com/nmslib/hnswlib) ![Stars](https://img.shields.io/github/stars/nmslib/hnswlib?style=flat) — Fast HNSW approximate NN
 
 ---
 
-### 1.5 Probability, Statistics & Stochastic Processes
+### 1.5 Probability Theory & Stochastic Processes
 
 #### 1.5.1 Foundations
-- 1.5.1.1 Probability Space (Ω, ℱ, ℙ), Random Variables, Distribution Functions (CDF, PDF, PMF)
-- 1.5.1.2 Expectation, Variance, Covariance, Correlation, Higher-Order Moments, Cumulants
-- 1.5.1.3 Conditional Probability, Bayes' Theorem, Law of Total Probability
-- 1.5.1.4 Common Continuous Distributions: Uniform, Gaussian (Univariate/Multivariate), Exponential, Gamma, Beta, Dirichlet, Wishart
-- 1.5.1.5 Common Discrete Distributions: Bernoulli, Binomial, Poisson, Multinomial, Categorical
-- 1.5.1.6 Exponential Family: Natural Parameter, Sufficient Statistic, Log-Partition, Conjugate Priors
-- 1.5.1.7 Information Theory: Entropy (Shannon, Differential, Relative/KL), Mutual Information, Cross-Entropy, Rate-Distortion Theory
+- 1.5.1.1 Probability Space (Ω,ℱ,ℙ); CDF/PDF/PMF; Transform Y=g(X) (Change of Variables)
+  - ▸ *CG use:* THE basis for ALL Monte Carlo rendering; IS transform method
+- 1.5.1.2 Expectation, Variance, Covariance; Law of Total Expectation; Conditional Variance
+  - ▸ *CG use:* MIS weight derivation; adaptive sampling variance analysis
+- 1.5.1.3 Concentration: Markov, Chebyshev, Chernoff, Hoeffding, Bernstein, McDiarmid; Exponential Family; MGF
+  - ▸ *CG use:* Certified MC error bounds; adaptive termination criteria; unified rendering distributions
+- 1.5.1.4 Key Distributions: Gaussian, Exponential, Gamma, Beta, Dirichlet, Wishart, von Mises-Fisher (Spherical)
+  - ▸ *CG use:* GGX NDF≈Beta; vMF for spherical BRDF lobe
 
-#### 1.5.2 Monte Carlo Methods for Graphics
-- 1.5.2.1 Classical Monte Carlo: Law of Large Numbers, Central Limit Theorem, Error ∝ 1/√N
-- 1.5.2.2 Variance Reduction: Importance Sampling (IS), Control Variates, Antithetic Variates, Rao-Blackwellization
-- 1.5.2.3 Stratified Sampling, Latin Hypercube, jittered sampling, N-Rooks sampling
-- 1.5.2.4 Quasi-Monte Carlo (QMC): Low-Discrepancy Sequences (Halton, Sobol', Faure), Discrepancy, Koksma-Hlawka Inequality
-- 1.5.2.5 Randomized QMC (RQMC): Owen's Scrambling, Cranley-Patterson Rotation, Practical Blue-noise QMC
-- 1.5.2.6 Multiple Importance Sampling (MIS): Balance Heuristic, Power Heuristic (β=2), One-Sample MIS
-- 1.5.2.7 Resampled Importance Sampling (RIS / ReSTIR): Reservoir Sampling, Spatiotemporal Reuse, Visibility Reuse
-- 1.5.2.8 Adaptive Sampling: Variance-based, Contrast-based, Stein's Unbiased Risk Estimate (SURE)
+#### 1.5.2 Monte Carlo Integration for Rendering
+- 1.5.2.1 Classical MC: Î=(1/N)Σf(X_i)/p(X_i); Unbiased; Var=σ²_f/N; CLT; Error∝1/√N
+  - ▸ *CG use:* Path tracing estimator; O(1/√N) is the fundamental rendering limitation
+- 1.5.2.2 Importance Sampling: Optimal q*∝|f|; BRDF IS (GGX VNDF); Light IS; Environment Map IS
+  - ▸ *CG use:* Every path tracer BRDF sample uses IS
+- 1.5.2.3 Multiple IS (MIS): Balance Heuristic w_s∝N_s p_s; Power Heuristic (β=2); One-Sample MIS
+  - ▸ *CG use:* BSDF+light combo in VCM; standard in every production renderer
+- 1.5.2.4 RIS & ReSTIR: Reservoir Sampling+Spatiotemporal Reuse; Generalized Resampling
+  - ▸ *CG use:* ReSTIR DI/GI/PT (SIGGRAPH 2020-2024); NVIDIA RTXDI — millions of lights in real-time
+- 1.5.2.5 QMC: Low-Discrepancy (Halton, Sobol', Faure); Koksma-Hlawka; Owen Scrambling (RQMC)
+  - ▸ *CG use:* Production PT (V-Ray, Arnold, Cycles) uses QMC for O(logᵈN/N) convergence
 
-#### 1.5.3 Markov Chain Monte Carlo (MCMC)
-- 1.5.3.1 Markov Chain Theory: Transition Kernel, Stationary Distribution, Ergodicity, Detailed Balance, Mixing Time
-- 1.5.3.2 Metropolis-Hastings (MH): Proposal Distributions, Acceptance Ratio, Random Walk MH
-- 1.5.3.3 Gibbs Sampling, Slice Sampling, Reversible Jump MCMC
-- 1.5.3.4 Hamiltonian Monte Carlo (HMC): Leapfrog Integrator, No-U-Turn Sampler (NUTS)
-- 1.5.3.5 MCMC in Rendering: Metropolis Light Transport (MLT), Primary Sample Space MLT (PSSMLT), Manifold Exploration (MNEE)
-- 1.5.3.6 Langevin Monte Carlo (SGLD, SGHMC) & Connections to DDPM/Score-based Diffusion
+#### 1.5.3 MCMC for Rendering
+- 1.5.3.1 Markov Chains: Transition Kernel, Stationary π=πP; Detailed Balance; Ergodicity & Mixing
+  - ▸ *CG use:* MCMC rendering→path integral measure π(X̄)∝f(X̄)
+- 1.5.3.2 MH: α=min(1,π(y)q(x|y)/(π(x)q(y|x))); HMC (Leapfrog+NUTS); Langevin MC
+  - ▸ *CG use:* MLT (1997); PSSMLT (2002); MNEE manifold exploration for specular paths
+- 1.5.3.3 MLT Mutations: Bidirectional, Perturbation, Lens Subpath; Handling SDS Paths
+  - ▸ *CG use:* Renders caustics & SDS impossible for standard PT
 
-#### 1.5.4 Stochastic Differential Equations & Diffusion Models
-- 1.5.4.1 Brownian Motion (Wiener Process), Itô Calculus, Itô's Lemma
-- 1.5.4.2 Forward SDE (Noising Process): Ornstein-Uhlenbeck, Variance-Preserving (VP SDE), Variance-Exploding (VE SDE)
-- 1.5.4.3 Reverse-Time SDE: Anderson's Theorem, Score Function ∇ₓ log p_t(x)
-- 1.5.4.4 Denoising Score Matching (DSM), Sliced Score Matching, Implicit Score Matching
-- 1.5.4.5 Denoising Diffusion Probabilistic Models (DDPM): Forward/Reverse Markov Chain, ϵ-Prediction vs. x₀-Prediction
-- 1.5.4.6 Flow Matching / Rectified Flow / Stochastic Interpolants — Continuous Normalizing Flows
-- 1.5.4.7 Applications in Graphics: 3D Generation (DreamFusion/ProlificDreamer), Texture Synthesis, Inverse Rendering Priors, Motion Diffusion
+#### 1.5.4 SDEs & Diffusion Generative Models
+- 1.5.4.1 Brownian Motion, Itô Integral, Itô's Lemma: df=(f_t+μf_x+½σ²f_{xx})dt+σf_xdW
+  - ▸ *CG use:* Foundation for diffusion-based 3D generation
+- 1.5.4.2 Forward SDE: VP-SDE dX=−½β(t)Xdt+√βdW; VE-SDE dX=√(d[σ²]/dt)dW
+  - ▸ *CG use:* DDPM=VP-SDE discretization; Score-based (Song 2021)=continuous SDE
+- 1.5.4.3 Reverse SDE: dX=[μ−σ²∇_x log p_t]dt+σdŴ (Anderson 1982); Score Function Must Be Learned
+  - ▸ *CG use:* The magic: learn score→reverse SDE→generate samples
+- 1.5.4.4 Score Matching: DSM (Vincent 2011), Sliced, Implicit; DDPM: ϵ-Prediction Parametrization
+  - ▸ *CG use:* 3D asset gen (3DGS+Score Distillation); text-to-texture
+- 1.5.4.5 Flow Matching, Rectified Flow, Stochastic Interpolants; Score Distillation (SDS), VSD
+  - ▸ *CG use:* Next-gen 3D generation (faster than DDPM); DreamFusion text→3D; ProlificDreamer
 
-#### 1.5.5 Bayesian Inference & Gaussian Processes
-- 1.5.5.1 Bayesian Framework: Prior, Likelihood, Posterior, Marginal Likelihood (Evidence)
-- 1.5.5.2 Conjugate Priors, Beta-Binomial, Gaussian-Gaussian, Normal-Inverse-Wishart
-- 1.5.5.3 Variational Inference (VI): Evidence Lower Bound (ELBO), Mean-Field VI, Reparameterization Trick
-- 1.5.5.4 Gaussian Processes (GP): Kernel/Covariance Functions (RBF, Matérn, Periodic, Spectral Mixture), GP Regression
-- 1.5.5.5 Sparse GPs: Inducing Points, FITC, SVGP — scalable to large 3D datasets
-- 1.5.5.6 Bayesian Optimization: Acquisition Functions (EI, UCB, Thompson Sampling) — material design, rendering parameter tuning
-
-#### 1.5.6 Random Fields & Spatial Statistics
-- 1.5.6.1 Markov Random Fields (MRF), Gibbs Distribution, Hammersley-Clifford Theorem
-- 1.5.6.2 Conditional Random Fields (CRF), Graph Cuts (α-Expansion, αβ-Swap) — segmentation, stereo, matting
-- 1.5.6.3 Gaussian Random Fields (GRF), Matérn Fields, Stochastic PDE Approach (Lindgren 2011) — procedural terrain, textures
-- 1.5.6.4 Noise Models: White Noise, Blue Noise (Poisson Disk Sampling, Fattal's Method, Bridson's Algorithm), Pink Noise (1/f)
-- 1.5.6.5 Procedural Noise Spectrum Analysis: Power Spectral Density, fBm, Domain Warping
+#### 1.5.5 Bayesian Inference, GPs & Random Fields
+- 1.5.5.1 Bayes Theorem; Conjugate Priors; VI (ELBO, Mean-Field, Reparameterization); GP (RBF/Matérn, Kriging, Sparse)
+  - ▸ *CG use:* Bayesian BRDF; GP-NeRF; geometry interpolation; Bayesian Optimization (rendering params, materials, cameras)
+- 1.5.5.2 MRF, CRF, Graph Cuts (α-Expansion, αβ-Swap); Noise Spectrum Engineering (White, Blue, Pink, Brown)
+  - ▸ *CG use:* Texture synthesis; segmentation; stereo; Perlin/Simplex noise; blue noise dithering; fBm terrain
 
 > 📚 **Resources:**
-> - [probml/pml-book](https://github.com/probml/pml-book) ![Stars](https://img.shields.io/github/stars/probml/pml-book?style=flat) — *Probabilistic Machine Learning* by Kevin Murphy: exhaustive probability + ML reference
-> - [CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers](https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers) ![Stars](https://img.shields.io/github/stars/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers?style=flat) — Full book + PyMC code: MCMC, Bayesian stats from scratch
-> - [chi-feng/mcmc-demo](https://github.com/chi-feng/mcmc-demo) ![Stars](https://img.shields.io/github/stars/chi-feng/mcmc-demo?style=flat) — Interactive browser-based MCMC visualization (MH, HMC, NUTS, SVGD)
-> - [yang-song/score_sde](https://github.com/yang-song/score_sde) ![Stars](https://img.shields.io/github/stars/yang-song/score_sde?style=flat) — Score-based generative modeling through SDEs (theoretical foundation)
-> - [huggingface/diffusers](https://github.com/huggingface/diffusers) ![Stars](https://img.shields.io/github/stars/huggingface/diffusers?style=flat) — State-of-the-art diffusion models (DDPM, Stable Diffusion, flow matching) in PyTorch
-> - [graykode/distribution-is-all-you-need](https://github.com/graykode/distribution-is-all-you-need) ![Stars](https://img.shields.io/github/stars/graykode/distribution-is-all-you-need?style=flat) — Visual cheatsheet of all common probability distributions
+> - [probml/pml-book](https://github.com/probml/pml-book) ![Stars](https://img.shields.io/github/stars/probml/pml-book?style=flat) — Exhaustive probability+ML (Murphy)
+> - [CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers](https://github.com/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers) ![Stars](https://img.shields.io/github/stars/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers?style=flat) — MCMC+Bayesian from scratch+PyMC
+> - [yang-song/score_sde](https://github.com/yang-song/score_sde) ![Stars](https://img.shields.io/github/stars/yang-song/score_sde?style=flat) — Score-based SDEs: theoretical foundation
+> - [huggingface/diffusers](https://github.com/huggingface/diffusers) ![Stars](https://img.shields.io/github/stars/huggingface/diffusers?style=flat) — SOTA diffusion (DDPM, SD, Flow Matching)
 
 ---
 
-### 1.6 Numerical Analysis & Scientific Computing
+### 1.6 Information Theory & Statistical Learning
 
-#### 1.6.1 Floating Point & Error Analysis
-- 1.6.1.1 IEEE 754: Binary32 (float), Binary64 (double), Subnormals, Inf, NaN, Rounding Modes
-- 1.6.1.2 FP16 (half), BF16 (bfloat16), TensorFloat-32 (TF32) for GPU ML workloads
-- 1.6.1.3 Error Types: Absolute/Relative Error, Forward/Backward Error, Condition Number, Stability
-- 1.6.1.4 Catastrophic Cancellation, Compensated Summation (Kahan), Pairwise Summation
-- 1.6.1.5 Interval Arithmetic, Affine Arithmetic — robust geometric predicates
+*Essential for neural rendering, geometry compression, perceptual metrics, and generative graphics.*
 
-#### 1.6.2 Linear Systems
-- 1.6.2.1 Direct Methods: Gaussian Elimination, LU, Cholesky (SPD), LDLᵀ, QR (Householder, Givens)
-- 1.6.2.2 Iterative Methods: Jacobi, Gauss-Seidel, SOR, Symmetric SOR (SSOR)
-- 1.6.2.3 Krylov Subspace Methods: Conjugate Gradient (CG), MINRES, GMRES, BiCGSTAB, LSQR
-- 1.6.2.4 Multigrid Methods (GMG, AMG): V-cycle, W-cycle, Full Multigrid (FMG) — optimal O(n) for Poisson
-- 1.6.2.5 Domain Decomposition: Schwarz Alternating, Schur Complement, FETI
-- 1.6.2.6 Preconditioners: Jacobi, ILU(k), AMG, Polynomial, Sparse Approximate Inverse (SPAI)
-- 1.6.2.7 Randomized Linear Solvers: Randomized Kaczmarz, Sketch-and-Precondition, Blendenpik
+#### 1.6.1 Core Information Measures
+- 1.6.1.1 Shannon Entropy H(X)=−Σp log p; Differential Entropy h(X)=−∫f log f; Maximum Entropy Principle
+  - ▸ *CG use:* Entropy-constrained quantization (Draco mesh compression); BRDF measurement uncertainty
+- 1.6.1.2 KL Divergence D_KL(P‖Q); Cross-Entropy; f-Divergences (TV, Hellinger, χ², JS)
+  - ▸ *CG use:* VAE training (KL term); GAN training (JS vs W); perceptual loss in neural rendering
+- 1.6.1.3 Mutual Information I(X;Y)=D_KL(P_XY‖P_X P_Y); Data Processing Inequality; MINE (Belghazi 2018)
+  - ▸ *CG use:* Viewpoint selection (max MI camera↔scene); InfoNCE for view-consistent scenes; CLIP-based 3D generation
 
-#### 1.6.3 Eigenvalue & SVD Computation
-- 1.6.3.1 Power Iteration, Inverse Iteration, Rayleigh Quotient Iteration (cubic convergence)
-- 1.6.3.2 QR Algorithm, Francis Shift, Implicit Q Theorem
-- 1.6.3.3 Lanczos & Arnoldi for Large Sparse Matrices
-- 1.6.3.4 Randomized SVD / Nyström: Prototype for Sketching, Power Iteration Enhancement
-- 1.6.3.5 GPU-Parallel Eigenvalue Solvers: Divide-and-Conquer, MRRR, Jacobi-Davidson
+#### 1.6.2 Rate-Distortion Theory & Neural Compression
+- 1.6.2.1 R(D)=min_{Q:𝔼[d]≤D} I(X;X̂); Blahut-Arimoto; Lossy Coding (Lloyd-Max, LBG, DCT→JPEG, Wavelet→JP2K)
+  - ▸ *CG use:* BCn/ASTC GPU texture compression; vertex quantization (Draco)
+- 1.6.2.2 Entropy Coding: Huffman, Arithmetic, ANS (Zstd, Draco); Neural Compression (Analysis/Synthesis+Quant+Entropy; Hyperprior; RD λ)
+  - ▸ *CG use:* Draco bitstream; neural radiance field compression; 3DGS compression (quant+entropy+pruning)
 
-#### 1.6.4 Function Approximation & Interpolation
-- 1.6.4.1 Polynomial Interpolation: Lagrange, Newton Divided Differences, Runge Phenomenon, Chebyshev Nodes
-- 1.6.4.2 Spline Interpolation: Cubic (Natural, Clamped, Not-a-knot), Hermite (Catmull-Rom, Kochanek-Bartels/TCB), B-Spline
-- 1.6.4.3 Radial Basis Functions (RBF): Gaussian, Multiquadric, Thin-Plate Spline, Wendland's Compactly Supported
-- 1.6.4.4 Moving Least Squares (MLS): Point Set Surfaces, Implicit MLS Surfaces
-- 1.6.4.5 Bézier Curves (de Casteljau) & B-Splines as Numerical Approximation Tools
-- 1.6.4.6 Least-Squares Approximation: Normal Equations (AᵀA), QR Approach, Tikhonov/ℓ₂ Regularization
-- 1.6.4.7 Sparse Approximation: Basis Pursuit (ℓ₁), OMP, LASSO — compressed BRDF/light field
-
-#### 1.6.5 Numerical Integration
-- 1.6.5.1 Newton-Cotes: Trapezoid, Simpson's 1/3, Simpson's 3/8, Boole's Rule
-- 1.6.5.2 Gauss-Legendre Quadrature: Nodes, Weights, n-point Rules ⇒ polynomials up to degree 2n−1 exact
-- 1.6.5.3 Adaptive Quadrature: Error Estimation, Richardson Extrapolation, Romberg Integration
-- 1.6.5.4 Sparse Grids (Smolyak) for High-Dimensional Integration — overcome curse of dimensionality
-- 1.6.5.5 Cubature for Triangles & Tetrahedra: Dunavant Rules, Grundmann-Möller, Stroud Conical
-- 1.6.5.6 Monte Carlo Integration (see §1.5.2) — unique advantage in high dimensions
-
-#### 1.6.6 ODE & PDE Numerical Methods
-- 1.6.6.1 ODE Time Steppers: Explicit Euler, RK4, Dormand-Prince (DOPRI5/DP5), Adams-Bashforth-Moulton (Predictor-Corrector)
-- 1.6.6.2 Symplectic Integrators: Verlet, Leapfrog, Implicit Midpoint — for Hamiltonian systems (physics simulation)
-- 1.6.6.3 Implicit Methods: Backward Euler, BDF, Radau IIA — stiff ODEs (cloth, FEM with stiff materials)
-- 1.6.6.4 Finite Difference Method (FDM): Forward/Backward/Central Difference, Stencils, Stability (CFL, von Neumann), Consistency, Convergence
-- 1.6.6.5 Finite Element Method (FEM): Weak Form, Galerkin, Test/Trial Spaces, Assembly, Quadrature, Nédélec/RT Elements
-- 1.6.6.6 Finite Volume Method (FVM): Flux Balance, Conservative Form, Godunov, MUSCL — fluid simulation
-- 1.6.6.7 Spectral Methods: Fourier Spectral, Chebyshev, Spectral Element Method — high-accuracy PDEs
-- 1.6.6.8 Particle Methods: SPH, MPM, FLIP, PIC, APIC — mesh-free PDE simulation
-- 1.6.6.9 Neural Operators (DeepONet, FNO, PINNs) — learned PDE surrogates for real-time simulation
-
-#### 1.6.7 Optimization in Numerical Context
-- 1.6.7.1 Line Search Methods: Backtracking (Armijo), Wolfe Conditions, Strong Wolfe, Goldstein
-- 1.6.7.2 Trust Region Methods: Dogleg, Subproblem Solution, Conjugate Gradient-Steihaug
-- 1.6.7.3 Newton-Raphson for Nonlinear Systems: Jacobian Assembly, Globalization Strategies
-- 1.6.7.4 Fixed-Point Iteration, Banach Fixed-Point Theorem, Contraction Mappings
-- 1.6.7.5 Continuation (Homotopy) Methods — robust solving for difficult nonlinear problems
+#### 1.6.3 Statistical Learning Theory
+- 1.6.3.1 PAC Learning, VC Dimension, Rademacher Complexity; Generalization Gap
+  - ▸ *CG use:* When does NeRF overfit? Sample complexity: how many views needed?
+- 1.6.3.2 Bias-Variance Trade-off; Double Descent (Modern Overparameterized); Regularization (L₁/Lasso, L₂/Ridge, Elastic Net, Early Stopping)
+  - ▸ *CG use:* Neural field capacity; sparse 3DGS; smoothness prior (Eikonal loss for neural SDF)
+- 1.6.3.3 Model Selection: AIC, BIC, MDL; Cross-Validation; Information Bottleneck min I(X;Z)−βI(Z;Y)
+  - ▸ *CG use:* BRDF lobe count; 3DGS Gaussian count; compact latent scene representations
 
 > 📚 **Resources:**
-> - [fastai/numerical-linear-algebra](https://github.com/fastai/numerical-linear-algebra) ![Stars](https://img.shields.io/github/stars/fastai/numerical-linear-algebra?style=flat) — Randomized SVD, Krylov solvers, PCA; Jupyter + PyTorch
-> - [SciML/DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl) ![Stars](https://img.shields.io/github/stars/SciML/DifferentialEquations.jl?style=flat) — Comprehensive Julia suite: adaptive ODE/PDE solvers, DDEs, SDEs, neural ODEs
-> - [scipy/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — `scipy.linalg`, `scipy.sparse.linalg`, `scipy.integrate`, `scipy.interpolate`
-> - [JuliaMath](https://github.com/JuliaMath) — Julia ecosystem: FFTW.jl, SpecialFunctions.jl, LinearSolve.jl, Krylov.jl
-> - [certik/fortran-utils](https://github.com/certik/fortran-utils) — LAPACK & modern Fortran numerical libraries reference
-> - [lululxvi/deepxde](https://github.com/lululxvi/deepxde) ![Stars](https://img.shields.io/github/stars/lululxvi/deepxde?style=flat) — Deep learning library for solving forward/inverse PDEs (PINNs, DeepONet)
+> - [Cover & Thomas — Elements of Information Theory](http://staff.ustc.edu.cn/~cgong821/Wiley.Interscience.Elements.of.Information.Theory.Jul.2006.eBook-DDU.pdf) — Canonical textbook
+> - [google/draco](https://github.com/google/draco) ![Stars](https://img.shields.io/github/stars/google/draco?style=flat) — Production 3D mesh compression with entropy coding
+> - [Understanding Deep Learning (Prince)](https://udlbook.github.io/udlbook/) — Modern text covering learning theory + info theory for DL
 
 ---
 
-### 1.7 Signal Processing & Harmonic Analysis
+### 1.7 Numerical Analysis & Scientific Computing
 
-#### 1.7.1 Classical Signal Processing
-- 1.7.1.1 Continuous-Time Signals: Time & Frequency Domain, Fourier Transform Properties
-- 1.7.1.2 Linear Time-Invariant (LTI) Systems: Impulse Response, Convolution, Transfer Function, Stability
-- 1.7.1.3 Sampling & Reconstruction:
-  - 1.7.1.3.1 Nyquist-Shannon Sampling Theorem, Bandlimited Signals, Aliasing (Time & Frequency View)
-  - 1.7.1.3.2 Ideal Reconstruction (Sinc Interpolation), Practical Non-ideal Reconstruction
-  - 1.7.1.3.3 Oversampling, Undersampling, Supersampling, Multisampling
-  - 1.7.1.3.4 Generalized Sampling Theory: Non-uniform, Compressive Sensing, NUS (Non-uniform Sampling)
-- 1.7.1.4 Filter Design: FIR vs. IIR, Window Method (Hamming, Blackman, Kaiser), Remez Exchange
-- 1.7.1.5 Z-Transform, Poles & Zeros, Stability Analysis
+#### 1.7.1 Floating-Point & Error Analysis
+- 1.7.1.1 IEEE 754: Binary32/64; FP16, BF16 (Same Range as FP32!), TF32; Subnormals, Inf, NaN
+  - ▸ *CG use:* Every GPU shader; BF16 for stable NeRF training; TF32→2× speedup on tensor cores
+- 1.7.1.2 Forward/Backward Error (Wilkinson); Condition Number; Catastrophic Cancellation
+  - ▸ *CG use:* Robust geometric predicates; stable cross-product normal; compensated summation (Kahan) for PT radiance
 
-#### 1.7.2 Discrete Signal Processing
-- 1.7.2.1 Discrete-Time Fourier Transform (DTFT), Discrete Fourier Transform (DFT), Circular Convolution
-- 1.7.2.2 Fast Fourier Transform: Cooley-Tukey (Radix-2 DIT/DIF), Mixed Radix, Split-Radix, Real-valued FFT, Rader's, Bluestein's (Chirp Z)
-- 1.7.2.3 GPU FFT: cuFFT, rocFFT, VkFFT — batched FFT, convolution via FFT
-- 1.7.2.4 Discrete Cosine Transform (DCT), Discrete Sine Transform (DST) — image/video compression (JPEG, H.264/H.265)
-- 1.7.2.5 Convolution Theorem: Fast Convolution, Deconvolution, Wiener Filter — image deblurring
+#### 1.7.2 Numerical Linear Algebra
+- 1.7.2.1 Krylov Subspace: CG (SPD), MINRES, GMRES(m), BiCGSTAB
+  - ▸ *CG use:* CG for Poisson pressure; GMRES for radiosity; BiCGSTAB for advection-diffusion
+- 1.7.2.2 Multigrid (GMG, AMG): Smoothing+V/W/F-Cycles; AMG as Black-Box Preconditioner
+  - ▸ *CG use:* State-of-the-art Poisson solver for fluid pressure
+- 1.7.2.3 Sparse Direct: Minimum Degree, Nested Dissection, Multifrontal (PARDISO/MUMPS); Preconditioning (Jacobi, ILU, AMG, SPAI, Schur)
+  - ▸ *CG use:* FEM stiffness factorization; good preconditioner→CG in ~20 iters vs 2000
 
-#### 1.7.3 Filter Banks & Multi-Resolution Analysis
-- 1.7.3.1 Filter Banks: Analysis/Synthesis, Perfect Reconstruction, Quadrature Mirror Filter (QMF), Conjugate Quadrature Filter (CQF)
-- 1.7.3.2 Wavelet Transform:
-  - 1.7.3.2.1 Continuous Wavelet Transform (CWT): Scale-Translation Plane, Wavelet Admissibility Condition
-  - 1.7.3.2.2 Discrete Wavelet Transform (DWT): Mallat Algorithm (à Trous), Subband Coding, Daubechies Wavelets
-  - 1.7.3.2.3 Lifting Scheme: Predict & Update Steps, Integer-to-Integer Wavelets — lossless compression
-  - 1.7.3.2.4 Second-Generation Wavelets on Irregular Meshes (Spherical Wavelets, Mesh Wavelets)
-- 1.7.3.3 Laplacian & Gaussian Pyramids: Burt-Adelson (1983), Redundancy, Collapse/Expand Operations
-- 1.7.3.4 Mipmapping & Anisotropic Filtering: Box, Kaiser, Lanczos Kernels, Elliptical Weighted Average (EWA)
-- 1.7.3.5 Steerable Pyramids, Oriented Filters (Gabor, Complex Wavelets), Curvelets, Contourlets
+#### 1.7.3 Function Approximation, Interpolation & Integration
+- 1.7.3.1 Polynomial (Lagrange, Newton, Barycentric), Spline (Cubic, Catmull-Rom, TCB), RBF (Gaussian, Thin-Plate, Wendland), MLS, Bézier (de Casteljau), B-Spline (Cox-de Boor), NURBS
+  - ▸ *CG use:* Keyframes; MLS point surfaces; font rendering; CAD modeling
+- 1.7.3.2 1D Gauss-Legendre (2n−1), Adaptive Gauss-Kronrod; Multidimensional Sparse Grids/Smolyak; Triangle Cubature (Dunavant); Romberg/Richardson
+  - ▸ *CG use:* FEM element integration; spherical quadrature for environment map; subsurface scattering moments
 
-#### 1.7.4 Image Processing
-- 1.7.4.1 Image Gradients: Sobel, Prewitt, Scharr, Roberts Cross; Higher-order (Laplacian of Gaussian)
-- 1.7.4.2 Edge Detection: Canny (Gradient + NMS + Hysteresis), Marr-Hildreth (LoG), Holistically-Nested Edge Detection (HED)
-- 1.7.4.3 Morphological Operators: Dilation, Erosion, Opening, Closing, Top-hat, Watershed, Distance Transform
-- 1.7.4.4 Bilateral Filter, Guided Filter, Joint Bilateral Filter — edge-preserving smoothing (denoising, tone mapping, detail enhancement)
-- 1.7.4.5 Non-Local Means (NLM), BM3D — image denoising benchmarks
-- 1.7.4.6 Total Variation (TV) Denoising: ROF Model, Primal-Dual Algorithm (Chambolle-Pock) — mesh smoothing, inverse rendering
-
-#### 1.7.5 Harmonic Analysis on Manifolds & Graphs
-- 1.7.5.1 Spectral Graph Theory: Graph Laplacian, Eigenvalues, Spectral Gap, Cheeger Inequality
-- 1.7.5.2 Graph Fourier Transform (GFT), Spectral Filtering on Graphs — mesh signal processing
-- 1.7.5.3 Spherical Harmonics (SH): Rotation via Wigner D-Matrices, Fast SH Rotation, Product Projection — real-time IBL
-- 1.7.5.4 Zonal Harmonics, H-Basis, Anisotropic Spherical Gaussians (ASG), Bingham Distributions — compact lighting models
-- 1.7.5.5 Wavelet & Pyramid on Meshes: Spherical Wavelets, Geometry Images (Gu 2002), Mesh Compression
-
-#### 1.7.6 Neural Signal Representations
-- 1.7.6.1 Fourier Feature Networks / Positional Encoding (NeRF, Tancik 2020): Spectral Bias of MLPs
-- 1.7.6.2 Multi-Resolution Hash Encoding (Instant NGP): Learned Feature Grids, Coarse-to-Fine
-- 1.7.6.3 SIREN (Sitzmann 2020): Periodic Activation Functions, Implicit Neural Representations
-- 1.7.6.4 Wavelet-based Neural Representations: WIRE, WaveNeRF, Multi-level Wavelet Decomposition
-- 1.7.6.5 Gaussian & Triplane Representations: 3DGS, TensoRF — signal processing view of 3D representations
-- 1.7.6.6 Neural Fields as Continuous Signal Representations: Occupancy, SDF, Radiance, BRDF fields
+#### 1.7.4 Numerical ODEs & PDEs
+- 1.7.4.1 Explicit ODE (Euler, RK4, DOPRI5); Symplectic (Verlet, Leapfrog, Implicit Midpoint) for Hamiltonian
+  - ▸ *CG use:* Particle advection (RK4); stable molecular dynamics (Verlet); game physics
+- 1.7.4.2 Implicit for Stiff Systems (BDF, Radau IIA); FEM (Galerkin, Shape Fn, Assembly); FVM (Godunov, MUSCL, WENO, MAC); SPH, MPM, FLIP/PIC/APIC, MLS-MPM
+  - ▸ *CG use:* Cloth (BDF-2); FEM solids; fluid (Stam 1999); snow (Disney Frozen MPM)
+- 1.7.4.3 Neural Operators: DeepONet, FNO (Spectral Conv), PINNs (Collocation Residual); Randomized SVD, Sketch-and-Solve
+  - ▸ *CG use:* Real-time fluid surrogate; learned cloth; fast PCA on massive meshes
 
 > 📚 **Resources:**
-> - [scikit-image/scikit-image](https://github.com/scikit-image/scikit-image) ![Stars](https://img.shields.io/github/stars/scikit-image/scikit-image?style=flat) — Comprehensive Python image processing library with tutorials
-> - [opencv/opencv](https://github.com/opencv/opencv) ![Stars](https://img.shields.io/github/stars/opencv/opencv?style=flat) — Industry-standard CV library: filtering, FFT, morphological ops, feature detection
-> - [AllenDowney/ThinkDSP](https://github.com/AllenDowney/ThinkDSP) ![Stars](https://img.shields.io/github/stars/AllenDowney/ThinkDSP?style=flat) — *Think DSP*: interactive book on signals, FFT, convolution, filters in Python
-> - [mikound/awesome-signal-processing](https://github.com/mikound/awesome-signal-processing) — Curated list of SP books, courses, papers
-> - [NVlabs/instant-ngp](https://github.com/NVlabs/instant-ngp) ![Stars](https://img.shields.io/github/stars/NVlabs/instant-ngp?style=flat) — Multi-resolution hash encoding: how to represent signals via learned features
-> - [vincentsitzmann/siren](https://github.com/vincentsitzmann/siren) ![Stars](https://img.shields.io/github/stars/vincentsitzmann/siren?style=flat) — Implicit neural representations with periodic activations
+> - [SciML/DifferentialEquations.jl](https://github.com/SciML/DifferentialEquations.jl) ![Stars](https://img.shields.io/github/stars/SciML/DifferentialEquations.jl?style=flat) — Julia ODE/PDE/SDE/DDE solvers
+> - [scipy/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — linalg, sparse.linalg, integrate, interpolate
+> - [taichi-dev/taichi](https://github.com/taichi-dev/taichi) ![Stars](https://img.shields.io/github/stars/taichi-dev/taichi?style=flat) — Differentiable physics (MPM, FEM, fluid)
 
 ---
 
-### 1.8 Optimization Theory
+### 1.8 Signal Processing & Harmonic Analysis
 
-#### 1.8.1 First-Order Methods
-- 1.8.1.1 Gradient Descent (GD): Fixed/Adaptive Step, Convergence Rates (Convex: O(1/k), Strongly-Convex: Linear)
-- 1.8.1.2 Stochastic Gradient Descent (SGD): Mini-batching, Variance Reduction, Learning Rate Schedules
-- 1.8.1.3 Momentum Methods: Polyak Heavy-Ball, Nesterov Accelerated Gradient (NAG) — optimal O(1/k²)
-- 1.8.1.4 Adaptive Methods: AdaGrad, RMSProp, Adam, AdamW (decoupled weight decay), LAMB
-- 1.8.1.5 Subgradient Methods (non-smooth convex), Proximal Gradient (ISTA, FISTA), Forward-Backward Splitting
-- 1.8.1.6 Coordinate Descent: Randomized, Cyclic, Block — massive-scale problems
-- 1.8.1.7 Variance-Reduced Methods: SVRG, SAGA, SARAH, SPIDER — bridge stochastic & deterministic rates
+#### 1.8.1 Classical Signal Processing
+- 1.8.1.1 LTI Systems: Impulse Response, Convolution, Transfer Function, BIBO Stability
+  - ▸ *CG use:* Image filtering=convolution; motion blur=box filter along motion vector
+- 1.8.1.2 Nyquist-Shannon f_s>2f_max; Aliasing; Antialiasing via Prefilter+Supersample
+  - ▸ *CG use:* MSAA/SSAA/TAA; mipmapping (prefiltered downsampling); texture minification
+- 1.8.1.3 Reconstruction Kernels: Sinc (Ideal), Box, Tent, Mitchell-Netravali (B=1/3,C=1/3), Lanczos
+  - ▸ *CG use:* Texture filtering (bilinear=tent); GPU hardware texture units
+- 1.8.1.4 Filter Design: FIR (Linear Phase), IIR; Window (Hamming, Blackman, Kaiser); Remez Exchange
+  - ▸ *CG use:* Audio DSP for game sound; procedural audio
 
-#### 1.8.2 Second-Order & Quasi-Newton Methods
-- 1.8.2.1 Newton's Method: Local Quadratic Convergence, Hessian Modification for Non-convexity
-- 1.8.2.2 Quasi-Newton: BFGS, DFP, SR1 — Secant Equation, Rank-1/2 Updates, Sherman-Morrison
-- 1.8.2.3 Limited-Memory BFGS (L-BFGS): Double-loop Recursion, Practical Dominance in Large-Scale Smooth Optimization
-- 1.8.2.4 Gauss-Newton & Levenberg-Marquardt — nonlinear least squares (bundle adjustment, IK solving)
-- 1.8.2.5 Natural Gradient Descent: Fisher Information Matrix, Approximate Natural Gradient (K-FAC, TENGraD)
-- 1.8.2.6 Hessian-Free (Truncated Newton) Methods: Conjugate Gradient for Newton Step, Martens (2010)
+#### 1.8.2 Multi-Resolution & Wavelet Analysis
+- 1.8.2.1 Filter Banks: Analysis(LP+HP→↓2)→Synthesis(↑2+LP+HP→Sum); Perfect Reconstruction; QMF/CQF
+  - ▸ *CG use:* JPEG 2000; geometry image compression; à-trous wavelet MC denoising
+- 1.8.2.2 DWT: Mallat Cascade; Haar, Daubechies, Symlets; Lifting (Predict+Update, Integer-to-Integer Lossless)
+  - ▸ *CG use:* Wavelet radiance caching; progressive mesh transmission; multiresolution editing
+- 1.8.2.3 Laplacian/Gaussian Pyramids; Burt-Adelson (1983) Multiresolution Spline Blending
+  - ▸ *CG use:* Mipmap chains; seamless image stitching; multiscale tone mapping
+- 1.8.2.4 Steerable Pyramids, Gabor, Complex Wavelets, Curvelets, Contourlets
+  - ▸ *CG use:* Edge-aware processing; anisotropic texture synthesis; directional NPR noise
 
-#### 1.8.3 Constrained & Structured Optimization
-- 1.8.3.1 Convex Optimization: Convex Sets, Convex Functions, KKT Optimality Conditions, Slater's Condition, Duality Gap
-- 1.8.3.2 Linear Programming (LP): Simplex, Interior-Point (Primal-Dual, Mehrotra Predictor-Corrector)
-- 1.8.3.3 Quadratic Programming (QP), Second-Order Cone Programming (SOCP), Semidefinite Programming (SDP)
-- 1.8.3.4 Augmented Lagrangian Methods (ALM), Alternating Direction Method of Multipliers (ADMM) — distributed & large-scale
-- 1.8.3.5 Projected Gradient, Frank-Wolfe (Conditional Gradient), Active Set Methods
-- 1.8.3.6 Interior Point Methods: Barrier Functions, Central Path, Primal-Dual Framework
+#### 1.8.3 Image Processing Core
+- 1.8.3.1 Edge Detection: Sobel, Prewitt, Scharr; LoG (Marr-Hildreth); Canny (Gaussian+NMS+Hysteresis); HED (Deep)
+  - ▸ *CG use:* NPR contour rendering; depth discontinuity for DoF; image-based mesh extraction
+- 1.8.3.2 Edge-Preserving Smoothing: Bilateral (Spatial+Range), Guided Filter O(N), Domain Transform
+  - ▸ *CG use:* MC denoising (SVGF, BMFR); base-detail texture decomposition; tone mapping
+- 1.8.3.3 NLM & BM3D (Collaborative Filtering); TV Regularization (ROF, Chambolle-Pock Primal-Dual)
+  - ▸ *CG use:* Denoising benchmarks; MC denoising inspiration; mesh smoothing; inverse rendering regularization
+- 1.8.3.4 Morphological Ops (Dilation, Erosion, Opening, Closing, Watershed, Distance Transform)
+  - ▸ *CG use:* SDF from binary masks; hole detection in meshes; particle separation
 
-#### 1.8.4 Riemannian Optimization
-- 1.8.4.1 Optimization on Matrix Manifolds: Stiefel, Grassmann, Oblique, Fixed-Rank Manifolds
-- 1.8.4.2 Riemannian Gradient & Riemannian Hessian: Retraction & Vector Transport
-- 1.8.4.3 Riemannian SGD, Riemannian Trust-Region, Riemannian L-BFGS
-- 1.8.4.4 Applications: Rotation Averaging (SO(3)), Camera Pose Optimization (SE(3)), Subspace Tracking, Dictionary Learning
-
-#### 1.8.5 Bilevel & Implicit Optimization
-- 1.8.5.1 Bilevel Optimization: Outer & Inner-Level Problems, Hypergradient via Implicit Function Theorem
-- 1.8.5.2 Implicit Differentiation: Adjoint Sensitivity, Neumann Series Approximation, Conjugate Gradient Approach
-- 1.8.5.3 Applications: Meta-Learning (MAML), Hyperparameter Optimization, Inverse Graphics (differentiable renderer as inner loop)
-- 1.8.5.4 Deep Equilibrium Models (DEQ): Root-finding at Inference, Implicit Layers
-
-#### 1.8.6 Global, Discrete & Derivative-Free Optimization
-- 1.8.6.1 Evolutionary Algorithms: Genetic Algorithm (GA), Differential Evolution (DE), CMA-ES — material fitting, procedural generation
-- 1.8.6.2 Simulated Annealing, Basin Hopping, Particle Swarm Optimization (PSO)
-- 1.8.6.3 Bayesian Optimization (BO): Gaussian Process Surrogate, Expected Improvement (EI), Knowledge Gradient
-- 1.8.6.4 Combinatorial / Discrete Optimization: Branch-and-Bound, Dynamic Programming, Integer Programming, Graph Cuts (α-Expansion)
-- 1.8.6.5 Derivative-Free Methods: Nelder-Mead, Powell's Method, COBYLA, BOBYQA
-
-#### 1.8.7 Optimization in Graphics-Specific Contexts
-- 1.8.7.1 Projective Dynamics (Bouaziz 2014): Gauss-Seidel on Element-wise Quadratic Energies — real-time FEM
-- 1.8.7.2 Position-Based Dynamics (PBD, XPBD): Nonlinear Gauss-Seidel, Constraint Projection — game physics
-- 1.8.7.3 ADMM for Inverse Problems in Graphics: Deconvolution, Inpainting, Compressive Light Transport
-- 1.8.7.4 Primal-Dual Methods: Chambolle-Pock for Total Variation — denoising, mesh fairing
-- 1.8.7.5 Differentiable Physics Optimization: DiffTaichi, ∇-Sim, Warp — gradient-based design & control
-- 1.8.7.6 Neural Style Transfer as Optimization: Gatys (2015), Feature Reconstruction, Texture Synthesis
+#### 1.8.4 Harmonic Analysis on Manifolds & Neural Representations
+- 1.8.4.1 Spectral Graph Theory: Graph Laplacian L=D−W; Spectrum; Graph Fourier Transform (GFT)
+  - ▸ *CG use:* Mesh spectral filtering; spectral clustering segmentation; functional maps
+- 1.8.4.2 Fourier Feature Networks (Tancik et al. 2020); Multi-Res Hash Encoding (Instant NGP, Müller 2022); SIREN (Sitzmann 2020)
+  - ▸ *CG use:* NeRF positional encoding; learned feature grids; continuous neural SDF/radiance fields
+- 1.8.4.3 Neural Fields as Universal Signal Learners: Occupancy, SDF, Radiance, BRDF Fields
+  - ▸ *CG use:* Unified view: all neural rendering=learning a continuous signal from sparse pixel/ray samples
 
 > 📚 **Resources:**
-> - [epfml/OptML_course](https://github.com/epfml/OptML_course) ![Stars](https://img.shields.io/github/stars/epfml/OptML_course?style=flat) — EPFL Optimization for ML: convex, SGD, ADMM, Quasi-Newton, distributed
-> - [cvxpy/cvxpy](https://github.com/cvxpy/cvxpy) ![Stars](https://img.shields.io/github/stars/cvxpy/cvxpy?style=flat) — Python-embedded convex optimization: LP, QP, SOCP, SDP with multiple backends
-> - [scipy/scipy](https://github.com/scipy/scipy) ![Stars](https://img.shields.io/github/stars/scipy/scipy?style=flat) — `scipy.optimize`: L-BFGS, SLSQP, trust-region, global (differential evolution, basinhopping)
-> - [cvxgrp/cvx_short_course](https://github.com/cvxgrp/cvx_short_course) — Stanford convex optimization short course (Boyd & Vandenberghe)
-> - [jaxopt/jaxopt](https://github.com/google/jaxopt) ![Stars](https://img.shields.io/github/stars/google/jaxopt?style=flat) — Differentiable optimization in JAX: implicit differentiation, bilevel, quadratic programming
-> - [pymanopt/pymanopt](https://github.com/pymanopt/pymanopt) ![Stars](https://img.shields.io/github/stars/pymanopt/pymanopt?style=flat) — Riemannian optimization on manifolds (Stiefel, Grassmann, SO(3), SE(3))
+> - [scikit-image/scikit-image](https://github.com/scikit-image/scikit-image) ![Stars](https://img.shields.io/github/stars/scikit-image/scikit-image?style=flat) — Python image processing with tutorials
+> - [NVlabs/instant-ngp](https://github.com/NVlabs/instant-ngp) ![Stars](https://img.shields.io/github/stars/NVlabs/instant-ngp?style=flat) — Hash encoding: learned features as signals
+> - [vincentsitzmann/siren](https://github.com/vincentsitzmann/siren) ![Stars](https://img.shields.io/github/stars/vincentsitzmann/siren?style=flat) — Periodic activations for implicit neural reps
 
 ---
 
-### 1.9 Topology for Graphics
+### 1.9 Optimization Theory
 
-#### 1.9.1 Algebraic Topology Basics
-- 1.9.1.1 Simplicial Complexes, Cell Complexes, CW-Complexes — meshes as simplicial complexes
-- 1.9.1.2 Homology Groups Hₖ: k-chains, Boundaries, Cycles, Betti Numbers βₖ — holes, tunnels, voids
-- 1.9.1.3 Cohomology: Hᵏ, Cup Product, Applications in Vector Field Design & Parameterization
-- 1.9.1.4 Fundamental Group π₁, Covering Spaces — global parameterization, texture synthesis
-- 1.9.1.5 Morse Theory: Critical Points, Morse-Smale Complex, Reeb Graphs — shape analysis, feature detection
+#### 1.9.1 First-Order Methods
+- 1.9.1.1 GD: Convex O(1/k), Strongly-Convex Linear; Nesterov Accelerated O(1/k²); Heavy-Ball Momentum
+  - ▸ *CG use:* Workhorse for all gradient-based graphics optimization
+- 1.9.1.2 SGD: Mini-batching, Variance Reduction (SVRG, SAGA, SPIDER); Adam/AdamW (Decoupled Weight Decay), LAMB
+  - ▸ *CG use:* NeRF/3DGS training (Adam dominates); convergence theory for adaptive methods
+- 1.9.1.3 Subgradient; Proximal Gradient (ISTA/FISTA); Forward-Backward Splitting
+  - ▸ *CG use:* ℓ₁-sparse compressed sensing BRDF/light transport
 
-#### 1.9.2 Persistent Homology & Topological Data Analysis (TDA)
-- 1.9.2.1 Filtration: Vietoris-Rips, Čech, Alpha Complex / Delaunay; Sublevel/Steplevel Sets
-- 1.9.2.2 Persistence Diagrams, Barcodes, Bottleneck & Wasserstein Distances — topological feature lifetime
-- 1.9.2.3 Persistence Landscapes, Persistence Images — vectorization for ML pipelines
-- 1.9.2.4 Mapper Algorithm, Reeb Graphs, Merge Trees — shape skeletonization
-- 1.9.2.5 Applications: 3D Shape Classification/Retrieval, Fluid Flow Analysis, Molecular Shape Analysis
+#### 1.9.2 Second-Order & Quasi-Newton
+- 1.9.2.1 Newton (Local Quadratic); Gauss-Newton, Levenberg-Marquardt (Nonlinear LS)
+  - ▸ *CG use:* Bundle adjustment (SfM); IK solving; material parameter fitting
+- 1.9.2.2 Quasi-Newton: BFGS; L-BFGS (Double-Loop, Sherman-Morrison)
+  - ▸ *CG use:* Dominates large-scale smooth optimization (geometry processing, texture optimization)
+- 1.9.2.3 Natural Gradient (Fisher-Rao); K-FAC, TENGraD (Approximations)
+  - ▸ *CG use:* Distribution-space optimization (BRDF, policy gradient in character control)
 
-#### 1.9.3 Discrete Morse Theory
-- 1.9.3.1 Discrete Gradient Vector Fields, Discrete Morse Functions, Critical Simplex Enumeration
-- 1.9.3.2 Morse-Smale Complexes on Meshes: Quadrangulation, Vector Field Topology
-- 1.9.3.3 Simplification via Cancellation: Persistence-Guided Simplification
+#### 1.9.3 Constrained, Riemannian & Structured Optimization
+- 1.9.3.1 Convex: KKT, Slater, Duality; LP (Simplex, IP), QP, SOCP, SDP
+  - ▸ *CG use:* Geometry convex formulations; OT as LP; ARAP as SOCP
+- 1.9.3.2 ALM & ADMM; Projected Gradient, Frank-Wolfe; Active Set, IP (Barrier+Central Path)
+  - ▸ *CG use:* ADMM for inverse problems (deconvolution, inpainting); constrained physics (contact, volume preservation)
+- 1.9.3.3 Riemannian Optimization: Stiefel, Grassmann; Riemannian SGD, Trust-Region, L-BFGS; pymanopt, geoopt
+  - ▸ *CG use:* Rotation averaging SO(3); camera pose SE(3); subspace tracking; dictionary learning
+
+#### 1.9.4 Bilevel, Global & Derivative-Free Optimization
+- 1.9.4.1 Bilevel: Hypergradient via IFT; Implicit Differentiation (Adjoint, Neumann, CG); DEQ
+  - ▸ *CG use:* MAML few-shot BRDF; inverse graphics (diff-render as inner loop); implicit neural rendering layers
+- 1.9.4.2 Global: Evolutionary (GA, CMA-ES, DE), Simulated Annealing, PSO, Nelder-Mead, Powell, COBYLA/BOBYQA
+  - ▸ *CG use:* Material fitting; procedural gen; camera placement; black-box renderer optimization
+
+#### 1.9.5 Graphics-Specific Optimization
+- 1.9.5.1 Projective Dynamics: Element-wise Quadratic+Gauss-Seidel→Real-Time FEM
+- 1.9.5.2 PBD/XPBD: Nonlinear Gauss-Seidel Constraint Projection→Game Physics
+- 1.9.5.3 Chambolle-Pock Primal-Dual for TV→Mesh Smoothing, Denoising, Inverse Rendering
+- 1.9.5.4 Differentiable Physics (∇-Sim, DiffTaichi, Warp)→Gradient-Based Design & Control
 
 > 📚 **Resources:**
-> - [scikit-tda/scikit-tda](https://github.com/scikit-tda/scikit-tda) — Python ecosystem for topological data analysis
-> - [giotto-ai/giotto-tda](https://github.com/giotto-ai/giotto-tda) ![Stars](https://img.shields.io/github/stars/giotto-ai/giotto-tda?style=flat) — High-performance TDA with persistent homology, Mapper
-> - [Ripser/ripser](https://github.com/Ripser/ripser) ![Stars](https://img.shields.io/github/stars/Ripser/ripser?style=flat) — Ultrafast computation of Vietoris-Rips persistence barcodes in C++
-> - [Applied Topology in Graphics (Notes & Papers)](https://graphics.stanford.edu/courses/cs468-12-spring/) — Stanford CS468: Topology for graphics
+> - [epfml/OptML_course](https://github.com/epfml/OptML_course) ![Stars](https://img.shields.io/github/stars/epfml/OptML_course?style=flat) — EPFL: convex, SGD, ADMM, Quasi-Newton
+> - [cvxpy/cvxpy](https://github.com/cvxpy/cvxpy) ![Stars](https://img.shields.io/github/stars/cvxpy/cvxpy?style=flat) — Python convex: LP, QP, SOCP, SDP
+> - [jaxopt/jaxopt](https://github.com/google/jaxopt) ![Stars](https://img.shields.io/github/stars/google/jaxopt?style=flat) — Differentiable optimization: implicit diff, bilevel, QP
+> - [pymanopt/pymanopt](https://github.com/pymanopt/pymanopt) ![Stars](https://img.shields.io/github/stars/pymanopt/pymanopt?style=flat) — Riemannian optimization
 
 ---
 
-### 1.10 Geometric & Clifford Algebra
+### 1.10 Topology for Graphics
 
-#### 1.10.1 Foundations of Geometric Algebra
-- 1.10.1.1 Exterior (Grassmann) Algebra: k-vectors, Wedge Product, Grade, k-blades, Volume Element
-- 1.10.1.2 Clifford Algebra Cl(p,q,r): Geometric Product a·b + a∧b, Signature, Basis Blades
-- 1.10.1.3 Multivectors: Scalar + Vector + Bivector + Trivector + ... — Unified Grade Representation
-- 1.10.1.4 Rotors: Sandwich Product RxR̃, Double-Sided Transformation, Relation to Quaternions
-- 1.10.1.5 Inversions, Reflections, Translations → Unified via Versors (Cartan-Dieudonné Theorem)
+#### 1.10.1 Algebraic Topology
+- 1.10.1.1 Simplicial/Cell/CW-Complexes; Homology Hₖ (Betti βₖ); Cohomology Hᵏ, Cup Product; π₁, Covering Spaces
+  - ▸ *CG use:* Hole/tunnel detection; topology-preserving simplification; vector field design (cohomology); global parameterization
+- 1.10.1.2 Morse Theory: Critical Points, Morse-Smale Complex, Reeb Graphs, Contour Trees
+  - ▸ *CG use:* Shape feature detection; topological skeletonization; isosurface topology in sci-viz
 
-#### 1.10.2 Projective Geometric Algebra (PGA) — Cl(3,0,1)
-- 1.10.2.1 Points, Lines, Planes as k-vectors; Join ∧ and Meet ∨ operations
-- 1.10.2.2 Euclidean Motions via Motors: Unified Rotation+Translation, No Matrices Needed
-- 1.10.2.3 Applications: Camera Transform Pipeline, Ray Casting, Collision Detection — all in a single algebra
-
-#### 1.10.3 Conformal Geometric Algebra (CGA) — Cl(4,1)
-- 1.10.3.1 Spheres, Circles, Point Pairs, Tangents as Basis Elements
-- 1.10.3.2 Conformal Versors: All Conformal Transformations (Möbius, Spherical Inversion) via a Single Operator
-- 1.10.3.3 Applications: Inverse Kinematics, Collision Detection, Skeletal Animation, Sphere Packing
+#### 1.10.2 Persistent Homology & TDA
+- 1.10.2.1 Filtration (Vietoris-Rips, Čech, Alpha), Persistence Diagram/Barcode, Bottleneck/Wasserstein Distance
+  - ▸ *CG use:* Topological feature lifetime → noise vs signal; 3D shape classification
+- 1.10.2.2 Persistence Landscapes/Images (ML Vectorization); Mapper; Merge Trees
+  - ▸ *CG use:* Shape skeletonization; ML-compatible topological shape features
+- 1.10.2.3 Discrete Morse: Gradient Fields, Cancelation; Morse-Smale Meshes→Quadrangulation
+  - ▸ *CG use:* Vector field topology-driven quad meshing; flow-guided remeshing
 
 > 📚 **Resources:**
-> - [bivector/Liber-Demysthen](https://github.com/bivector/Liber-Demysthen) — Interactive intro to GA for CG with code examples
-> - [enkimute/ganja.js](https://github.com/enkimute/ganja.js) ![Stars](https://img.shields.io/github/stars/enkimute/ganja.js?style=flat) — Geometric Algebra for JavaScript with visualizations
-> - [projectivegeometricalgebra.org](https://projectivegeometricalgebra.org/) — PGA reference with cheat sheets and code
-> - [bivector.net](https://bivector.net) — Community hub: tutorials, tools, papers for GA/CGA/PGA
+> - [Ripser/ripser](https://github.com/Ripser/ripser) ![Stars](https://img.shields.io/github/stars/Ripser/ripser?style=flat) — Ultrafast Vietoris-Rips persistence in C++
+> - [giotto-ai/giotto-tda](https://github.com/giotto-ai/giotto-tda) ![Stars](https://img.shields.io/github/stars/giotto-ai/giotto-tda?style=flat) — High-performance TDA with Mapper
+> - [Stanford CS468: Topology for Graphics](https://graphics.stanford.edu/courses/cs468-12-spring/) — Course notes & papers
 
 ---
 
+### 1.11 Geometric & Clifford Algebra
 
+#### 1.11.1 Foundations
+- 1.11.1.1 Exterior (Grassmann) Algebra: k-vectors, Wedge ∧, Grade, k-blades
+  - ▸ *CG use:* Oriented area/volume; Plücker line coordinates
+- 1.11.1.2 Clifford Algebra Cl(p,q,r): Geometric Product ab=a·b+a∧b; Multivectors; Graded Structure
+  - ▸ *CG use:* Unified framework replacing separate vector+quaternion+matrix code
+- 1.11.1.3 Rotors RxR̃; Versors: All Orthogonal Transforms as Versor Products (Cartan-Dieudonné)
+  - ▸ *CG use:* Rotation, reflection, translation as single algebraic entity
 
-### 1.11 Color Science & Visual Perception
+#### 1.11.2 PGA — Cl(3,0,1) & CGA — Cl(4,1)
+- 1.11.2.1 PGA: Points/Lines/Planes as k-vectors; Join ∧ (Span), Meet ∨ (Intersection); Motor (Rigid Motion)
+  - ▸ *CG use:* Entire camera pipeline in one algebra; ray-triangle via meet; rigid body=motor
+- 1.11.2.2 CGA: Spheres/Circles/Point Pairs/Tangents as Basis; Conformal Versors (Möbius, Spherical Inversion)
+  - ▸ *CG use:* Sphere packing; IK (joint limits as spheres); Möbius texture distortion; lens correction
 
-#### 1.11.1 Photometry & Colorimetry Fundamentals
-- 6.1.1 Visible Spectrum & Radiometry Review
-- 6.1.2 Photometric Units (Lumen lm, Candela cd, Lux lx, Nit cd/m²)
-- 6.1.3 Human Visual System Characteristics (Photoreceptors: Cones/Rods, Spectral Sensitivity)
-
-#### 1.11.2 Color Spaces
-- 6.2.1 CIE 1931 XYZ Color Space
-- 6.2.2 CIE xy Chromaticity Diagram
-- 6.2.3 CIE 1976 L\*a\*b\* (CIELAB) Color Space: Perceptual Uniformity
-- 6.2.4 CIE L\*u\*v\* Color Space
-- 6.2.5 CIE LCh (Lightness, Chroma, Hue) Color Space
-- 6.2.6 sRGB: Primaries, White Point, Gamma Curve, Linear vs. Encoded Values
-- 6.2.7 DCI-P3, Display P3
-- 6.2.8 Adobe RGB, ProPhoto RGB
-- 6.2.9 Rec.709 (HDTV), Rec.2020 (UHD/HDR)
-- 6.2.10 ACES (Academy Color Encoding System): ACES2065-1, ACEScg, ACEScct
-- 6.2.11 ICtCp (ITU-R BT.2100)
-- 6.2.12 Wide Color Gamut (WCG)
-- 6.2.13 OKLab / OKLCH (Perceptually Uniform Color Spaces)
-
-#### 1.11.3 Gamma, Transfer Functions & Tone Mapping
-- 6.3.1 Gamma Encoding & Correction (Gamma 2.2, sRGB EOTF/OETF)
-- 6.3.2 Transfer Functions (OETF / EOTF)
-- 6.3.3 PQ (Perceptual Quantizer, ST.2084 / SMPTE 2084)
-- 6.3.4 HLG (Hybrid Log-Gamma)
-- 6.3.5 Scene-Referred vs. Display-Referred Pipelines
-- 6.3.6 Tone Mapping Operators (Review 3.7.1)
-- 6.3.7 HDR-to-SDR Dynamic Range Adaptation
-
-#### 1.11.4 Color Appearance Models
-- 6.4.1 CIECAM02 / CIECAM16
-- 6.4.2 iCAM06 (HDR Image Appearance Model)
-- 6.4.3 Chromatic Adaptation Transforms (von Kries, Bradford, CAT02/16)
-
-#### 1.11.5 Visual Perception Models
-- 6.5.1 Contrast Sensitivity Function (CSF)
-- 6.5.2 Just Noticeable Difference (JND)
-- 6.5.3 Visual Masking Effects: Luminance Masking, Texture Masking, Temporal Masking
-- 6.5.4 Perceptual Metrics (SSIM, MS-SSIM, FSIM, LPIPS, DISTS, ST-LPIPS)
-- 6.5.5 Visual Attention Models (Saliency Maps, Itti-Koch Model, Deep Gaze Prediction)
-- 6.5.6 Perception-Driven Rendering Optimization (Foveated Rendering)
-
-#### 1.11.6 High Dynamic Range Imaging
-- 6.6.1 HDR Image Formats (OpenEXR, Radiance HDR, PFM, JPEG-XL HDR, AVIF HDR)
-- 6.6.2 Multi-Exposure HDR Merging (Debevec & Malik Method, Robertson Method)
-- 6.6.3 Ghost Removal
-- 6.6.4 HDR Display Technologies (OLED, Mini-LED, Micro-LED Backlight)
-- 6.6.5 HDR Environment Map Capture & Processing
+> 📚 **Resources:**
+> - [bivector/Liber-Demysthen](https://github.com/bivector/Liber-Demysthen) — Interactive intro to GA for CG
+> - [enkimute/ganja.js](https://github.com/enkimute/ganja.js) ![Stars](https://img.shields.io/github/stars/enkimute/ganja.js?style=flat) — GA for JavaScript with visualizations
+> - [projectivegeometricalgebra.org](https://projectivegeometricalgebra.org/) — PGA reference + cheat sheets
 
 ---
 
+### 1.12 Color Science & Visual Perception
+
+#### 1.12.1 Photometry & Colorimetry
+- 1.12.1.1 Radiometry→Photometry (lm, cd, lx, nit); CIE V(λ); CIE 1931 XYZ (x̄ȳz̄ CMFs); CIE xy Chromaticity
+  - ▸ *CG use:* Display calibration; spectral rendering→XYZ→display encoding; gamut visualization
+- 1.12.1.2 CIE LAB (L*a*b*, ΔE*₀₀), LCh; OKLab/OKLCH (Improved Uniformity & Hue Linearity)
+  - ▸ *CG use:* Perceptually-uniform color difference metrics; gradient-domain ops in perceptual space
+
+#### 1.12.2 Color Spaces & Encoding
+- 1.12.2.1 sRGB (Rec.709 Primaries, D65, ~γ2.2); DCI-P3/Display P3; Adobe RGB; ProPhoto RGB
+  - ▸ *CG use:* Default framebuffer; texture storage; wide-gamut HDR displays
+- 1.12.2.2 Rec.2020 (UHD), Rec.2100 (HDR: PQ ST.2084 + HLG); ACES (ACES2065-1, ACEScg, ACEScct)
+  - ▸ *CG use:* HDR10/Dolby Vision; scRGB; film/VFX industry standard pipeline (ACES RRT+ODT)
+- 1.12.2.3 Gamma/EOTF/OETF; Scene-Referred vs. Display-Referred; Linear Workflow (Linearize→Compute→Encode)
+  - ▸ *CG use:* Correct texture sampling; HDR tone mapping chain
+
+#### 1.12.3 Visual Perception
+- 1.12.3.1 HVS: Cones L/M/S (Trichromatic), Rods (Scotopic); Opponent Color; CSF (Mannos & Sakrison, Daly VDP)
+  - ▸ *CG use:* Foveated rendering exploits cone falloff; blue noise dithering shaped to CSF; JND for adaptive quality
+- 1.12.3.2 Visual Masking: Luminance (Weber-Fechner ΔL/L≈const), Contrast, Texture, Temporal (Flicker~60Hz)
+  - ▸ *CG use:* Perceptual metrics (SSIM, MS-SSIM, HDR-VDP); rendering noise visibility prediction
+- 1.12.3.3 Modern Perceptual Losses: LPIPS (AlexNet Features), DISTS (Structure+Texture), ST-LPIPS (Spatiotemporal)
+  - ▸ *CG use:* Neural rendering loss functions; GAN training; NeRF/3DGS quality evaluation
+- 1.12.3.4 Visual Attention (Saliency): Itti-Koch, DeepGaze; Foveated/Gaze-Contingent Rendering
+  - ▸ *CG use:* Adaptive sample budget allocation; VR eye-tracking quality optimization
+
+#### 1.12.4 HDR Imaging
+- 1.12.4.1 HDR Capture: Debevec & Malik 1997 (CRF Recovery via LS); Multi-Exposure Fusion; Ghost Removal
+  - ▸ *CG use:* IBL environment map capture; light probe HDR stitching
+- 1.12.4.2 HDR Formats: OpenEXR (Half Float, Multi-Layer, Deep), Radiance .hdr, JPEG-XL HDR, AVIF HDR
+  - ▸ *CG use:* Production rendering output; PBR texture storage
+- 1.12.4.3 Tone Mapping: Reinhard (Photographic), Filmic (UE4 ACES), Hable, Gran Turismo; Display Mapping
+  - ▸ *CG use:* HDR→SDR for consumer displays; artistic look development
+
+> 📚 **Resources:**
+> - [PBR Book v4 (Color & Radiometry Chapters)](https://pbr-book.org/) — Definitive CG reference
+> - [colour-science/colour](https://github.com/colour-science/colour) ![Stars](https://img.shields.io/github/stars/colour-science/colour?style=flat) — Comprehensive Python color science library
+> - [richzhang/PerceptualSimilarity](https://github.com/richzhang/PerceptualSimilarity) ![Stars](https://img.shields.io/github/stars/richzhang/PerceptualSimilarity?style=flat) — LPIPS perceptual metric (standard for neural rendering)
+> - [ACES Documentation](https://acescentral.com/) — Academy Color Encoding System specs
 
 ---
+
 
 ## Chapter 2 · Geometry & Shape Representation
 
