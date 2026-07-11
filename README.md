@@ -1151,49 +1151,438 @@
 
 ## Chapter 3 · Appearance, Materials & Textures
 
-*This chapter covers the theoretical foundations of how light interacts with matter — radiometry, BRDF/BSDF theory, materials, and the rendering equation — the "what" before the "how" of rendering.*
+*How light interacts with matter — the complete theory of surface and volume appearance. From classical radiometry to neural materials. `▸ CG use:` links each concept to practice.*
 
-*This chapter covers the theoretical foundations of how light interacts with matter — radiometry, BRDF/BSDF theory, materials, and the rendering equation — the "what" before the "how" of rendering.*
-
-### 3.1 Rendering Equation & Theoretical Foundations
-
-#### 3.1.1 Radiometry
-- 3.1.1.1 Radiant Flux (Power) Φ
-- 3.1.1.2 Irradiance E — Incident Area Density
-- 3.1.1.3 Radiant Exitance (Radiosity) B / M
-- 3.1.1.4 Radiant Intensity I — Per Unit Solid Angle
-- 3.1.1.5 Radiance L — Per Unit Projected Area, Per Unit Solid Angle
-- 3.1.1.6 Spectral Radiometry
-- 3.1.1.7 Solid Angles & Projected Solid Angles
-
-#### 3.1.2 BRDF / BTDF / BSDF / BSSRDF
-- 3.1.2.1 BRDF Definition & Properties (Non-negativity, Helmholtz Reciprocity, Energy Conservation)
-- 3.1.2.2 Isotropic BRDF vs. Anisotropic BRDF
-- 3.1.2.3 Diffuse Reflection Models (Lambert, Oren-Nayar, Disney Diffuse)
-- 3.1.2.4 Specular Reflection & Smooth-Surface Microfacet Models (Cook-Torrance)
-- 3.1.2.5 Microfacet Theory: Normal Distribution Function NDF (Beckmann, GGX/Trowbridge-Reitz, GTR)
-- 3.1.2.6 Microfacet Theory: Geometric Shadowing-Masking Function (Smith, Cook-Torrance, Heitz Height-Correlated Masking)
-- 3.1.2.7 Microfacet Theory: Fresnel Equations (Schlick Approximation, Full Fresnel)
-- 3.1.2.8 Disney Principled BRDF
-- 3.1.2.9 BTDF & Refraction
-- 3.1.2.10 BSDF = BRDF + BTDF
-- 3.1.2.11 Layered Material BRDF (Clear Coat, Thin-Film Interference)
-- 3.1.2.12 Wave Optics BRDF (Diffraction, Thin-Film Interference)
-- 3.1.2.13 BSSRDF & Subsurface Scattering (Dipole Model, Multipole, Path-Space Formulation)
-- 3.1.2.14 Measured BRDF / Data-Driven BRDF (MERL, MIT CSAIL, EPFL Databases)
-
-#### 3.1.3 The Rendering Equation
-- 3.1.3.1 Kajiya's Rendering Equation (1986)
-- 3.1.3.2 Surface Form: Emission Term + Reflection Term
-- 3.1.3.3 Area Form
-- 3.1.3.4 Path Form & Path-Space Formulation
-- 3.1.3.5 Operator Form & Neumann Series Expansion
-- 3.1.3.6 Adjoint Equation & Importance Function
+> 💡 **Top-Level References:**
+> - [PBR Book v4 (Free Online)](https://pbr-book.org/) — Definitive reference for physically-based appearance and light transport
+> - [google/filament](https://github.com/google/filament) ![Stars](https://img.shields.io/github/stars/google/filament?style=flat) — Production PBR material system with detailed documentation
+> - [AcademySoftwareFoundation/MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX) ![Stars](https://img.shields.io/github/stars/AcademySoftwareFoundation/MaterialX?style=flat) — Industry-standard material definition and interchange
 
 ---
 
+### 3.1 Radiometry & Light Measurement
+
+#### 3.1.1 Fundamental Radiometric Quantities
+- 3.1.1.1 Radiant Flux (Power) Φ [W = J/s]: Total Energy Emitted/Received Per Second by a Light Source or Surface
+  - ▸ *CG use:* Light source power specification (e.g., "100W incandescent bulb"); total energy budget in light transport
+- 3.1.1.2 Irradiance E = dΦ/dA [W/m²]: Radiant Flux Incident Per Unit Surface Area; Radiosity B = dΦ_out/dA: Flux Exiting Per Unit Area
+  - ▸ *CG use:* Light map values stored as irradiance; diffuse surface response is proportional to irradiance; sensor pixel response
+- 3.1.1.3 Radiant Intensity I = dΦ/dω [W/sr]: Flux Per Unit Solid Angle (Point Source Approximation); Isotropic Point Source: I = Φ/(4π)
+  - ▸ *CG use:* Point light intensity specification; IES profile-based light sources in architectural rendering
+- 3.1.1.4 Radiance L = d²Φ/(dA⊥ dω) [W/(m²·sr)]: THE Central Quantity — Flux Per Unit Projected Area Per Unit Solid Angle; Invariant Along Ray in Vacuum
+  - ▸ *CG use:* Every light transport quantity is radiance; what cameras measure; what displays emit; what the rendering equation solves for
+- 3.1.1.5 Spectral Radiometry: Per-Wavelength Quantities L_λ, Φ_λ; Color Matching Functions Convert Spectrum → RGB; Spectral Rendering vs. RGB Rendering
+  - ▸ *CG use:* Spectral rendering for accurate dispersion (prisms, rainbows), fluorescence, and metamerism; RGB rendering is a 3-sample approximation
+
+#### 3.1.2 Measurement & Units in Practice
+- 3.1.2.1 Photometric Units (Human-Visual-System-Weighted): Luminous Flux (Lumen lm), Illuminance (Lux lx = lm/m²), Luminance (cd/m² = nit)
+  - ▸ *CG use:* Display brightness specification (500 nits SDR, 1000+ nits HDR); architectural lighting standards (500 lux for office)
+- 3.1.2.2 Solid Angle: dω = dA/r² = sin θ dθ dφ; Projected Solid Angle dω⊥ = cos θ dω; Integrals Over Hemisphere ∫_{H²} dω = 2π, ∫_{H²} cos θ dω = π
+  - ▸ *CG use:* BRDF integration; irradiance from environment map = ∫ L_i cos θ dω; normalization constants in shading models
+- 3.1.2.3 Radiometric Image Formation: Pixel Value ∝ ∫_{Pixel} ∫_{Exposure} L(x,ω,t) · W(x,ω,t) dω dt dA; Camera Response Function (CRF) Maps Irradiance → Pixel Value
+  - ▸ *CG use:* HDR capture (recover L from pixel values via inverse CRF); physically-based camera model in rendering
+
+> 📚 **GitHub Repos:**
+> - [PBR Book v4](https://pbr-book.org/) — Complete radiometry chapter with interactive visualizations
+> - [colour-science/colour](https://github.com/colour-science/colour) ![Stars](https://img.shields.io/github/stars/colour-science/colour?style=flat) — Spectral-to-RGB conversion, illuminants, CMFs
+>
+> 📖 **Textbooks:** *Physically Based Rendering* — Pharr, Jakob, Humphreys (Ch. 5: Color and Radiometry); *Principles of Digital Image Synthesis* — Andrew Glassner
 
 ---
+
+### 3.2 BRDF Theory & Microfacet Models
+
+#### 3.2.1 BRDF Fundamentals
+- 3.2.1.1 BRDF Definition f_r(ω_i, ω_o) = dL_o(ω_o) / dE_i(ω_i) = dL_o(ω_o) / (L_i(ω_i) cos θ_i dω_i) [sr⁻¹]; BRDF Relates Incoming Irradiance to Outgoing Radiance
+  - ▸ *CG use:* The core abstraction for surface appearance; every shading operation evaluates f_r for given light and view directions
+- 3.2.1.2 Physical Plausibility Requirements: Non-Negativity f_r ≥ 0; Helmholtz Reciprocity f_r(ω_i,ω_o) = f_r(ω_o,ω_i); Energy Conservation ∫_{H²} f_r(ω_i,ω_o) cos θ_o dω_o ≤ 1 ∀ ω_i
+  - ▸ *CG use:* Energy-conserving BRDFs prevent unnaturally bright surfaces; reciprocity enables bidirectional path tracing
+- 3.2.1.3 Isotropic vs. Anisotropic: Isotropic: f_r(θ_i,φ_i,θ_o,φ_o) = f_r(θ_i,θ_o,|φ_i−φ_o|) (Depends Only on Relative Azimuth); Anisotropic: Depends on Absolute Orientation
+  - ▸ *CG use:* Brushed metal, hair, carbon fiber → anisotropic BRDF with tangent-direction-dependent roughness
+- 3.2.1.4 BRDF Parameterization: Rusinkiewicz Coordinates (Half-Angle θ_h, φ_h + Difference θ_d, φ_d) vs. Standard (θ_i,φ_i,θ_o,φ_o); Factorized BRDFs
+  - ▸ *CG use:* Rusinkiewicz parameterization reveals BRDF structure; better for analysis, measurement, and compression
+
+#### 3.2.2 Diffuse & Simple Models
+- 3.2.2.1 Lambertian BRDF: f_r = ρ/π (Constant, Perfectly Diffuse); Reflectance ρ = ∫ f_r cos θ_o dω_o ∈ [0,1]; Albedo = ρ; Radiosity L_o = (ρ/π) ∫_{H²} L_i cos θ_i dω_i = ρ E/π
+  - ▸ *CG use:* The default diffuse model; simplest form of energy conservation; albedo texture maps directly usable
+- 3.2.2.2 Oren-Nayar (1994): Rough Diffuse Model; Microfacet Diffuse (V-Cavities with Lambertian Walls); Accounts for View-Dependent Darkening at Grazing Angles; Parameter: Surface Roughness σ
+  - ▸ *CG use:* Moon surface rendering (no specular → all roughness effect); clay, sand, rough paper; Mars rover image calibration
+- 3.2.2.3 Disney Diffuse (Burley 2012): Empirical Model with Fresnel-Inspired Falloff; f_diffuse = (ρ/π)(1+(F_D90−1)(1−cos θ_i)⁵)(1+(F_D90−1)(1−cos θ_o)⁵) with F_D90 = 0.5+2α cos²θ_d
+  - ▸ *CG use:* Part of the Disney Principled BSDF; smooth transition between diffuse at normal and retro-reflective at grazing
+
+#### 3.2.3 Microfacet Theory — The Modern Standard
+- 3.2.3.1 Microfacet BRDF: f_r = F(ω_i·ω_h) · D(ω_h) · G(ω_i,ω_o) / (4 |ω_i·n| |ω_o·n|); F = Fresnel, D = NDF, G = Geometry; Derivation via Distribution of Visible Normals (VNDF)
+  - ▸ *CG use:* Cook-Torrance (1981) introduced this; the dominant model for all modern PBR pipelines
+- 3.2.3.2 Normal Distribution Function (NDF) D(ω_h): Statistical Distribution of Microfacet Normals; Must Satisfy ∫_{H²} D(ω_h) cos θ_h dω_h = 1 (Projected Area Normalization)
+  - Beckmann: D(θ_h) = exp(−tan²θ_h/α²) / (π α² cos⁴ θ_h) — Gaussian Slope Distribution
+  - GGX / Trowbridge-Reitz: D(θ_h) = α² / (π cos⁴ θ_h (α²+tan²θ_h)²) — Longer Tail (Hyperbolic Distribution); Better Matches Real-World Materials!
+  - GTR (Generalized Trowbridge-Reitz): D = c / ((α² cos²θ_h+sin²θ_h)^γ); γ Controls Tail Falloff; GGX = GTR(γ=2), Beckmann ≈ GTR(γ→∞)
+  - ▸ *CG use:* GGX is the de-facto standard NDF in games and film; captures the "glow" around specular highlights better than Beckmann
+- 3.2.3.3 Shadowing-Masking (Geometry) Function G(ω_i,ω_o): Accounts for Microfacet Self-Occlusion; Must Be ≤1 and Satisfy Reciprocity
+  - Smith G: G(ω) = 1/(1+Λ(ω)) where Λ(ω) = ½(erf(a)−1+(a√π)⁻¹exp(−a²)), a = 1/(α tan θ); Height-Correlated Smith G₂(ω_i,ω_o) = χ⁺/(1+Λ(ω_i)+Λ(ω_o))
+  - Heitz (2014): Demonstrated Height-Correlated G₂ is Essential for Accurate Energy Conservation; Separable G = G₁(ω_i)G₁(ω_o) Over-Darkens at Grazing
+  - ▸ *CG use:* Always use height-correlated Smith G₂; separable G₁G₁ produces visible dark rings at silhouette (most engines corrected post-2014)
+- 3.2.3.4 Fresnel Reflectance F(cos θ): Fraction of Light Reflected vs. Transmitted at Interface; Depends on Complex IOR η+ik
+  - Full Fresnel (Polarized): r_∥ = (η₂ cos θ_i − η₁ cos θ_t)/(η₂ cos θ_i + η₁ cos θ_t); r_⊥ = (η₁ cos θ_i − η₂ cos θ_t)/(η₁ cos θ_i + η₂ cos θ_t); R = ½(r_∥²+r_⊥²)
+  - Schlick Approximation (1994): F(θ) = F₀ + (1−F₀)(1−cos θ)⁵; F₀ = ((η₁−η₂)/(η₁+η₂))² (Normal Incidence)
+  - ▸ *CG use:* Schlick is the dominant approximation in real-time; full Fresnel for offline (metals have complex η → colored F₀)
+- 3.2.3.5 Multiple-Scattering Microfacet: Single-Scattering Microfacet Loses Energy at High Roughness (Darkening); Multi-Scatter Compensation via Precomputed LUT (Furnace Test → Energy-Preserving Normalization); Heitz et al. (2016) Stochastic Evaluation
+  - ▸ *CG use:* UE5 and Filament use multi-scatter LUTs; roughness-dependent albedo scaling to recover lost energy
+
+#### 3.2.4 Specialized BRDF Models
+- 3.2.4.1 Ashikhmin-Shirley (2000): Anisotropic Phong-Based Microfacet; Explicit Anisotropy Parameters α_u, α_v (Perpendicular Roughness Directions)
+  - ▸ *CG use:* Brushed metal rendering; anisotropic specular highlights on machined surfaces
+- 3.2.4.2 Ward BRDF (1992): Gaussian Slope Distribution; Isotropic and Anisotropic Variants; Physically Plausible but Simpler than Full Microfacet
+  - ▸ *CG use:* Historical significance; still used in some real-time applications for simplicity
+- 3.2.4.3 Hair BSDF Models: Kajiya-Kay (1989) — Tangent-Space Specular Cylinder (Diffuse + Specular Scattering); Marschner et al. (2003) — Full 3D Scattering Model (R, TT, TRT Paths); d'Eon et al. (2011) — Energy-Conserving; Chiang et al. (2016) — Practical Implementation
+  - ▸ *CG use:* Film-quality digital humans and creatures; game hair rendering (TressFX, HairWorks); Pixar's *Brave* and *Coco*
+
+> 📚 **GitHub Repos:**
+> - [google/filament](https://github.com/google/filament) ![Stars](https://img.shields.io/github/stars/google/filament?style=flat) — Production PBR: GGX, multi-scatter, clear coat, anisotropy
+> - [brentburley/brdf](https://github.com/brentburley/brdf) — Disney Principled BRDF exploration and reference
+>
+> 📖 **Textbooks:** *Physically Based Rendering* — Pharr et al. (Ch. 8: Reflection Models); *Real-Time Rendering* — Akenine-Möller et al. (Ch. 9: Physically Based Shading)
+
+---
+
+### 3.3 BTDF, BSDF & Layered Materials
+
+#### 3.3.1 Transmission & Refraction
+- 3.3.1.1 Snell's Law: η₁ sin θ₁ = η₂ sin θ₂; Total Internal Reflection when η₁ sin θ₁/η₂ > 1 (θ₂ = arcsin > 90° → All Light Reflected); Critical Angle θ_c = arcsin(η₂/η₁)
+  - ▸ *CG use:* Glass, water, gemstone rendering; TIR creates the bright edges in water droplets and diamond sparkle
+- 3.3.1.2 BTDF (Bidirectional Transmission Distribution Function): f_t(ω_i,ω_o) = dL_o(ω_o) / dE_i(ω_i); Refracted Radiance Given Incident Irradiance; Fresnel Controls Transmission Amount F_T = 1−F_R
+  - ▸ *CG use:* Dielectric BSDF = BRDF (Reflection) + BTDF (Transmission); glass, water, plastic all use BSDF
+- 3.3.1.3 Microfacet BTDF (Walter et al. 2007): Same Microfacet Framework Extended to Transmission; Refracted Half-Vector ω_{ht} Follows Snell's Law; Modified Jacobian for Solid Angle Compression at Interface
+  - ▸ *CG use:* Rough glass (frosted glass, ice); GGX BTDF for consistent roughness in both reflection and transmission
+
+#### 3.3.2 Layered Material Models
+- 3.3.2.1 Clear Coat Model: Base BRDF + Thin Transparent Layer on Top (Car Paint, Varnished Wood, Phone Screen); Second BRDF for Coating with Separate Fresnel + Absorption
+  - ▸ *CG use:* UE5 Clear Coat shading model; automotive rendering (metallic base + clear gloss coat); Filament material model
+- 3.3.2.2 Adding-Doubling Method (van de Hulst 1980): Exact Solution for Multiple Scattering in Layered Slabs; Propagate Scattering (S) and Transmission (T) Matrices Layer-by-Layer; Gold Standard for Layered Material Simulation
+  - ▸ *CG use:* Skin rendering (epidermis + dermis layers); paint appearance; accurate thin-film interference stacks
+- 3.3.2.3 Belcour (2018) Layered BSDF: Statistical Model via Random Walk in Layer; Shadowing-Masking Extended to Layer Interface; GPU-Friendly Approximation for Real-Time
+  - ▸ *CG use:* Real-time layered material rendering; car paint with metallic flakes under clear coat
+- 3.3.2.4 Thin-Film Interference: Wave Optics → Constructive/Destructive Interference at Thin Layers (Soap Bubbles, Oil Slicks, Insect Wings); Iridescence via Wavelength-Dependent Reflectance
+  - ▸ *CG use:* Butterfly wing rendering; soap bubble shader; pearlescent car paint; beetle iridescence in photorealistic rendering
+
+> 📚 **GitHub Repos:**
+> - MaterialX Layered BSDF nodes — Standard layered material definition
+> - [pbrt-v4](https://github.com/mmp/pbrt-v4) ![Stars](https://img.shields.io/github/stars/mmp/pbrt-v4?style=flat) — Full BSDF/BTDF implementation including layered models
+>
+> 📖 **Textbooks:** *Physically Based Rendering* — Pharr et al. (Ch. 9: Materials); *Real-Time Rendering* — Ch. 9
+
+---
+
+### 3.4 Subsurface Scattering & BSSRDF
+
+#### 3.4.1 BSSRDF Theory
+- 3.4.1.1 BSSRDF S(x_i,ω_i; x_o,ω_o): Generalization of BRDF; Light Enters at Point x_i, Scatters Inside, Exits at x_o ≠ x_i; Units [m⁻² sr⁻¹]
+  - ▸ *CG use:* Skin, marble, milk, jade, wax — any material where light enters, bounces inside, and exits elsewhere
+- 3.4.1.2 Radiative Transfer Equation (RTE) Inside Medium: (ω·∇)L(x,ω) = −σ_t L + σ_s ∫_{S²} p(ω,ω')L(x,ω') dω' + Q; Same as Volume Rendering but with Boundary Conditions
+  - ▸ *CG use:* The full volumetric light transport equation; solved for accurate SSS via Monte Carlo or diffusion approximation
+- 3.4.1.3 Diffusion Approximation: When σ_s ≫ σ_a (Scattering-Dominated) and Far from Source, Radiance ≈ Isotropic + Small Anisotropic Component; Reduces RTE to Poisson Equation ∇²φ − σ_a/D φ = −Q₀
+  - ▸ *CG use:* Basis for real-time SSS models (dipole, multipole, directional dipole)
+
+#### 3.4.2 Practical SSS Models
+- 3.4.2.1 Dipole Model (Jensen et al. 2001): Place Positive (Real) and Negative (Virtual) Point Sources at z_r = 1/σ_t' and z_v = −(1+4A/3)/σ_t' Below Surface; Diffuse Reflectance Profile R_d(r) = Sum of Two Dipole Contributions
+  - ▸ *CG use:* First practical real-time SSS (GPU Gems 3, Chapter 14); skin rendering breakthrough (Pixar's *Geri's Game*, *Finding Nemo*)
+- 3.4.2.2 Multipole Model (Donner & Jensen 2005): Cylindrical Geometry Requires Infinite Sum of Dipole Reflections; More Accurate for Thin Objects (Ears, Fingers)
+  - ▸ *CG use:* Accurate thin translucent geometry; ear and finger rendering in digital humans
+- 3.4.2.3 Directional Dipole (Frisvad et al. 2007): Incorporate Directional Component; Better Near Light Entry Point; Bridge Between Dipole and Full Monte Carlo
+  - ▸ *CG use:* Improved close-up skin rendering; light-source-dependent scattering direction
+- 3.4.2.4 Texture-Space Diffusion (d'Eon et al. 2007, NVIDIA): Unwrap Mesh to Texture Space → Blur Irradiance Texture with Diffusion Profile (Gaussian Sum); → Look Up Blurred Value via UV → Screen-Space Rendering
+  - ▸ *CG use:* Real-time skin rendering in games (Uncharted 4, Call of Duty); efficient GPU diffusion via separable Gaussian convolution in texture space
+- 3.4.2.5 Burley Normalized Diffusion (Disney 2015): f(r) = (e^(−r/d) + e^(−r/(3d))) / (8π d r); Single Parameter d = Scattering Distance; Normalized to Unit Integral; Fitted to Monte Carlo Ground Truth
+  - ▸ *CG use:* Disney Hyperion renderer; simple, artist-friendly, energy-conserving; adopted widely in production
+
+#### 3.4.3 Path-Space BSSRDF & Advanced Models
+- 3.4.3.1 Path Integral BSSRDF Formulation: Integrate Over All Subsurface Paths; Monte Carlo Sampling of Entry-Exit Point Pairs; Bidirectional Scattering Distribution Ray Tracing (BSSRDF Sampling)
+  - ▸ *CG use:* Production rendering (Arnold, RenderMan, V-Ray) uses MC SSS; handles complex geometry and heterogeneous media
+- 3.4.3.2 Quantized Diffusion (d'Eon & Irving 2011): Full Radiative Transfer Solution via Spectral Decomposition; Captures Anisotropy and Short-Path Effects Beyond Diffusion
+  - ▸ *CG use:* Gold standard for skin appearance; accounts for both shallow (epidermal) and deep (dermal) scattering
+- 3.4.3.3 Heterogeneous SSS via Neural Methods: Train Neural Network on MC-Reference to Predict SSS in Heterogeneous Media; NeRF-Style Volume → BSSRDF Representation
+  - ▸ *CG use:* Next-gen digital humans with spatially-varying SSS (freckles, scars, tattoos with different scattering properties)
+
+> 📚 **GitHub Repos:**
+> - [PBR Book v4 SSS Chapter](https://pbr-book.org/4ed/Subsurface_Scattering) — Complete BSSRDF implementation
+> - Filament SSS implementation — Real-time Burley diffusion
+>
+> 📖 **Textbooks:** *Physically Based Rendering* — Pharr et al. (Ch. 15: Subsurface Scattering); *Digital Modeling of Material Appearance* — Dorsey, Rushmeier, Sillion
+
+---
+
+### 3.5 Participating Media & Volumetric Appearance
+
+#### 3.5.1 Optical Properties of Participating Media
+- 3.5.1.1 Absorption Coefficient σ_a(x) [m⁻¹]: Probability of Photon Absorption Per Unit Distance; Determines Material Color (e.g., Red Wine Absorbs Blue/Green)
+  - ▸ *CG use:* Colored glass, tinted fog, wine, tea; spectral σ_a(λ) for accurate color
+- 3.5.1.2 Scattering Coefficient σ_s(x) [m⁻¹]: Probability of Scattering Event Per Unit Distance; Determines Cloudiness/Turbidity
+  - ▸ *CG use:* Milk (high σ_s), clouds (very high σ_s), mist (moderate σ_s), clear air (low σ_s)
+- 3.5.1.3 Extinction Coefficient σ_t = σ_a + σ_s; Albedo α = σ_s/σ_t (Fraction Scattered vs. Absorbed at Interaction); Mean Free Path = 1/σ_t (Average Distance Between Interactions)
+  - ▸ *CG use:* σ_t controls medium density; α controls brightness (α=1 pure scattering, α=0 pure absorption)
+- 3.5.1.4 Phase Function p(ω→ω'): Angular Distribution of Scattered Light; Normalization ∫_{S²} p(ω,ω') dω' = 1; Asymmetry Parameter g = ∫ p(cos θ) cos θ dω
+  - Isotropic p = 1/(4π); Rayleigh p ∝ 1+cos²θ (Molecular, λ⁻⁴ Wavelength Dependence → Blue Sky); Mie (Hazy, Forward-Peaked); Henyey-Greenstein p(cos θ) = (1−g²)/(4π(1+g²−2g cos θ)^{3/2}) (Analytic Single-Parameter)
+  - ▸ *CG use:* HG phase is the default for clouds/smoke/fog; Mie for water droplets (fog, clouds); Rayleigh for atmospheric scattering
+
+#### 3.5.2 Volume Rendering Equation
+- 3.5.2.1 Radiative Transfer Equation (RTE — Full Form): (ω·∇ + σ_t(x)) L(x,ω) = σ_s(x) ∫_{S²} p(ω',ω) L(x,ω') dω' + Q(x,ω) (Emission Term)
+  - ▸ *CG use:* The fundamental equation for all volumetric light transport; solved via MC path tracing or deterministic methods
+- 3.5.2.2 Transmittance T(x,y) = exp(−∫_x^y σ_t(s) ds): Fraction of Light Surviving Path from x to y Without Absorption/Scattering; Optical Depth τ = −ln(T) = ∫ σ_t ds
+  - ▸ *CG use:* Beer-Lambert law for absorption-only media; attenuation factor in volume rendering integral
+- 3.5.2.3 Volume Rendering Integral: L(x,ω) = ∫_0^∞ T(x,x_t) [σ_s(x_t) ∫ p L_i dω' + Q(x_t)] dt; Solution via Ray Marching with Step Size Δt: L += T_accum · (emission + scattering_contribution) · Δt
+  - ▸ *CG use:* Every volumetric path tracer evaluates this integral; GPU ray marching (clouds, god rays, volumetric fog)
+
+#### 3.5.3 Natural Phenomena Appearance
+- 3.5.3.1 Atmospheric Scattering: Rayleigh (λ⁻⁴, Blue Sky, Red Sunset), Mie (Aerosols, Hazy Horizon), Ozone Absorption; Precomputed via Bruneton et al. (2008)
+  - ▸ *CG use:* Outdoor environment rendering; flight simulators; game sky systems; UE5 Sky Atmosphere component
+- 3.5.3.2 Cloud Rendering: Volumetric Path Tracing with High Albedo (>0.999); Lorenz-Mie Scattering by Water Droplets (Exact via Mie Theory or Tabulated); Multi-Scattering Dominates Appearance
+  - ▸ *CG use:* Film-quality cloud rendering; real-time volumetric clouds (UE5, Horizon Forbidden West); Houdini cloud simulations
+- 3.5.3.3 Smoke, Fire & Explosions: Emissive + Absorbing + Scattering Medium; Black-Body Radiation for Fire Color; Temperature Field → Emission Spectrum
+  - ▸ *CG use:* VFX explosions (Houdini, EmberGen); game particle effects; thermal imaging simulation
+- 3.5.3.4 Ocean & Water Appearance: Volume Scattering + Absorption for Underwater Color; Chlorophyll and CDOM Absorption Spectra; Jerlov Water Types (I, IA, IB, II, III — Clear to Turbid)
+  - ▸ *CG use:* Submarine/snorkeling simulation; underwater photography color correction; ocean rendering
+
+> 📚 **GitHub Repos:**
+> - [PBR Book v4 Volumetric Scattering](https://pbr-book.org/4ed/Volume_Scattering) — Full volumetric path tracing implementation
+> - [ebruneton/precomputed_atmospheric_scattering](https://github.com/ebruneton/precomputed_atmospheric_scattering) — Bruneton atmospheric model reference
+>
+> 📖 **Textbooks:** *Physically Based Rendering* — Pharr et al. (Ch. 11: Volume Scattering); *Fluid Simulation for Computer Graphics* — Bridson
+
+---
+
+### 3.6 Texture Mapping & Filtering Theory
+
+#### 3.6.1 Texture Fundamentals
+- 3.6.1.1 Texture Mapping Paradigm: Surface Parameterization (u,v) → Texture Domain [0,1]² → Lookup Texture Color T(u,v) → Modulate Surface Appearance (Albedo, Roughness, Normal, etc.)
+  - ▸ *CG use:* PBR material parameter maps (base color, metallic, roughness, normal, AO, height); every rendered surface uses textures
+- 3.6.1.2 UV Parameterization for Textures: Seam Minimization; Chart Packing Efficiency; Distortion (Stretch, Shear) Minimization; UDIM (U-Dimension) Tiling for High-Resolution Multi-Tile Textures
+  - ▸ *CG use:* UV unwrapping is a core DCC task; UDIM for film-quality textures (Mari, Substance Painter)
+- 3.6.1.3 Ptex (Per-Face Texture — Disney 2008): Eliminates UVs Entirely; Each Face Stores Its Own Texture (No Seams!); Filtering Across Face Boundaries via Adjacency Data
+  - ▸ *CG use:* Disney/Pixar film production (no UV unwrapping!); RenderMan native texture format
+
+#### 3.6.2 Texture Filtering — The Theory
+- 3.6.2.1 Nyquist Theory Applied to Textures: Texture Signal Must Be Bandlimited to Avoid Aliasing When Minified (Many Texels → One Pixel); Antialiasing via Prefiltering (Mipmapping)
+  - ▸ *CG use:* All real-time rendering relies on mipmapping for texture antialiasing; without it → moiré patterns, flickering
+- 3.6.2.2 Mipmapping (Williams 1983): Power-of-Two Image Pyramid; Each Level = Previous Level Downsampled 2×; d = log₂(max(|du/dx|,|dv/dy|)) → Sample from Level d; Trilinear Filtering = Bilinear Sampling on Two Mip Levels + Linear Blend
+  - ▸ *CG use:* GPU hardware texture units; O(log n) lookup vs O(n); storage overhead only 1/3 extra (1+¼+1/16+...=4/3)
+- 3.6.2.3 Anisotropic Filtering: When Texture is Stretched in One Direction (e.g., Floor at Grazing Angle); EWA (Elliptical Weighted Average — Heckbert 1989) → Filter Along Stretched Axis
+  - ▸ *CG use:* GPU anisotropic filtering (2×, 4×, 8×, 16×); samples multiple mip-level taps along anisotropic axis; critical for ground/floor textures
+- 3.6.2.4 Reconstruction Kernels for Textures: Nearest-Neighbor (Aliasing + Pixelation), Bilinear (Smooth but Blurry), Bicubic (Sharper, Ringing Artifacts), Lanczos (Windowed Sinc — Best Quality but More Taps); Mitchell-Netravali (Two-Parameter Family — Free Parameters B, C)
+  - ▸ *CG use:* GPU hardware: bilinear (free, hardware-accelerated); bicubic requires manual fetch; film rendering uses Lanczos for quality
+- 3.6.2.5 Virtual Textures / MegaTextures (Tanner et al. 1998; id Tech 5 — Carmack): Indirection Table Maps Virtual Pages → Physical Pages; On-Demand Streaming from Disk; Only Load Visible Texels
+  - ▸ *CG use:* RAGE (id Software); UE5 Virtual Texture; sparse/resident textures in D3D12/Vulkan; planetary-scale terrain texturing
+
+#### 3.6.3 Advanced Texture Representations
+- 3.6.3.1 Compressed GPU Textures: BC1 (DXT1 — RGB, 4bpp), BC3 (DXT5 — RGBA, 8bpp), BC5 (Normal Maps, 8bpp), BC6H (HDR FP16), BC7 (High-Quality RGBA, 8bpp); ASTC (Adaptive Scalable — Variable Block Size, Modern Mobile)
+  - ▸ *CG use:* Every game texture is stored in BCn/ASTC; GPU hardware decompression (no CPU cost); critical for memory bandwidth
+- 3.6.3.2 Sparse Textures / Tiled Resources: Hardware Virtual Texture via GPU Page Tables; Partially Resident Texture (PRT); Shader Can Check if Page is Resident Before Sampling
+  - ▸ *CG use:* Virtual texture without CPU feedback loop; streaming open worlds without texture pop-in
+- 3.6.3.3 Bindless Textures (NVIDIA ARB_bindless_texture, Vulkan Descriptor Indexing): Shader Can Access All Textures via Flat Index (No Binding Per Draw Call); GPU-Driven Material System
+  - ▸ *CG use:* GPU-driven rendering (no CPU per-material binding); material variety without draw call explosion
+
+> 📚 **GitHub Repos:**
+> - [GPUOpen-LibrariesAndSDKs/TextureCompression](https://github.com/GPUOpen-LibrariesAndSDKs) — BCn/ETC/ASTC tools and samples
+> - [Ptex (Disney)](https://github.com/wdas/ptex) ![Stars](https://img.shields.io/github/stars/wdas/ptex?style=flat) — Per-face texture mapping library
+>
+> 📖 **Textbooks:** *Real-Time Rendering* — Akenine-Möller et al. (Ch. 6: Texturing); *GPU Gems 2* — Ch. Lefohn et al. (Virtual Textures)
+
+---
+
+### 3.7 PBR Material Models & Workflows
+
+#### 3.7.1 The PBR Material Revolution
+- 3.7.1.1 What is PBR?: Physics-Based Shading Grounded in Microfacet Theory; Energy Conservation Enforced; Dielectrics (IOR→F₀) vs. Conductors (Complex IOR→Colored Reflectance); No Ad-Hoc Specular Power Parameters
+  - ▸ *CG use:* Industry-wide standardization since ~2014; consistent material appearance across lighting conditions and renderers
+- 3.7.1.2 Metalness-Roughness Workflow (Most Common): Parameters: BaseColor (RGB), Metalness [0=Diel, 1=Metal], Roughness [0=Smooth, 1=Rough]; F₀ = lerp(0.04, BaseColor, Metalness); DiffuseColor = BaseColor × (1−Metalness)
+  - ▸ *CG use:* Unreal Engine, Unity HDRP, glTF 2.0, Substance Painter default; artist-friendly (few parameters, physically constrained)
+- 3.7.1.3 Specular-Glossiness Workflow: Parameters: DiffuseColor (RGB), SpecularColor (RGB — Direct F₀ Control), Glossiness [0=Rough, 1=Smooth]; Full Artistic Control but Easy to Break Energy Conservation
+  - ▸ *CG use:* Older pipelines; glTF 2.0 extension; still available in Substance Painter for legacy compatibility
+- 3.7.1.4 Disney Principled BSDF (Burley 2012): 11 Parameters: baseColor, subsurface, metallic, specular, specularTint, roughness, anisotropic, sheen, sheenTint, clearcoat, clearcoatGloss; Monolithic Shader Covering 95% of Real-World Materials
+  - ▸ *CG use:* The basis for Blender Principled BSDF, Unreal layered material, Arnold Standard Surface; single shader for nearly everything
+
+#### 3.7.2 PBR Extensions & Special Materials
+- 3.7.2.1 Sheen: Additional Microfiber Lobe (fabric appearance); Tinted Fresnel at Grazing; Typically Combined with Base Metallic-Roughness
+  - ▸ *CG use:* Velvet, felt, peach fuzz, certain fabrics; Disney and Filament sheen models
+- 3.7.2.2 Clear Coat: Extra Layer with Separate Roughness (Usually Low for Glossy Coating); Fresnel at Air-Coating Interface; Two-Lobe Normal Distribution (Base Layer + Coating)
+  - ▸ *CG use:* Car paint (metallic base + high-gloss clear); varnished wood; glossy phone screens; metallic paint with clear lacquer
+- 3.7.2.3 Thin-Film (Iridescence): Wavelength-Dependent Reflectance via Optical Path Difference 2ηd cos θ_t; Airy Summation Formula for Infinite Bounces; Spectrum → XYZ → RGB Conversion
+  - ▸ *CG use:* Soap bubbles, oil slicks, insect cuticle, pearl, dichroic glass; UE5 Filament implementation
+- 3.7.2.4 Anisotropy: Direction-Dependent Roughness α_u ≠ α_v; Tangent/Bitangent Direction Defines Anisotropy Axis; Brushed Microfacet Normal Distribution D_aniso
+  - ▸ *CG use:* Brushed metals (stainless steel appliances), hair, carbon fiber, machined aluminum, grooved surfaces
+
+#### 3.7.3 Material Representation Standards
+- 3.7.3.1 MaterialX (ASWF): XML-Based Material Definition; Node Graph → Platform-Agnostic Shader Generation; OSL/GLSL/MDL/HLSL Code Generation; Standard Library (PBR Nodes, Math, Textures)
+  - ▸ *CG use:* USD Material Binding; VFX pipeline interchange; NVIDIA Omniverse uses MaterialX as default; cross-engine material portability
+- 3.7.3.2 MDL (NVIDIA Material Definition Language): C-Like DSL for Materials; Physically Based by Default; Supports Measured BSDF; Compiles to Diverse Backends (OSL, PTX, GLSL)
+  - ▸ *CG use:* Iray, mental ray, vMaterials library; NVIDIA Omniverse rendering; automotive and industrial design visualization
+- 3.7.3.3 OpenPBR: Joint Standard by Autodesk + Adobe + NVIDIA + Epic; Unified Surface-Shading Model; Intended to Replace Proprietary Shader Fragmentation
+  - ▸ *CG use:* Emerging standard (2024+); aims to unify Metalness-Roughness + Specular-Glossiness + Disney under one model
+- 3.7.3.4 UsdShade: USD's Material Binding System; Shader Graph (Node Network); Connects Shaders to Geometry via Material Assignment API
+  - ▸ *CG use:* VFX pipeline: define material once → consistent across modeling, layout, animation, lighting, rendering
+
+> 📚 **GitHub Repos:**
+> - [AcademySoftwareFoundation/MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX) ![Stars](https://img.shields.io/github/stars/AcademySoftwareFoundation/MaterialX?style=flat) — Industry-standard material definition
+> - [google/filament](https://github.com/google/filament) ![Stars](https://img.shields.io/github/stars/google/filament?style=flat) — Complete PBR material system (Metalness-Roughness, ClearCoat, Sheen, Anisotropy)
+> - [NVIDIA/MDL-SDK](https://github.com/NVIDIA/MDL-SDK) ![Stars](https://img.shields.io/github/stars/NVIDIA/MDL-SDK?style=flat) — NVIDIA Material Definition Language SDK
+>
+> 📖 **Textbooks:** *Real-Time Rendering* — Ch. 9 (Physically Based Shading); *Physically Based Rendering* — Ch. 9 (Materials)
+
+---
+
+### 3.8 Measured, Data-Driven & Neural Materials
+
+#### 3.8.1 Measured BRDF Databases & Fitting
+- 3.8.1.1 MERL BRDF Database (Matusik et al. 2003): 100 Isotropic BRDFs Measured via Spherical Gantry; Dense (θ_h, θ_d, φ_d) Sampling (90×90×180); De-Facto Benchmark for BRDF Models
+  - ▸ *CG use:* Ground truth for BRDF fitting evaluation; still the most widely used measured BRDF dataset; available at merl.com
+- 3.8.1.2 EPFL Material Database (Dupuy & Jakob 2018): High-Resolution Anisotropic BSDF Measurements; Includes Transmission and Retroflection Components; Raw Measurement Data + Fitted Model Parameters
+  - ▸ *CG use:* Anisotropic reflectance validation; BSDF research evaluation; physically accurate material reproduction
+- 3.8.1.3 BRDF Fitting Techniques: Nonlinear Least Squares (Levenberg-Marquardt) to Fit Model Parameters to Measured Data; BRDF Explorer (Disney 2012); Isotropic → GGX Fitting (α, F₀ per Color Channel)
+  - ▸ *CG use:* Convert measured data to PBR pipeline parameters; automate material capture workflows
+- 3.8.1.4 SVBRDF (Spatially-Varying BRDF) Measurement: Per-Texel BRDF via Camera+Flash Photography; Photometric Stereo for Surface Orientation; Aittala et al. (2015) — Single Image SVBRDF via Neural Network
+  - ▸ *CG use:* Quixel Megascans material capture; smartphone material scanning (Adobe Capture, Unity MARS); game texture generation
+
+#### 3.8.2 Neural Material Representations
+- 3.8.2.1 Neural BRDF: MLP f_θ(ω_i, ω_o) → RGB Reflectance; Train on Measured BRDF Data; Autoencoder Architecture: Encode BRDF to Latent Vector → Decode Specific Query Directions
+  - ▸ *CG use:* Compact BRDF representation (few KB vs traditional tabulation's MB); fast evaluation; interpolation between measured materials
+- 3.8.2.2 Neural BTF (Bidirectional Texture Function): 6D Function BTF(x,ω_i,ω_o) — Appearance Depends on Surface Position and Light/View Directions; Captures Meso-Scale Detail (Fabric Weave, Leather Grain)
+  - ▸ *CG use:* Film-quality fabric rendering; car interior materials with visible weave; close-up surface detail beyond bump mapping
+- 3.8.2.3 Neural SVBRDF Recovery from Images: Given Single or Few Photos → Neural Network Predicts Per-Pixel Albedo, Normal, Roughness, Metallic; Deschaintre et al. (2018), Li et al. (2018)
+  - ▸ *CG use:* Material creation from smartphone photos; game asset material authoring from reference images
+- 3.8.2.4 Diffusion-Based Material Generation: Stable Diffusion Fine-Tuned on SVBRDF Maps; Text Prompt → 4-Map Output (Albedo, Normal, Roughness, Metallic); MatFuse, ControlMat, DreamMat (SIGGRAPH 2024)
+  - ▸ *CG use:* AI-assisted texture/material creation; rapid prototyping; filling material libraries with diverse variations
+
+#### 3.8.3 Light Transport & Appearance Capture
+- 3.8.3.1 Light Stage (Debevec et al. 2000): Hemispherical LED Array; Controlled Lighting Patterns; Separate Diffuse + Specular + Normal from Multi-Light Images; Spherical Harmonic Gradient Illumination
+  - ▸ *CG use:* Digital human face capture; film-quality reflectance field acquisition; USC ICT Light Stage used in Avatar, Blade Runner 2049, etc.
+- 3.8.3.2 Reflectance Field: 8D Function R(x_c,y_c,θ,φ,x_p,y_p) — Appearance for Every Camera Pixel, Every Projector Pixel; Spatially-Varying Reflectance + Global Illumination Effects
+  - ▸ *CG use:* Relighting real scenes from photographs; movie set relighting; museum artifact digitization
+- 3.8.3.3 OLAT (One-Light-at-a-Time) & Neural Relighting: Capture Scene Under Individual Light Directions → Train Network to Predict Appearance Under Any Lighting; Neural Radiance Cache (NRC — Müller 2021) for Real-Time Relighting
+  - ▸ *CG use:* Product visualization (change lighting interactively); architectural walkthroughs; e-commerce 3D viewers
+
+> 📚 **GitHub Repos:**
+> - [MERL BRDF Database](https://www.merl.com/brdf) — 100 measured isotropic BRDFs
+> - [EPFL Realistic Graphics Lab](https://rgl.epfl.ch/) — High-quality BSDF measurement data
+> - [NVlabs/nrc](https://github.com/NVlabs/nrc) ![Stars](https://img.shields.io/github/stars/NVlabs/nrc?style=flat) — Neural Radiance Cache for real-time relighting
+>
+> 📖 **Textbooks:** *Digital Modeling of Material Appearance* — Dorsey, Rushmeier, Sillion (Comprehensive reference); *High Dynamic Range Imaging* — Reinhard et al.
+
+---
+
+### 3.9 Procedural & Neural Textures
+
+#### 3.9.1 Procedural Texture Generation
+- 3.9.1.1 Noise-Based Procedurals: fBm (fractal Brownian motion) for terrain, clouds, marble veining; Turbulence (abs(noise)) for fire, marble; Domain Warping for organic patterns
+  - ▸ *CG use:* Infinite-resolution textures without storage cost; ShaderToy art; procedural planets (No Man's Sky)
+- 3.9.1.2 Pattern-Based Procedurals: Tiled/Wang Tiles for seamless aperiodic textures; Reaction-Diffusion (Turing Patterns → Zebra Stripes, Leopard Spots); Voronoi → Stone, Cells, Soap Bubbles
+  - ▸ *CG use:* Material graph nodes in Substance Designer; game environment texturing without repetition artifacts
+- 3.9.1.3 GPU Noise Libraries: FastNoise2 (SIMD-Optimized); Psrdnoise (Tiling Simplex with Derivatives); Curl Noise Generators
+  - ▸ *CG use:* Real-time procedural effects in shaders; terrain generation at runtime; VFX particle noise fields
+
+#### 3.9.2 Neural Texture Synthesis & Super-Resolution
+- 3.9.2.1 Example-Based Texture Synthesis (Efros & Leung 1999; Wei & Levoy 2000): Non-Parametric; Grow Texture Pixel-by-Pixel Matching Neighborhoods; Image Quilting (Efros & Freeman 2001) — Minimum Error Boundary Cut for Patch Blending
+  - ▸ *CG use:* Texture expansion (make a small sample into a large texture); game texture authoring (start from photo, expand to needed size)
+- 3.9.2.2 Neural Style Transfer for Textures (Gatys et al. 2015): CNN Feature Space Optimization; Content Loss (Preserve Structure) + Style Loss (Gram Matrix Statistics of Filter Responses); TextureNet, StyleGAN-2-Net
+  - ▸ *CG use:* Style transfer for artistic texture generation; material variation from reference style image
+- 3.9.2.3 Diffusion-Based Texture Generation: Fine-Tuned SD on PBR Map Pairs; Text Prompt → Albedo + Normal + Roughness; MatFuse (Vecchio et al. 2024), ControlNet for Guided PBR Map Generation
+  - ▸ *CG use:* Text-to-PBR-material workflow; rapid material library population; concept art → production texture pipeline
+- 3.9.2.4 Texture Super-Resolution: ESRGAN, Real-ESRGAN for Single-Image Upscaling; Texture-Specific SR Networks Trained on PBR Maps; Perceptual Loss (LPIPS) for Texture Detail Preservation
+  - ▸ *CG use:* Upscale low-res game textures to 4K; enhance legacy assets; mobile → console port texture upgrade
+
+> 📚 **GitHub Repos:**
+> - [Auburn/FastNoise2](https://github.com/Auburn/FastNoise2) ![Stars](https://img.shields.io/github/stars/Auburn/FastNoise2?style=flat) — High-performance SIMD noise generation
+> - [xinntao/Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) ![Stars](https://img.shields.io/github/stars/xinntao/Real-ESRGAN?style=flat) — Practical image/texture super-resolution
+>
+> 📖 **Textbooks:** *Texturing and Modeling: A Procedural Approach* — Ebert, Musgrave, Peachey, Perlin, Worley
+
+---
+
+### 3.10 Wave Optics & Special Effects
+
+#### 3.10.1 Wave Optics Foundations
+- 3.10.1.1 When Geometric Optics Fails: When Feature Size ∼ Wavelength (Nanoscale Structures); Diffraction, Interference, Polarization Effects Emerge; CD/DVD Rainbow, Butterfly Wings, Holograms
+  - ▸ *CG use:* Beyond the microfacet model — wave effects explain color in nature that ray optics cannot
+- 3.10.1.2 Diffraction: Light Bending Around Edges (Huygens-Fresnel Principle); Fraunhofer (Far-Field) and Fresnel (Near-Field) Regimes; Diffraction Grating → Wavelength-Dependent Angular Dispersion
+  - ▸ *CG use:* CD/DVD rainbow pattern; diffraction spikes on camera lens apertures (star filters); solar coronas in atmosphere rendering
+- 3.10.1.3 Thin-Film Interference (Precise): Phase Difference Δφ = (2π/λ) × 2ηd cos θ_t + Δφ_reflection (Phase Shift at Interface); Constructive: Δφ = 2πm (Bright); Destructive: Δφ = 2π(m+½) (Dark); Infinite Summation via Airy Formula
+  - ▸ *CG use:* Lens coatings (anti-reflection → purple/green tint); oil slicks; dichroic filters; accurate soap bubble rendering (Belcour & Barla 2017)
+
+#### 3.10.2 Polarization
+- 3.10.2.1 Stokes Vector/Mueller Calculus: 4D Stokes Vector S = (I,Q,U,V); I = Total Intensity, Q = Horizontal/Vertical, U = ±45°, V = Circular; Mueller Matrix M (4×4) Transforms Stokes Vector (Arbitrary Polarization Transform)
+  - ▸ *CG use:* Polarization-aware rendering (Mitsuba 3); LCD screen/mobile phone reflections (polarized light); sunglasses rendering
+- 3.10.2.2 Fresnel Polarization Split: r_∥ vs r_⊥ Different! → Dielectric Reflection is Partially Polarizing (Brewster's Angle: θ_B = arctan(η₂/η₁), r_∥ = 0 at θ_B)
+  - ▸ *CG use:* Polarized highlights on water/glass (removed by polarizing filters in photography); LCD emission is linearly polarized
+- 3.10.2.3 Fluorescence & Phosphorescence: Photon Absorption → Electron Excitation → Re-Emission at Longer Wavelength (Stokes Shift); Fluorescence = Prompt (<10⁻⁸s), Phosphorescence = Delayed (ms to hours)
+  - ▸ *CG use:* Fluorescent materials (highlighters, neon, certain minerals, coral); blacklight rendering; spectral reradiation matrix (Glassner 1994)
+
+#### 3.10.3 Spectral Rendering
+- 3.10.3.1 Why Spectral?: RGB Rendering Cannot Reproduce Dispersion, Thin-Film Colors, Fluorescence, or Metamerism (Two Different Spectra → Same RGB); Spectral Rendering Uses Many Wavelength Samples (Typically 4-16, Hero Wavelength Sampling)
+  - ▸ *CG use:* Film-quality rendering (Arnold, RenderMan spectral mode); accurate gemstone, prism, rainbow rendering; color-critical product visualization
+- 3.10.3.2 Hero Wavelength Sampling (Wilkie et al. 2014): Trace Single Wavelength Per Path (Hero λ ∼ Blackbody); Compute Path Weight via MIS Over Wavelengths; Spectral-to-XYZ → RGB at Sensor
+  - ▸ *CG use:* Efficient spectral rendering without tracing N wavelengths per path; production renderers use this approach
+- 3.10.3.3 Spectral Upsampling: Given RGB Triplet → Recover Plausible Spectrum; RGB → Smooth Spectrum via Optimization (Smits 1999), Dictionary Learning (Jakob & Hanika 2019), or Neural Methods
+  - ▸ *CG use:* Artists paint in RGB → spectral renderer needs spectrum; enabling spectral rendering in RGB-dominated pipelines
+
+> 📚 **GitHub Repos:**
+> - [mitsuba-renderer/mitsuba3](https://github.com/mitsuba-renderer/mitsuba3) ![Stars](https://img.shields.io/github/stars/mitsuba-renderer/mitsuba3?style=flat) — Full spectral + polarization rendering support
+> - [colour-science/colour](https://github.com/colour-science/colour) ![Stars](https://img.shields.io/github/stars/colour-science/colour?style=flat) — Spectral manipulation, CIE standards, illuminants
+>
+> 📖 **Textbooks:** *Physically Based Rendering* — Pharr et al. (Ch. 5: Color and Radiometry — Spectral Representation); *Principles of Digital Image Synthesis* — Glassner
+
+---
+
+### 3.11 Fluorescent, Phosphorescent & Spectral Materials
+
+#### 3.11.1 Fluorescence in Rendering
+- 3.11.1.1 Reradiation Matrix (Glassner 1994): M(λ_i,λ_o) — Probability of Absorbing λ_i and Re-Emitting λ_o; Fluorescence Adds M · L_i to RTE Source Term; Matrix is Banded (λ_o > λ_i, Spectral Shift)
+  - ▸ *CG use:* Fluorescent materials; security markings (passport UV patterns); coral reef appearance; highlighter pens under UV
+- 3.11.1.2 Practical Fluorescence Models: Reduce Full Reradiation Matrix to Moments (Mean Shift + Width); Fitted to Measured Fluorescent Material Database (Wilkie et al. 2006)
+  - ▸ *CG use:* Production spectral rendering; automotive paint with fluorescent pigments; theatrical lighting simulation
+- 3.11.1.3 Phosphorescence (Glow-in-the-Dark): Delayed Emission (Seconds to Hours); Requires Time-Dependent Simulation; Charge/Discharge Model (Accumulate Energy, Release Exponentially)
+  - ▸ *CG use:* Glow-in-the-dark toys/stickers; phosphorescent watch dials; emergency exit signs; phosphor persistence on old CRT monitors
+
+#### 3.11.2 Special Optical Materials
+- 3.11.2.1 Dichroic Materials: Transmit/Reflect Different Wavelengths Differently (Not Thin-Film — Selective Absorption); Polarizing Filters; Dichroic Beam Splitters in Projectors
+  - ▸ *CG use:* Dichroic glass blocks; LCD projector optical path; color separation prisms in 3-CCD cameras
+- 3.11.2.2 Retroreflective Materials: Light Reflected Back Toward Source Regardless of Incidence Angle; Corner-Cube Reflectors (Three Mutually Perpendicular Mirrors); Glass Beads (Cat's Eye Reflectors)
+  - ▸ *CG use:* Road signs and markings at night; bicycle reflectors; motion capture markers (passive retroreflective spheres)
+- 3.11.2.3 Gemstone Rendering: High IOR (Diamond 2.42, Sapphire 1.77), High Dispersion (Abbe Number V_d), Polarization via Birefringence (Calcite — Double Refraction), Inclusions and Flaws
+  - ▸ *CG use:* Jewelry rendering (Tiffany, Cartier); accurate gem visualization for e-commerce; diamond grading simulation
+- 3.11.2.4 Transparent Conductive Oxides (TCO): Thin Conductive Layer on Glass (Phone Screens, Solar Panels); Slight Tint (ITO = Yellow-Green, FTO = Haze); Important for Accurate Mobile Device Rendering
+  - ▸ *CG use:* Product visualization for consumer electronics; architectural glass with low-E coatings
+
+> 📖 **Textbooks:** *Digital Modeling of Material Appearance* — Dorsey, Rushmeier, Sillion; *Measuring and Modeling Fluorescent Materials* — Wilkie et al.
+
+---
+
+### 3.12 Material Standards, Interchange & Future Directions
+
+#### 3.12.1 Material Ecosystem Standards
+- 3.12.1.1 glTF 2.0 PBR: KHR_materials_pbrSpecularGlossiness (Legacy) + KHR_materials_metallicRoughness; Extensions: ClearCoat, Sheen, Transmission, Volume, Iridescence, Specular, Anisotropy
+  - ▸ *CG use:* Web 3D standard material; every WebGL/WebGPU viewer; game engine import/export; USDZ for AR Quick Look
+- 3.12.1.2 MaterialX/USD Integration: MaterialX Node Graph → USD Shader Prim → Hydra Renderer Backend; Multi-Renderer Support (Storm GL, Arnold, RenderMan, Karma, Cycles)
+  - ▸ *CG use:* VFX pipeline material exchange; look development consistency across departments; real-time ↔ offline interoperability
+- 3.12.1.3 OpenPBR (2024+): Community-Driven Unified Shading Model; Incorporates Disney + Autodesk Standard Surface + MDL + MaterialX; Single Parameterization for All Renderers
+  - ▸ *CG use:* Goal: define material once → render consistently everywhere (games, film, AR, print); reduces current fragmentation
+
+#### 3.12.2 Future Material Directions
+- 3.12.2.1 Differentiable Material Models: BRDF Parameters Directly Optimizable via Gradient Descent; Differentiable Renderer → ∇L/∇(albedo, roughness, metallic) → Update Material to Match Photograph
+  - ▸ *CG use:* Automatic material parameter estimation from photos; inverse rendering for asset creation; material optimization for target appearance
+- 3.12.2.2 Generative Material AI: Diffusion Models Trained on Material Databases → Generate Novel, Physically-Plausible PBR Materials; Text-Guided Material Generation; Material Variation from Single Example
+  - ▸ *CG use:* Infinite material library generation; artist tool augmentation; procedural material population for large scenes
+- 3.12.2.3 Real-Time Neural Materials: Neural BRDF Evaluated in Shader via Tiny MLP (Few FLOPs); Precomputed Neural Texture (Baked MLP Weights into Texture); Neural Material LOD
+  - ▸ *CG use:* Complex measured BRDFs at real-time frame rates; film-quality materials in games; mobile neural material inference
+- 3.12.2.4 Appearance Capture Democratization: Smartphone-Based Material Scanning (LiDAR + RGB → PBR Maps); Cloud Processing → Material Library; AR-Ready Asset Generation
+  - ▸ *CG use:* User-generated content for games; e-commerce 3D product scanning; architectural material documentation
+
+> 📚 **GitHub Repos:**
+> - [KhronosGroup/glTF](https://github.com/KhronosGroup/glTF) ![Stars](https://img.shields.io/github/stars/KhronosGroup/glTF?style=flat) — glTF specification + PBR extensions
+> - [AcademySoftwareFoundation/OpenPBR](https://github.com/AcademySoftwareFoundation/OpenPBR) — Unified PBR shading model (emerging standard)
+> - [google/filament](https://github.com/google/filament) ![Stars](https://img.shields.io/github/stars/google/filament?style=flat) — Complete PBR implementation + material documentation
+>
+> 📖 **Textbooks:** *Physically Based Rendering* — Pharr et al. (Complete pipeline); *Real-Time Rendering* — Akenine-Möller et al. (Real-time materials)
+
+---
+
 
 ## Chapter 4 · Light Transport & Rendering
 
