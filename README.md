@@ -1996,842 +1996,1147 @@
 
 ## Chapter 5 · Neural, Differentiable & Inverse Rendering
 
+*The 2020s rendering revolution — differentiable pipelines, neural radiance fields, Gaussian splatting, and diffusion-based 3D generation. `▸ CG use:` links each technique to its practical impact.*
 
-### 5.1 Differentiable Rendering
-- 3.8.1 Differentiable Rasterization: Forward & Backward Propagation
-- 3.8.2 Differentiable Path Tracing: Edge Sampling, Reparameterization Tricks
-- 3.8.3 Differentiable Volume Rendering (Gradients in NeRF Volume Rendering)
-- 3.8.4 Differentiable BRDF / Material Optimization
-- 3.8.5 Differentiable Geometry Optimization (Mesh Vertex Gradient Propagation)
-- 3.8.6 Inverse Rendering:
-  - 3.8.6.1 Recovering Geometry from Images (Photometric Stereo, Shape-from-Shading)
-  - 3.8.6.2 Recovering Materials & Lighting from Images (Inverse Path Tracing)
-  - 3.8.6.3 Joint Inverse Rendering (Simultaneous Estimation of Geometry, Materials & Lighting)
-- 3.8.7 Differentiable Rendering Frameworks (Mitsuba 3, Redner, PSDR-CUDA, Nvdiffrast, Slang.D)
-
-### 5.2 Neural Rendering
-- 3.9.1 Neural Radiance Field (NeRF): Positional Encoding, Hierarchical Sampling, Coarse-to-Fine
-- 3.9.2 NeRF Acceleration (Instant NGP, TensoRF, Plenoxels, DIVeR, MERF, SMERF)
-- 3.9.3 Few-View NeRF (PixelNeRF, MVSNeRF, RegNeRF, FreeNeRF)
-- 3.9.4 Dynamic NeRF (D-NeRF, HyperNeRF, TiNeuVox, K-Planes)
-- 3.9.5 Large-Scale Scene NeRF (Block-NeRF, Mega-NeRF, BungeeNeRF)
-- 3.9.6 Editable / Relightable NeRF (NeRF-Editing, NeRF-W / NeRF in the Wild)
-- 3.9.7 3D Gaussian Splatting (3DGS):
-  - 3.9.7.1 Point Primitives + Covariance Matrices + Spherical Harmonics Colors
-  - 3.9.7.2 Adaptive Density Control (Clone / Split)
-  - 3.9.7.3 Tile-Based Differentiable Rasterization
-  - 3.9.7.4 Variants: 2DGS (Surfel), Dynamic 4DGS, Compressed 3DGS
-- 3.9.8 Neural SDF / Occupancy Fields (NeuS, VolSDF, MonoSDF)
-- 3.9.9 Neural Materials (Neural BRDF / Neural BTF)
-- 3.9.10 Neural Radiance Cache (NRC)
-- 3.9.11 Diffusion-Model-Based 3D Generation (DreamFusion / SDS Loss, SJC, ProlificDreamer / VSD)
-- 3.9.12 Feed-Forward 3D Reconstruction (LRM, Instant3D, LGM, GRM)
+> 💡 **Top-Level References:**
+> - [mitsuba-renderer/mitsuba3](https://github.com/mitsuba-renderer/mitsuba3) ![Stars](https://img.shields.io/github/stars/mitsuba-renderer/mitsuba3?style=flat) — Research-grade differentiable renderer (the standard)
+> - [NVlabs/instant-ngp](https://github.com/NVlabs/instant-ngp) ![Stars](https://img.shields.io/github/stars/NVlabs/instant-ngp?style=flat) — Hash encoding + NeRF/SDF training in seconds
+> - [graphdeco-inria/gaussian-splatting](https://github.com/graphdeco-inria/gaussian-splatting) ![Stars](https://img.shields.io/github/stars/graphdeco-inria/gaussian-splatting?style=flat) — Original 3DGS — real-time novel view synthesis
+> - [nerfstudio-project/nerfstudio](https://github.com/nerfstudio-project/nerfstudio) ![Stars](https://img.shields.io/github/stars/nerfstudio-project/nerfstudio?style=flat) — Unified NeRF/3DGS training framework
 
 ---
 
+### 5.1 Differentiable Rendering Foundations
+
+#### 5.1.1 Why Differentiable Rendering?
+- 5.1.1.1 The Inverse Problem: Given an Image, Recover Scene Parameters (Geometry, Materials, Lighting); Traditional Approach = Manual + Heuristic; Differentiable Rendering = Render → Compare to Photo → Gradient → Optimize Parameters Automatically
+  - ▸ *CG use:* Automatic material estimation from photographs; 3D reconstruction from images via gradient descent; computational design optimization
+- 5.1.1.2 Forward vs. Inverse Rendering: Forward: Scene → Renderer → Image (Well-Posed, Deterministic); Inverse: Image → Optimizer → Scene Parameters (Ill-Posed, Underdetermined, Requires Priors); Differentiable Renderer = Differentiable Forward Model Enabling Gradient-Based Inverse
+  - ▸ *CG use:* The bridge connecting pixels to scene understanding; enables machine learning to directly optimize 3D content
+- 5.1.1.3 The Gradient Challenge: Rendering Has Discontinuities (Occlusion Boundaries, Shadows, Specular Highlights); Naive Autodiff Produces Zero Gradients at Discontinuities (0 = Not Useful); Need Specialized Gradient Estimators
+  - ▸ *CG use:* This is why a "simple" differentiable renderer doesn't work — requires careful handling of discontinuities
+
+#### 5.1.2 Gradient Estimation Strategies
+- 5.1.2.1 Reparameterization: Change Integration Variable to Remove Discontinuity from Integrand; Primary Sample Space (PSS): Differentiate w.r.t. Uniform Random Numbers → Discontinuity Moves to Sampling Strategy; Used in Differentiable Path Tracing
+  - ▸ *CG use:* Mitsuba 3 PSDR (Primary Sample Space Differentiable Rendering); continuous gradients despite discrete visibility changes
+- 5.1.2.2 Edge Sampling / Boundary Integrals (Li et al. 2018): Discontinuity Gradient = Integral Over Object Silhouettes; Sample Points on Discontinuity Boundaries × Magnitude of Jump × Change in Boundary Location; Yields Usable Gradients for Vertex Positions
+  - ▸ *CG use:* Differentiable rasterization (Redner); gradient-based mesh optimization from images (soft rasterizer); inverse geometry
+- 5.1.2.3 REINFORCE (Score Function / Likelihood Ratio): ∇_θ 𝔼[f(X)] = 𝔼[f(X) ∇_θ log p_θ(X)]; Unbiased but High Variance; Works on Non-Differentiable Black Box; Antithetic Sampling for Variance Reduction
+  - ▸ *CG use:* Black-box differentiable rasterization (transform any rasterizer into a differentiable one — Intel I3D 2024 Best Paper); NVIDIA Warp uses REINFORCE for non-differentiable ops
+- 5.1.2.4 Control Variates for REINFORCE Variance Reduction: f(X)∇ log p(X) − β(∇ log p(X) − 𝔼[∇ log p]) (Subtract Baseline); Learned Control Variates (Neural Network Predicts Baseline)
+  - ▸ *CG use:* Dramatically reduces REINFORCE variance; enables practical black-box diff-rendering
+
+> 📚 **GitHub Repos:** [mitsuba-renderer/mitsuba3](https://github.com/mitsuba-renderer/mitsuba3) ![Stars](https://img.shields.io/github/stars/mitsuba-renderer/mitsuba3?style=flat) — PSDR, edge sampling, reparameterization; [NVIDIAGameWorks/nvdiffrast](https://github.com/NVIDIAGameWorks/nvdiffrast) ![Stars](https://img.shields.io/github/stars/NVIDIAGameWorks/nvdiffrast?style=flat) — GPU differentiable rasterization
+>
+> 📖 **Papers:** Li et al. *Differentiable Monte Carlo Ray Tracing through Edge Sampling* (SIGGRAPH 2018); Loubet et al. *Reparameterizing Path Space* (SIGGRAPH 2019)
 
 ---
+
+### 5.2 Differentiable Rasterization & Path Tracing
+
+#### 5.2.1 Differentiable Rasterization
+- 5.2.1.1 Soft Rasterizer (Liu et al. 2019 — SoftRas): Replace Hard Occlusion Step with Sigmoid; Probability Each Triangle Covers Each Pixel; Gradients Flow Through Coverage Probabilities; Blurry but Smooth Gradients
+  - ▸ *CG use:* Single-image 3D reconstruction; deformable mesh fitting to silhouettes; shape-from-shading via gradient descent
+- 5.2.1.2 Forward Rasterization (Nvdiffrast — Laine et al. 2020): Standard Hardware Rasterization → Differentiable Interpolation of Attributes; Gradients via Barycentrics; Discontinuity Gradients Manual (Edge Sampling for Silhouette Derivatives); GPU-Optimized via CUDA/OpenGL Interop
+  - ▸ *CG use:* Nvdiffrec (inverse rendering: multi-view images → mesh + PBR materials); Nvdiffmodeling; 3D deep learning training with rendering in the loop
+- 5.2.1.3 DIB-R (Chen et al. 2019): Differentiable Interpolation-Based Renderer; Forward Pass = Standard Rasterization; Backward Pass = Interpolate Gradients from Pixels to Vertices via Barycentric Weights; Handles Texture + Lighting
+  - ▸ *CG use:* Learning-based 3D reconstruction; face model fitting; mesh prediction from images
+
+#### 5.2.2 Differentiable Path Tracing
+- 5.2.2.1 Primary Sample Space Differentiable Rendering (PSDR — Zhang et al. 2020, 2021, 2023): Differentiate w.r.t. Uniform Random Numbers (Primary Samples) → Removes Scene-Parameter Dependency from Sampler; Handle Discontinuities via MIS Over Tangent-Space Strategies
+  - ▸ *CG use:* Mitsuba 3's differentiable mode (PSDR integrator); differentiable light transport for complex scenes (caustics, participating media)
+- 5.2.2.2 Radiative Backpropagation (Nimier-David et al. 2020): Adjoint Method for Radiative Transfer Equation; Propagate Adjoint Radiance from Sensor Backward Through Scene; Efficient for High-Dimensional Parameter Spaces
+  - ▸ *CG use:* Mitsuba 3 adjoint integrator; efficient for scenes with many parameters (e.g., per-vertex geometry optimization)
+- 5.2.2.3 Warp-Area Product (Bangaru et al. 2020): Directly Compute Discontinuity Gradient as Integral Over Silhouette in Path Space; Relationship Between Silhouette Movement and Pixel Intensity Change
+  - ▸ *CG use:* Unbiased gradients for geometry optimization; handles complex visibility effects (multiple bounces, participating media)
+
+> 📚 **GitHub Repos:** [NVIDIAGameWorks/nvdiffrast](https://github.com/NVIDIAGameWorks/nvdiffrast) ![Stars](https://img.shields.io/github/stars/NVIDIAGameWorks/nvdiffrast?style=flat) — GPU differentiable rasterizer; [mitsuba-renderer/mitsuba3](https://github.com/mitsuba-renderer/mitsuba3) — PSDR + adjoint + reparameterization integrators
+>
+> 📖 **Papers:** Laine et al. *Modular Primitives for High-Performance Differentiable Rendering* (SIGGRAPH Asia 2020); Nimier-David et al. *Radiative Backpropagation* (SIGGRAPH 2020)
+
+---
+
+### 5.3 Neural Radiance Fields (NeRF) — The 2020 Breakthrough
+
+#### 5.3.1 NeRF Core Algorithm
+- 5.3.1.1 Scene Representation: MLP F_Θ: (x, y, z, θ, φ) → (RGB_σ, Density σ); 3D Position → Density (View-Independent); 3D Position + 2D View Direction → Color (View-Dependent); Continuous Implicit Representation
+  - ▸ *CG use:* Novel view synthesis from posed images; the 2020 paper transformed 3D computer vision and graphics; ECCV 2020 Best Paper Honorable Mention
+- 5.3.1.2 Positional Encoding γ(p) = [sin(2⁰πp), cos(2⁰πp), sin(2¹πp), cos(2¹πp), ..., sin(2^{L−1}πp), cos(2^{L−1}πp)]; L=10 for Position, L=4 for Direction; Fourier Features Enable MLP to Learn High-Frequency Detail (Tancik et al. NeurIPS 2020 — Spectral Bias Analysis)
+  - ▸ *CG use:* Without PE, MLP produces blurry results (low-frequency bias of ReLU networks); PE is the "secret sauce" for NeRF detail
+- 5.3.1.3 Volume Rendering Integration: C(r) = Σᵢ T_i (1 − exp(−σ_i δ_i)) c_i; T_i = exp(−Σ_{j<i} σ_j δ_j) (Accumulated Transmittance); Sample Points Along Ray via Stratified Sampling + Hierarchical Sampling (Coarse Network → Fine Network)
+  - ▸ *CG use:* Differentiable volume rendering enables end-to-end training from images only; no 3D supervision needed!
+- 5.3.1.4 Training: L = Σ_r ‖C_GT(r) − C_pred(r)‖²; Random Ray Batches from Training Images; Adam Optimizer; ~100K-300K Iterations (~Hours on Single GPU); No 3D Ground Truth Required
+  - ▸ *CG use:* First practical neural scene representation trainable from posed photographs; spawned an entire research field
+
+#### 5.3.2 NeRF Quality Improvements
+- 5.3.2.1 Mip-NeRF (Barron et al. 2021): Replace Point Sampling with Conical Frustum Sampling (Integrated Positional Encoding — IPE); Anti-Aliased Multi-Scale Representation; Handles Variable Camera Distances/Resolutions
+  - ▸ *CG use:* Sharper results at multiple resolutions; eliminates aliasing when training and testing at different scales
+- 5.3.2.2 Mip-NeRF 360 (Barron et al. 2022): Contract Unbounded Scene into Bounded Ball via Coordinate Contraction; Proposal Network (Lightweight Density MLP) for Efficient Sampling; Distortion Loss Regularization; Handles Indoor/Outdoor Unbounded Scenes
+  - ▸ *CG use:* Practical NeRF for real-world unbounded scenes (not just object-centric); Google's "RawNeRF" for dark scenes
+- 5.3.2.3 Ref-NeRF (Verbin et al. 2022): Separate Diffuse + Specular Appearance; View Direction → Reflected Direction (via Normal) → Specular Color; Integrated Directional Encoding (IDE) for Specular; handles glossy reflections significantly better than vanilla NeRF
+  - ▸ *CG use:* Glossy object rendering; specular highlights that change correctly with viewpoint
+
+> 📚 **GitHub Repos:**
+> - [bmild/nerf](https://github.com/bmild/nerf) ![Stars](https://img.shields.io/github/stars/bmild/nerf?style=flat) — Original NeRF implementation (Mildenhall et al. 2020)
+> - [google-research/multinerf](https://github.com/google-research/multinerf) ![Stars](https://img.shields.io/github/stars/google-research/multinerf?style=flat) — Mip-NeRF 360 implementation (Google)
+> - [nerfstudio-project/nerfstudio](https://github.com/nerfstudio-project/nerfstudio) ![Stars](https://img.shields.io/github/stars/nerfstudio-project/nerfstudio?style=flat) — Unified training framework with 20+ NeRF variants
+>
+> 📖 **Papers:** Mildenhall et al. *NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis* (ECCV 2020); Tancik et al. *Fourier Features Let Networks Learn High Frequency Functions in Low Dimensional Domains* (NeurIPS 2020)
+
+---
+
+### 5.4 NeRF Acceleration & Efficient Variants
+
+#### 5.4.1 Grid-Based Acceleration
+- 5.4.1.1 Instant NGP (Müller et al. SIGGRAPH 2022): Multi-Resolution Hash Encoding: L Levels × T=2^19 Hash Entries × F=2 Feature Dimensions; Tiny CUDA Neural Network (Fully Fused MLP — 1-2 Layer, 64 Neurons); Training: 5-15 Seconds (vs. Hours for Vanilla NeRF!)
+  - ▸ *CG use:* The breakthrough that made neural rendering practical; real-time NeRF training; backbone for most subsequent work
+- 5.4.1.2 TensoRF (Chen et al. ECCV 2022): Factorize 3D Density + Appearance Grid into CP (Vector) or VM (Vector-Matrix) Decomposition; Explicit 3D Grid = Σ_r v_r¹ ∘ v_r² ∘ v_r³ (CP) or Σ_r v_r ∘ M_r (VM); Compact Yet High-Quality
+  - ▸ *CG use:* Interpretable factorization enables editing (modify basis vectors → edit scene); comparable quality to NGP with better compression
+- 5.4.1.3 Plenoxels (Fridovich-Keil et al. 2022): Fully Explicit Voxel Grid of Spherical Harmonics; No MLP at All!; Direct Optimization of Voxel Values via SGD; Training in ~10 Minutes; Rendering via Trilinear Interpolation
+  - ▸ *CG use:* Demonstrates MLP is not strictly necessary; explicit optimization is simple + interpretable; fast rendering
+- 5.4.1.4 Triplane / K-Planes (Chan et al. 2022, Fridovich-Keil et al. 2023): Decompose 3D Volume into 2D (Triplane: XY, XZ, YZ) or 3×1D (HexPlane) Factorized Planes; Query via Projection + Bilinear Interpolation + Concatenation → Tiny MLP; Dense Grid Quality with Factorized Memory
+  - ▸ *CG use:* EG3D (Chan et al. 2022) — 3D-aware GAN for face generation; efficient 4D representations for dynamic scenes
+
+#### 5.4.2 Compression & Deployment
+- 5.4.2.1 MERF / SMERF (Duckworth et al. 2023, 2024): Mobile/Web-Friendly NeRF; Compact Representation (Sparse Grid + Triplane); SMERF: Real-Time on Smartphones via WebGL
+  - ▸ *CG use:* NeRF on the web; product configurators; real estate walkthroughs; AR viewing
+- 5.4.2.2 VQ-NeRF (Takikawa et al. 2022): Vector Quantization of Feature Grid; Learned Codebook + Grid of Indices → Drastic Compression; Distillation from Larger Model
+  - ▸ *CG use:* Streaming NeRF; mobile deployment; game-ready neural scene assets
+- 5.4.2.3 ReRF / StreamRF (Li et al. 2023): Residual Radiance Fields; Encode Temporal Change as Compact Residual → Efficient Dynamic Scene Streaming; Progressive Refinement
+  - ▸ *CG use:* Volumetric video streaming; free-viewpoint video at manageable bitrates
+
+> 📚 **GitHub Repos:**
+> - [NVlabs/instant-ngp](https://github.com/NVlabs/instant-ngp) ![Stars](https://img.shields.io/github/stars/NVlabs/instant-ngp?style=flat) — Hash encoding + real-time training
+> - [apchenstu/TensoRF](https://github.com/apchenstu/TensoRF) ![Stars](https://img.shields.io/github/stars/apchenstu/TensoRF?style=flat) — VM/CP tensor decomposition
+> - [sxyu/svox2](https://github.com/sxyu/svox2) ![Stars](https://img.shields.io/github/stars/sxyu/svox2?style=flat) — Plenoxels: explicit voxel grid + SH
+
+---
+
+### 5.5 Dynamic, Few-View & Large-Scale NeRF
+
+#### 5.5.1 Dynamic NeRF
+- 5.5.1.1 D-NeRF (Pumarola et al. 2021): Deformation Field Maps Canonical Space ↔ Deformed Space at Time t; MLP: (x_canonical, t) → (Δx, Δr) for Position + Rotation; Volume Render in Canonical Space — Always Consistent
+  - ▸ *CG use:* Monocular video → dynamic 3D scene; deformable object reconstruction; virtual production
+- 5.5.1.2 HyperNeRF (Park et al. 2021): Ambient Space Slice Codes for Topological Changes; Higher-Dimensional Hyperspace → Projections Handle Appearance Changes Beyond Simple Deformation
+  - ▸ *CG use:* Dynamic scenes with topological changes (mouth opening, bag opening); facial performance capture
+- 5.5.1.3 TiNeuVox / K-Planes 4D (Fang et al. 2022, Fridovich-Keil et al. 2023): Time-Aware Voxel Grids; HexPlane Decomposition: 3 Spatial + 1 Temporal Dimension; Fast Training + Rendering for Dynamic Scenes
+  - ▸ *CG use:* Real-time dynamic view synthesis; volumetric video; sports replay
+- 5.5.1.4 4D Gaussian Splatting: Dynamic 3DGS via Time-Varying Positions + Covariances + Colors; Real-Time Rendering of Dynamic Scenes from Multi-View Video
+  - ▸ *CG use:* Free-viewpoint video at 30+ FPS; immersive sports broadcasting; volumetric performance capture
+
+#### 5.5.2 Few-View & Generalizable NeRF
+- 5.5.2.1 PixelNeRF (Yu et al. 2021): Image-Conditioned NeRF; CNN Encodes Input Images → Per-Point Features → Input to NeRF MLP Along with (x,y,z,d); Generalizes Across Scenes (Train on Many, Test on New Without Per-Scene Optimization)
+  - ▸ *CG use:* Single/few-view 3D reconstruction; no per-scene training needed; feed-forward reconstruction
+- 5.5.2.2 MVSNeRF (Chen et al. 2021): MVS Cost Volume → 3D Feature Volume + Neural Rendering; Multi-View Stereo + NeRF Hybrid; Generalizable Across Scenes
+  - ▸ *CG use:* Few-shot view synthesis; camera array capture; drone photogrammetry enhancement
+- 5.5.2.3 FreeNeRF / RegNeRF (Yang et al. 2023, Niemeyer et al. 2022): Regularization Strategies for Sparse-View NeRF; Depth Smoothness + Appearance Regularization; Can Reconstruct from as Few as 3 Views!
+  - ▸ *CG use:* Casual capture (3 phone photos → 3D); practical NeRF for non-experts
+- 5.5.2.4 Zero-1-to-3 / Zero123 (Liu et al. 2023): Diffusion Model Trained on Large 3D Dataset (Objaverse); Input: Single Image + Relative Camera Pose → Output: Novel View; Feed-Forward, No Per-Scene Optimization
+  - ▸ *CG use:* Single-image novel view synthesis; 3D asset preview from product photo; AR content creation
+
+#### 5.5.3 Large-Scale & Outdoor NeRF
+- 5.5.3.1 Block-NeRF (Tancik et al. 2022): City-Scale via Tiling into Blocks; Each Block = Independently Trained NeRF; Block Boundary Blending via Appearance Embedding Overlap; Waymo/Street View Data (Millions of Images)
+  - ▸ *CG use:* Autonomous driving simulation; city digital twins; Google Immersive View
+- 5.5.3.2 Urban Radiance Fields (Rematas et al. 2022): Satellite + Street-Level Imagery Fusion; RGB + LiDAR Data; Multi-Scale Training (Coarse from Satellite, Fine from Street View) → Fly-Through from Any Altitude
+  - ▸ *CG use:* Google Earth 3D; urban planning visualization; gaming environment capture
+- 5.5.3.3 NeRF-W / NeRF in the Wild (Martin-Brualla et al. 2021): Per-Image Appearance Embedding + Transient Object (People, Cars) Handling via Uncertainty; Trained on Internet Photo Collections (Uncontrolled Lighting, Occlusions, Variable Appearance)
+  - ▸ *CG use:* Tourist landmark reconstruction from Flickr; removes pedestrians automatically; cultural heritage digitization
+
+> 📚 **GitHub Repos:**
+> - [nerfstudio-project/nerfstudio](https://github.com/nerfstudio-project/nerfstudio) ![Stars](https://img.shields.io/github/stars/nerfstudio-project/nerfstudio?style=flat) — Implements most NeRF variants in a unified framework
+> - [cvlab-columbia/zero123](https://github.com/cvlab-columbia/zero123) ![Stars](https://img.shields.io/github/stars/cvlab-columbia/zero123?style=flat) — Zero-1-to-3 single image → novel view
+
+---
+
+### 5.6 3D Gaussian Splatting — The 2023 Revolution
+
+#### 5.6.1 3DGS Core Method
+- 5.6.1.1 Primitive Representation: Anisotropic 3D Gaussian G(x) = σ · exp(−½(x−μ)ᵀΣ⁻¹(x−μ)); Σ = RSSᵀRᵀ (Rotation R + Scale S); Each Gaussian: Position μ (3D), Cov Σ (9 params → 7 after decomposition), Opacity σ, Color via SH Coefficients (48 coefficients / 16 bands per channel)
+  - ▸ *CG use:* Explicit point-based representation; interpretable (unlike NeRF MLP); naturally supports editing
+- 5.6.1.2 Tile-Based Differentiable Rasterizer: Sort Gaussians by Depth (Per-Tile Radix Sort); For Each Tile: Accumulate Front-to-Back via α-Blending C = Σᵢ c_i α_i Π_{j<i}(1−α_j), α_i = σ_i · G_2D(u,v); Entirely Differentiable (Gradients w.r.t. μ, Σ, σ, SH)
+  - ▸ *CG use:* Fast training (minutes vs. hours for NeRF); real-time rendering (30+ FPS at 1080p); GPU-friendly (rasterization, not ray marching)
+- 5.6.1.3 Adaptive Density Control: Detect Under-Reconstruction (Small Gaussians with Large Position Gradients → Clone); Detect Over-Reconstruction (Large Gaussians with Large Position Gradients → Split); Periodic Culling of Low-Opacity Gaussians
+  - ▸ *CG use:* Automatic LOD — more Gaussians on detailed regions, fewer on smooth surfaces; no manual tuning needed
+- 5.6.1.4 SfM Initialization: Start from COLMAP Sparse Point Cloud → Each Point = One Gaussian (Color + Covariance from 3 Nearest Neighbors); Provides Good Initialization → Faster Convergence
+  - ▸ *CG use:* Standard pipeline: COLMAP SfM → 3DGS Training → Real-Time Rendering; works with any SfM input
+
+#### 5.6.2 3DGS Quality & Efficiency Extensions
+- 5.6.2.1 Mip-Splatting (Yu et al. 2023): 3D Frequency-Constrained Gaussians; Band-Limited 3DGS for Anti-Aliasing at Variable Resolutions/Zooms; 3D Smoothing Filter Applied During Training
+  - ▸ *CG use:* Eliminates aliasing when rendering at different resolutions; zoom into 3DGS without artifacts
+- 5.6.2.2 Compact3D / LightGaussian / EAGLES: Scalar Quantization of Gaussian Parameters (8-bit); Entropy Coding of Compressed Parameters; Learned Mask to Prune Unnecessary Gaussians; Retain Methods for Post-Training
+  - ▸ *CG use:* 3DGS on mobile/web; storage reduced from GB to tens of MB; streaming Gaussian splats
+- 5.6.2.3 StopThePop (Radl et al. 2024): Sort-Free Rendering via Multi-Pass Approximate Ordering; Eliminates Expensive Per-Frame Radix Sort; Up to 2× Rendering Speedup with Minimal Quality Loss
+  - ▸ *CG use:* Higher FPS for real-time 3DGS; mobile deployment where radix sort is expensive
+- 5.6.2.4 Scaffold-GS (Lu et al. 2023): Anchor-Based Gaussian Distribution; Sparse Voxel Grid of Anchor Points → Each Anchor Generates Local Gaussians via MLP; Better Structure, Fewer Floaters
+  - ▸ *CG use:* Cleaner geometry; more structured representation; fewer artifacts in novel views
+
+#### 5.6.3 2DGS, Surfel-Based & Hybrid Methods
+- 5.6.3.1 2D Gaussian Splatting (Huang et al. SIGGRAPH 2024): "Flat" Gaussians → Surfels (One Dimension Collapsed); Surface Normal = Shortest Axis → Direct Normal Map Rendering; Better Surface Reconstruction than 3DGS
+  - ▸ *CG use:* High-quality mesh extraction from Gaussian splats; surface reconstruction quality approaching MVS; direct normal for relighting
+- 5.6.3.2 SuGaR (Guédon & Lepetit 2023): Regularize Gaussians to Be Flat and Aligned with Surface; Poisson Surface Reconstruction from Aligned Gaussians; Mesh Extraction from 3DGS for Traditional Rendering Pipelines
+  - ▸ *CG use:* Convert 3DGS to standard mesh → import into game engines, DCC tools, physics simulation
+- 5.6.3.3 GOF (Gaussian Opacity Fields — Yu et al. 2024): Replace Discrete Gaussians with Continuous Opacity Field; Ray-Marching Through Gaussian Field → Surface-Like Rendering; Direct SDF Extraction
+  - ▸ *CG use:* Best-of-both: explicit efficiency of 3DGS + continuous surface quality of implicit methods
+
+> 📚 **GitHub Repos:**
+> - [graphdeco-inria/gaussian-splatting](https://github.com/graphdeco-inria/gaussian-splatting) ![Stars](https://img.shields.io/github/stars/graphdeco-inria/gaussian-splatting?style=flat) — Original 3DGS (Kerbl et al. SIGGRAPH 2023)
+> - [nerfstudio-project/gsplat](https://github.com/nerfstudio-project/gsplat) ![Stars](https://img.shields.io/github/stars/nerfstudio-project/gsplat?style=flat) — Optimized CUDA Gaussian rasterizer
+> - [hbb1/2d-gaussian-splatting](https://github.com/hbb1/2d-gaussian-splatting) ![Stars](https://img.shields.io/github/stars/hbb1/2d-gaussian-splatting?style=flat) — 2DGS: surfel-based surface reconstruction
+>
+> 📖 **Papers:** Kerbl et al. *3D Gaussian Splatting for Real-Time Radiance Field Rendering* (SIGGRAPH 2023); Huang et al. *2D Gaussian Splatting* (SIGGRAPH 2024)
+
+---
+
+### 5.7 Neural Surface Reconstruction
+
+#### 5.7.1 SDF-Based Neural Methods
+- 5.7.1.1 NeuS (Wang et al. NeurIPS 2021): Volume Rendering of SDF with Unbiased Weight Function w(t) = φ_s(f(p(t))) / ∫ φ_s(f(p(u))) du; φ_s(x) = se^{−sx}/(1+e^{−sx})² (Logistic Density Distribution, s→∞ → Surface); Transforms SDF to Density for Volume Rendering
+  - ▸ *CG use:* High-quality surface reconstruction from multi-view images; watertight meshes; replaces traditional MVS pipeline
+- 5.7.1.2 VolSDF (Yariv et al. 2021): SDF → Density via Laplace CDF σ(x) = α Ψ_β(−d(x)), Ψ_β(s) = ½(1+erf(s/β)) for s<0 else ½(1+exp(−s/β)); β Controls Surface Thickness (Learnable); Better Volume Rendering Gradients than Naive SDF-Density
+  - ▸ *CG use:* More stable training than NeuS; better handling of thin structures
+- 5.7.1.3 Neuralangelo (Li et al. 2023): Multi-Resolution Hash Grids + Numerical Gradient Computation for Higher-Order Smoothness; Coarse-to-Fine Optimization on Hash Grid Resolution; State-of-the-Art Surface Detail
+  - ▸ *CG use:* Reconstructs fine geometric detail (brick textures, sculptures, terrain) from images; NVIDIA's flagship reconstruction method
+- 5.7.1.4 BakedSDF (Yariv et al. 2023): Multi-Layer Perceptron → Bake into High-Resolution SDF Grid + Feature Grid for View-Dependent Color; Fast Real-Time Rendering After Baking; Hybrid Training + Baking Pipeline
+  - ▸ *CG use:* Production-quality neural assets; precompute neural scene → render at interactive rates in game engines
+
+#### 5.7.2 Hybrid & Real-Time Neural Surfaces
+- 5.7.2.1 VoxFusion / Voxurf (Wu et al. 2023): Dense Voxel Grid + Sparse Convolution for Efficiency; Direct Mesh Extraction via Marching Cubes on Optimized Voxel Grid; No MLP at Inference Time
+  - ▸ *CG use:* Fast neural surface reconstruction; direct mesh output; mobile-friendly
+- 5.7.2.2 MobileNeRF (Chen et al. 2023): Bake NeRF into Textured Polygons (Surface Mesh); Polygon Mesh + View-Dependent Texture Atlas; Runs on Mobile Phones at 60 FPS via Standard GPU Rasterization
+  - ▸ *CG use:* Deploy NeRF-quality views on web and mobile without specialized ML hardware; Google's Immersive View uses this
+- 5.7.2.3 SMERF / MERF (Duckworth et al. 2023, 2024): Streamable Memory-Efficient Radiance Field; Distilled Sparse Voxel Representation + Triplane; Real-Time on WebGL Smartphones
+  - ▸ *CG use:* Web-based immersive 3D experiences; real estate virtual tours; e-commerce 3D product viewing
+
+> 📚 **GitHub Repos:**
+> - [autonomousvision/sdfstudio](https://github.com/autonomousvision/sdfstudio) ![Stars](https://img.shields.io/github/stars/autonomousvision/sdfstudio?style=flat) — Unified neural SDF reconstruction framework
+> - [NVlabs/neuralangelo](https://github.com/NVlabs/neuralangelo) ![Stars](https://img.shields.io/github/stars/NVlabs/neuralangelo?style=flat) — High-detail surface reconstruction
+>
+> 📖 **Papers:** Wang et al. *NeuS* (NeurIPS 2021); Li et al. *Neuralangelo* (CVPR 2023); Yariv et al. *BakedSDF* (SIGGRAPH 2023)
+
+---
+
+### 5.8 Neural Materials & Neural Radiance Caches
+
+#### 5.8.1 Neural Materials
+- 5.8.1.1 Neural BRDF (Rainer et al. 2019, 2020): MLP f_θ(θ_i, φ_i, θ_o, φ_o) → RGB; Autoencoder Architecture: Encoder Compresses Measured BRDF → Latent z, Decoder Evaluates Any (θ_i, φ_i, θ_o, φ_o); Compact Yet Accurate
+  - ▸ *CG use:* Store complex measured BRDFs (MERL database) in few KB; fast evaluation via GPU MLP inference; material space interpolation
+- 5.8.1.2 Neural BTF (Rainer et al. 2019): Captures Meso-Scale Detail (Fabric Weave, Leather Grain); 6D Function BTF(x, ω_i, ω_o) Compressed via Neural Network; View-Dependent Texture from Any Angle
+  - ▸ *CG use:* Film-quality fabric/apparel rendering; car interior material realism; close-up surface detail beyond bump/normal maps
+- 5.8.1.3 NeuMIP (Kužel & Sýkora 2022): Neural Multi-Resolution Material Representation; Replaces Traditional Mipmap Chain with Neural Pyramids; Handles Complex Displacement + Parallax Effects
+  - ▸ *CG use:* Self-shadowing, parallax, and specular at grazing angles in real-time; video game material enhancement
+- 5.8.1.4 MatFuse / DreamMat / ControlMat (2024): Diffusion Model → Generate PBR Material Maps (Albedo, Normal, Roughness, Metallic); Text/Image-Conditioned; Produce 4+ SVBRDF Maps Simultaneously
+  - ▸ *CG use:* Text-to-material pipeline; rapid material library creation; material variation from single sample
+
+#### 5.8.2 Neural Radiance Cache & Light Transport Learning
+- 5.8.2.1 Neural Radiance Cache (NRC — Müller et al. 2021): Train Tiny MLP Online to Cache Path-Traced Radiance; MLP Input: (x, θ, φ) → Radiance L_o; Faster Than Re-Tracing, More Accurate Than Irradiance Caching; Real-Time Path Tracing Acceleration
+  - ▸ *CG use:* RTXGI NRC; real-time path tracing with full global illumination at interactive rates
+- 5.8.2.2 Neural Incident Radiance Field (Boss et al. 2021): Learn Directional Incident Radiance as Neural Network; Query Incident Light at Any Surface Point in Any Direction → Use for Relighting; Fast Evaluation (No Path Tracing at Runtime)
+  - ▸ *CG use:* Dynamic scene relighting; product visualization with interactive lighting changes
+- 5.8.2.3 Neural Light Transport (Chen et al. 2020): Learn 4D Light Transport Matrix Between Camera Pixels and Projector Pixels; Neural Network Factorization → Compact Representation
+  - ▸ *CG use:* Projector-camera systems; computational illumination; relightable photography
+- 5.8.2.4 Real-Time Neural Appearance Models (Müller et al. 2023): Neural BRDF + Neural Radiance Cache + Neural Importance Sampling All Running in Real-Time; Tensor-Core-Accelerated MLP Inference in Shader
+  - ▸ *CG use:* DLSS/RTX neural rendering pipeline; film-quality materials + lighting in real-time games
+
+> 📚 **GitHub Repos:**
+> - [NVlabs/nrc](https://github.com/NVlabs/nrc) ![Stars](https://img.shields.io/github/stars/NVlabs/nrc?style=flat) — Neural Radiance Cache for real-time GI
+> - [mitsuba-renderer/mitsuba3](https://github.com/mitsuba-renderer/mitsuba3) — Neural BRDF integrator plugins
+
+---
+
+### 5.9 Diffusion Models for 3D Generation
+
+#### 5.9.1 Score Distillation Sampling (SDS)
+- 5.9.1.1 DreamFusion (Poole et al. 2022): Text-to-3D via Frozen 2D Diffusion Model (Imagen); SDS Loss: ∇_θ L_SDS = 𝔼_{t,ϵ} [w(t)(ϵ̂_φ(x_t, y, t) − ϵ) ∂x/∂θ]; Gradient of 2D Diffusion w.r.t. 3D Representation Parameters; No 3D Training Data Required!
+  - ▸ *CG use:* First practical text-to-3D; "a corgi riding a bicycle" → 3D model; spawned text-to-3D field
+- 5.9.1.2 Variational Score Distillation (VSD — ProlificDreamer, Wang et al. 2023): SDS Suffers from Over-Smoothing and Mode-Seeking (Low Diversity); VSD: Learn Particle-Based Variational Inference via Wasserstein Gradient Flow; Finetune LoRA on Current Render → More Detailed, Diverse Results
+  - ▸ *CG use:* High-quality text-to-3D; sharper geometry, more texture detail, less "blobby" results
+- 5.9.1.3 Magic3D / Fantasia3D (Lin et al. 2023, Chen et al. 2023): Two-Stage: Coarse NeRF → Fine Mesh (DMTet); SDS on DMTet (Differentiable Mesh Representation) → High-Resolution Geometry + Texture
+  - ▸ *CG use:* Production-quality text-to-3D meshes; directly importable into DCC tools and game engines
+
+#### 5.9.2 Multi-View Diffusion & 3D-Consistent Generation
+- 5.9.2.1 MVDream (Shi et al. 2024): Multi-View Consistent Diffusion Model; Generate 4 Views (Front, Right, Back, Left) Simultaneously; Attention Across Views Ensures 3D Consistency; Eliminates Janus/Multi-Face Problem
+  - ▸ *CG use:* Reliable multi-view generation → feed into NeRF/3DGS reconstruction → consistent 3D model
+- 5.9.2.2 SyncDreamer (Liu et al. 2023): Synchronized Multi-View Diffusion via 3D-Aware Feature Volume; Generate 16 Views from Single Image with 3D Consistency
+  - ▸ *CG use:* Single image → consistent 3D preview; rapid asset generation
+- 5.9.2.3 ImageDream (Wang et al. 2024): Image-Conditioned 3D Generation; More Control than Text (Composition, Style, Specific Object); Guidance from Reference Image + Text for Details
+  - ▸ *CG use:* 3D from concept art; product 3D from photograph; style-preserving 3D generation
+- 5.9.2.4 3D Diffusion Models: DiffTF (Cao et al. 2023) — Diffusion on Triplane Latent Representation; NFD (Shue et al. 2023) — Neural Field Diffusion; Direct 3D Diffusion (Not 2D Distillation) → Better 3D Structure
+  - ▸ *CG use:* Native 3D generation (not via 2D proxy); more 3D-coherent; fewer artifacts than SDS
+
+> 📚 **GitHub Repos:**
+> - [threestudio-project/threestudio](https://github.com/threestudio-project/threestudio) ![Stars](https://img.shields.io/github/stars/threestudio-project/threestudio?style=flat) — Unified text-to-3D framework (DreamFusion, MVDream, ProlificDreamer)
+> - [ashawkey/stable-dreamfusion](https://github.com/ashawkey/stable-dreamfusion) ![Stars](https://img.shields.io/github/stars/ashawkey/stable-dreamfusion?style=flat) — DreamFusion with Stable Diffusion
+>
+> 📖 **Papers:** Poole et al. *DreamFusion* (arXiv 2022); Wang et al. *ProlificDreamer* (NeurIPS 2023); Shi et al. *MVDream* (arXiv 2024)
+
+---
+
+### 5.10 Feed-Forward 3D Reconstruction
+
+#### 5.10.1 Large Reconstruction Models (LRM)
+- 5.10.1.1 LRM (Hong et al. 2024): Transformer Architecture; Input: Single Image (or Few Views) Patches → Image Tokens; Predict Triplane NeRF Representation in Single Forward Pass (< 5 Seconds); Trained on Objaverse (800K+ 3D Models) with Rendering Supervision
+  - ▸ *CG use:* Instant 3D from single photo; e-commerce product digitization; AR content creation pipeline
+- 5.10.1.2 Instant3D (Li et al. 2024): Feed-Forward Text/Image → 3D Triplane; Multi-View Diffusion as Teacher; Text-to-3D in < 10 Seconds (vs. Hours for DreamFusion optimization)
+  - ▸ *CG use:* Real-time text-to-3D; rapid prototyping; game asset ideation
+- 5.10.1.3 LGM (Tang et al. 2024): LRM that Predicts 3DGS Instead of NeRF; Direct 3D Gaussian Splat from Single Image; Real-Time Rendering After Prediction
+  - ▸ *CG use:* Single image → animatable 3DGS in seconds; real-time 3D preview
+- 5.10.1.4 CRM / GRM (Wang et al. 2024, Xu et al. 2024): Convolutional Reconstruction Model; U-Net Architecture + Cross-Attention to Image Features → Triplane; Even Faster Than Transformer LRM
+  - ▸ *CG use:* Mobile/edge deployment of feed-forward reconstruction; real-time 3D on device
+
+#### 5.10.2 Multi-View Reconstruction Networks
+- 5.10.2.1 DUSt3R (Wang et al. 2024): End-to-End Dense Stereo from Unposed Image Pairs; Transformer Predicts Dense 3D Pointmaps (Per-Pixel XYZ) for Both Images; No Camera Pose Required (!); Foundation Model for 3D Vision
+  - ▸ *CG use:* Drop-in replacement for SfM + MVS; casual 3D capture without calibration; 3D reconstruction at scale
+- 5.10.2.2 Spann3R (Kasten et al. 2024): Streaming Dense Reconstruction from Video; Incremental Frame-by-Frame Pointmap Prediction; No Global Optimization (Unlike SfM); Real-Time
+  - ▸ *CG use:* Real-time 3D mapping from smartphone video; AR/VR scene understanding; robot navigation
+- 5.10.2.3 CAT3D (Gao et al. 2024): Generate Many Consistent Views from Few Input Images via Diffusion; Reconstruct 3D Scene from Generated Views; Few-Shot Scene Reconstruction
+  - ▸ *CG use:* 3D from 3-5 photos; fills in missing viewpoints automatically; democratizing 3D capture
+
+> 📚 **GitHub Repos:**
+> - [openai/shap-e](https://github.com/openai/shap-e) ![Stars](https://img.shields.io/github/stars/openai/shap-e?style=flat) — Text/image-to-3D feed-forward
+> - [naver/dust3r](https://github.com/naver/dust3r) ![Stars](https://img.shields.io/github/stars/naver/dust3r?style=flat) — Dense unposed stereo reconstruction
+
+---
+
+### 5.11 Inverse Rendering
+
+#### 5.11.1 Joint Estimation of Geometry, Materials & Lighting
+- 5.11.1.1 Nvdiffrec (Munkberg et al. 2022): Multi-View Images → Optimize Mesh + PBR Materials (Albedo, Roughness, Metallic) + Environment Map via Differentiable Rasterization + Path Tracing; Regularization Priors (Smoothness, Minimal Specular)
+  - ▸ *CG use:* Turn photo set into game-ready PBR asset (mesh + textures + materials) automatically
+- 5.11.1.2 NeRFactor (Zhang et al. 2021): NeRF Pre-Training → Extract Surface + View-Dependent Appearance → Factor into Albedo + Normal + Roughness + Lighting (SH) via MLP; Relightable Neural Representation
+  - ▸ *CG use:* Relightable 3D from photos; change lighting after capture; consistent material editing
+- 5.11.1.3 TensoIR (Jin et al. 2023): TensoRF-Based Inverse Rendering; VM Factorization for Geometry + Materials + Visibility + Indirect Illumination; Joint Optimization via Differentiable Rendering; Relightable + Editable
+  - ▸ *CG use:* Inverse rendering with editable materials; scene decomposition; VFX integration
+- 5.11.1.4 GS-IR (Liang et al. 2024): 3DGS for Inverse Rendering; Decompose Gaussian Colors into Material Parameters + Lighting; Normal Estimation from Gaussians; Relightable Gaussian Splatting
+  - ▸ *CG use:* Real-time relightable 3DGS; change environment map in real-time on Gaussian scenes
+
+#### 5.11.2 Specialized Inverse Problems
+- 5.11.2.1 Photometric Stereo (Differentiable): Known Lighting Directions → Recover Surface Normals via Differentiable BRDF Optimization → Integrate Normals → Height Map/3D Surface
+  - ▸ *CG use:* High-frequency surface detail (pores, scratches) from multi-light photography; museum artifact digitization
+- 5.11.2.2 Inverse Path Tracing: Jointly Estimate Emitter Distribution and Reflectance from Photographs; Gradient Through Full Light Transport; Underdetermined → Strong Priors Required
+  - ▸ *CG use:* Room lighting estimation; architectural daylight analysis; forensic image analysis
+- 5.11.2.3 Differentiable Volume Reconstruction: Tomographic Reconstruction with Differentiable Forward Model; Replace Traditional Filtered Back-Projection with Learned/Iterative Reconstruction; Application: CT, Cryo-EM, Neutron Imaging
+  - ▸ *CG use:* Medical imaging; materials science; industrial non-destructive testing
+
+> 📚 **GitHub Repos:**
+> - [NVlabs/nvdiffrec](https://github.com/NVlabs/nvdiffrec) ![Stars](https://img.shields.io/github/stars/NVlabs/nvdiffrec?style=flat) — Joint inverse rendering (mesh + PBR from images)
+> - [Haian-Jin/TensoIR](https://github.com/Haian-Jin/TensoIR) ![Stars](https://img.shields.io/github/stars/Haian-Jin/TensoIR?style=flat) — TensoRF-based inverse rendering
+>
+> 📖 **Papers:** Munkberg et al. *Extracting Triangular 3D Models, Materials, and Lighting From Images* (CVPR 2022); Zhang et al. *NeRFactor* (SIGGRAPH Asia 2021)
+
+---
+
+### 5.12 Differentiable Rendering Frameworks & Ecosystem
+
+#### 5.12.1 Research Frameworks
+- 5.12.1.1 Mitsuba 3 (Jakob et al. 2022): Retargetable Differentiable Renderer; Python-Driven + JIT Compilation (Dr.Jit → LLVM/CUDA); Multiple Integrators: PSDR, Adjoint, Reparameterization; Spectral + Polarization; Research Standard
+  - ▸ *CG use:* Academic research in differentiable rendering; new integrator prototyping; benchmark for inverse methods
+- 5.12.1.2 Redner (Li et al. 2018): Python-Based Differentiable Renderer; Implements Edge Sampling for Mesh Gradients; Production Use via PyTorch Integration; Reference Implementation for Discontinuity Handling
+  - ▸ *CG use:* Single-image 3D reconstruction; material estimation; shape-from-shading research
+- 5.12.1.3 Nvdiffrast (Laine et al. 2020): NVIDIA's GPU Differentiable Rasterizer; OpenGL/CUDA Interop; Fast (Hardware Rasterization + CUDA Gradients); Modular: Use with Any Deep Learning Framework
+  - ▸ *CG use:* Nvdiffrec, Nvdiffmodeling; training 3D deep learning models with rendering in the loop; texture optimization
+- 5.12.1.4 PSDR-CUDA (Zhang et al. 2023): GPU-Optimized Primary Sample Space Diff-Renderer; Wavefront Path Tracing on GPU; Handles Complex Lighting (Caustics, Participating Media); Production-Grade Performance
+  - ▸ *CG use:* Large-scale inverse rendering; film-quality scene parameter estimation
+
+#### 5.12.2 Production & DSL Approaches
+- 5.12.2.1 Slang.D (Bangaru, He et al. 2023): Automatic Differentiation Compiler for Shading Languages; Write Renderer in Slang → Automatically Get Forward + Backward Passes; No Manual Gradient Code; Differentiable Path Tracer in < 1000 Lines
+  - ▸ *CG use:* Rapid prototyping of differentiable rendering algorithms; production renderer differentiation
+- 5.12.2.2 Taichi (Hu et al. 2019): Differentiable Programming Language for Physical Simulation; Python Frontend + LLVM/CUDA Backend; Automatic Differentiation of Entire Simulation Loop
+  - ▸ *CG use:* DiffTaichi (differentiable physics); ∇-Sim; differentiable MPM/FEM for inverse design
+- 5.12.2.3 Warp (NVIDIA — Macklin et al. 2022): Python Framework for High-Performance Simulation + Differentiable Rendering; JIT-Compiled CUDA Kernels from Python; Automatic Differentiation via Source Transformation
+  - ▸ *CG use:* Differentiable physics + rendering for robotics; inverse design; reinforcement learning with rendering in loop
+
+#### 5.12.3 Emerging Standards & Convergence
+- 5.12.3.1 Unified Differentiable Rendering API (Proposed): Common Interface Across Mitsuba/Redner/Nvdiffrast/Warp; Standard Scene Description → Any Backend; Reduces Fragmentation
+  - ▸ *CG use:* Easier comparison between methods; plug-and-play backend switching
+- 5.12.3.2 Neural + Classical Hybrid Pipelines: Differentiable Renderer as Component in Larger Neural System; Render → Neural Network → Loss → Gradient Through Both; End-to-End Trainable Visual Computing
+  - ▸ *CG use:* Inverse graphics; AI-assisted content creation; robot vision training; autonomous vehicle perception
+- 5.12.3.3 Real-Time Differentiable Rendering (Emerging): GPU-Optimized + Sparse Gradient Computation; Interactive Inverse Rendering; Enables Artist-in-the-Loop Optimization
+  - ▸ *CG use:* Real-time material fitting with visual feedback; interactive scene reconstruction
+
+> 📚 **GitHub Repos:**
+> - [mitsuba-renderer/mitsuba3](https://github.com/mitsuba-renderer/mitsuba3) ![Stars](https://img.shields.io/github/stars/mitsuba-renderer/mitsuba3?style=flat) — Research standard differentiable renderer
+> - [NVIDIAGameWorks/nvdiffrast](https://github.com/NVIDIAGameWorks/nvdiffrast) ![Stars](https://img.shields.io/github/stars/NVIDIAGameWorks/nvdiffrast?style=flat) — GPU differentiable rasterizer
+> - [NVIDIA/warp](https://github.com/NVIDIA/warp) ![Stars](https://img.shields.io/github/stars/NVIDIA/warp?style=flat) — Python differentiable simulation + rendering
+> - [taichi-dev/taichi](https://github.com/taichi-dev/taichi) ![Stars](https://img.shields.io/github/stars/taichi-dev/taichi?style=flat) — Differentiable programming for physics
+>
+> 📖 **Papers:** Jakob et al. *Mitsuba 3* (SIGGRAPH 2022); Laine et al. *Nvdiffrast* (SIGGRAPH Asia 2020); Bangaru et al. *Slang.D* (SIGGRAPH 2023)
+
+---
+
 
 ## Chapter 6 · Animation & Physics Simulation
 
-### 4.1 Keyframe Animation
-- 4.1.1 Keyframes & Interpolation Curves
-- 4.1.2 Linear Interpolation
-- 4.1.3 Bézier / Spline Curve Interpolation
-- 4.1.4 Easing Functions: Ease-in, Ease-out, Ease-in-out
-- 4.1.5 Time Remapping
-- 4.1.6 Parameterized Keyframes (Arc-Length Parameterization)
+*From keyframes to physics-based simulation — the complete theory of motion, deformation, and dynamics. `▸ CG use:` links each technique to practice.*
 
-### 4.2 Skeletal Animation
-
-#### 4.2.1 Skeleton Structure
-- 4.2.1.1 Joint Hierarchy
-- 4.2.1.2 Local vs. Global Transforms
-- 4.2.1.3 Bind Pose / Rest Pose
-- 4.2.1.4 Joint Limits / Constraints
-
-#### 4.2.2 Forward Kinematics (FK)
-- 4.2.2.1 Chain Transform Composition
-- 4.2.2.2 Transformation Matrix Stack
-- 4.2.2.3 FK in the Animation Pipeline
-
-#### 4.2.3 Inverse Kinematics (IK)
-- 4.2.3.1 Analytical IK (Closed-Form for 2-Joint / 3-Joint Chains)
-- 4.2.3.2 Cyclic Coordinate Descent (CCD)
-- 4.2.3.3 Jacobian Methods (Jacobian Transpose / Damped Least Squares / Pseudo-Inverse)
-- 4.2.3.4 FABRIK (Forward And Backward Reaching IK)
-- 4.2.3.5 Full-Body IK
-- 4.2.3.6 IK Constraints (Look-At, Pole Vector, Goal Matching)
-
-#### 4.2.4 Skinning
-- 4.2.4.1 Rigid Skinning / Partition Skinning
-- 4.2.4.2 Linear Blend Skinning (LBS / Skeletal Subspace Deformation)
-- 4.2.4.3 LBS Artifacts: Candy-Wrapper Effect, Volume Collapse
-- 4.2.4.4 Dual Quaternion Skinning (DQS)
-- 4.2.4.5 Optimization-Based Skinning
-- 4.2.4.6 Rigid / Elasticity-Based Skinning
-- 4.2.4.7 Skinning Decomposition (SSDR / Smooth Skinning Decomposition)
-- 4.2.4.8 Delta Mush Smoothing
-- 4.2.4.9 Pose Space Deformation (PSD)
-- 4.2.4.10 Automatic Skinning Weight Computation / Heat Diffusion (Bounded Biharmonic Weights, BBW)
-
-### 4.3 Deformation Techniques
-
-#### 4.3.1 Mesh-Based Deformation
-- 4.3.1.1 Free-Form Deformation (FFD): Lattice Deformation
-- 4.3.1.2 As-Rigid-As-Possible Deformation (ARAP)
-- 4.3.1.3 Laplacian Mesh Editing / Differential Coordinates
-- 4.3.1.4 Skeleton-Based Deformation
-- 4.3.1.5 Spatial Deformation: Bend, Twist, Taper, Stretch
-- 4.3.1.6 Cage-Based Deformation: Mean Value Coordinates, Harmonic Coordinates, Green Coordinates
-- 4.3.1.7 Biharmonic Deformation
-
-#### 4.3.2 Blend Shapes
-- 4.3.2.1 Blend Shapes / Morph Targets
-- 4.3.2.2 Facial Action Coding System (FACS)
-- 4.3.2.3 Automatic Blend Shape Generation (Scan-to-Target)
-- 4.3.2.4 PCA-Based Expression Compression
-- 4.3.2.5 Corrective Blend Shapes
-
-#### 4.3.3 Data-Driven Deformation
-- 4.3.3.1 Example-Based Deformation
-- 4.3.3.2 Parametric Human Body Models (SMPL, SMPL-X, STAR, GHUM)
-- 4.3.3.3 Parametric Face Models (FaceWarehouse, FLAME, 3DMM)
-- 4.3.3.4 Parametric Hand Models (MANO)
-
-### 4.4 Rigid Body Simulation
-
-#### 4.4.1 Fundamental Dynamics
-- 4.4.1.1 Newton's Laws of Motion & Euler's Equations of Motion
-- 4.4.1.2 Rigid Body Kinematics (Position, Orientation, Linear Velocity, Angular Velocity)
-- 4.4.1.3 Rigid Body Dynamics (Force, Torque, Inertia Tensor)
-- 4.4.1.4 Center of Mass & Equations of Motion in World Coordinates
-
-#### 4.4.2 Time Integration
-- 4.4.2.1 Explicit Euler Method
-- 4.4.2.2 Semi-Implicit Euler (Symplectic Euler)
-- 4.4.2.3 Verlet Integration
-- 4.4.2.4 Runge-Kutta Methods (RK4)
-- 4.4.2.5 Implicit Integration (Backward Euler)
-
-#### 4.4.3 Collision Detection
-- 4.4.3.1 Collision Detection Pipeline: Broad Phase → Narrow Phase → Response
-- 4.4.3.2 Broad-Phase Algorithms: Sweep and Prune (SAP), Spatial Hashing, BVH
-- 4.4.3.3 Narrow-Phase Algorithms:
-  - 4.4.3.3.1 Gilbert-Johnson-Keerthi (GJK) Algorithm
-  - 4.4.3.3.2 Expanding Polytope Algorithm (EPA)
-  - 4.4.3.3.3 Separating Axis Theorem (SAT)
-  - 4.4.3.3.4 Feature-Pair Detection (Lin-Canny, V-Clip)
-- 4.4.3.4 Continuous Collision Detection (CCD): Sweep-Based CCD, Speculative CCD
-- 4.4.3.5 Collision Response: Impulse-Based, Penalty Force, Constraint Solver
-- 4.4.3.6 Friction Models (Coulomb Model, Static & Dynamic Friction)
-- 4.4.3.7 Stacking & Resting Contact Handling (Contact Manifold, Contact Graph)
-
-#### 4.4.4 Constrained Dynamics
-- 4.4.4.1 Joint Types: Ball-and-Socket, Hinge, Slider, Fixed
-- 4.4.4.2 Constraint Equations & Jacobian Matrices
-- 4.4.4.3 Force-Based Constraints (Penalty Method)
-- 4.4.4.4 Impulse-Based Constraints (Sequential Impulse / PGS Solver)
-- 4.4.4.5 Position-Based Dynamics (PBD)
-- 4.4.4.6 Extended Position-Based Dynamics (XPBD)
-- 4.4.4.7 Reduced Coordinate Methods (Featherstone Algorithm)
-- 4.4.4.8 Soft Body Constraints (Strain Constraints: Stretch, Shear, Bend)
-
-### 4.5 Soft Body & Deformable Body Simulation
-
-#### 4.5.1 Mass-Spring Systems
-- 4.5.1.1 Mass-Spring Model Fundamentals
-- 4.5.1.2 Structural Springs, Shear Springs, Bend Springs
-- 4.5.1.3 Damping & Numerical Dissipation
-- 4.5.1.4 Cloth Simulation Applications (Provot Cloth Model)
-
-#### 4.5.2 Finite Element Method (FEM)
-- 4.5.2.1 Continuum Mechanics Fundamentals: Deformation Gradient, Green Strain, Cauchy Stress
-- 4.5.2.2 Constitutive Models: Linear Elastic (Hooke), Hyperelastic (Neo-Hookean, Mooney-Rivlin, StVK)
-- 4.5.2.3 Plasticity Models (von Mises, Drucker-Prager)
-- 4.5.2.4 FEM Discretization: Tetrahedra, Hexahedra, Shape Functions, Stiffness Matrix Assembly
-- 4.5.2.5 Implicit Integration & Newton-Raphson Solver
-- 4.5.2.6 Optimization-Based Implicit Integration (Projective Dynamics)
-- 4.5.2.7 Fast Corotational FEM
-
-#### 4.5.3 Meshless & Particle Methods
-- 4.5.3.1 Smoothed Particle Hydrodynamics (SPH)
-- 4.5.3.2 Material Point Method (MPM)
-- 4.5.3.3 Moving Least Squares MPM (MLS-MPM)
-- 4.5.3.4 Discrete Element Method (DEM)
-
-### 4.6 Fluid Simulation
-
-#### 4.6.1 Grid-Based Methods
-- 4.6.1.1 Navier-Stokes Equations
-- 4.6.1.2 Incompressibility Condition (div v = 0)
-- 4.6.1.3 Staggered Grid (MAC Grid)
-- 4.6.1.4 Advection Solvers: Semi-Lagrangian, BFECC, MacCormack
-- 4.6.1.5 Pressure Projection & Poisson Equation Solver (Conjugate Gradient, Multigrid)
-- 4.6.1.6 Free Surface Handling (VOF Method, Level Set Method, Particle Level Set)
-- 4.6.1.7 Vorticity Confinement
-- 4.6.1.8 Coupled Boundary Conditions (Solid Wall, Inflow/Outflow, Periodic)
-
-#### 4.6.2 Particle-Based Methods
-- 4.6.2.1 SPH Fluid Simulation (WCSPH, IISPH, DFSPH, PCISPH)
-- 4.6.2.2 Fluid-Implicit Particle (FLIP / PIC)
-- 4.6.2.3 Affine Particle-In-Cell (APIC)
-- 4.6.2.4 PolyPIC / High-Order PIC
-
-#### 4.6.3 Hybrid Methods
-- 4.6.3.1 FLIP + Grid (Hybrid FLIP)
-- 4.6.3.2 Particles + Level Set
-- 4.6.3.3 MPM for Fluids (Engineering & Visual Hybrid)
-
-#### 4.6.4 Specialized Fluid Effects
-- 4.6.4.1 Free-Surface Flows (Water, Ocean Waves: Gerstner Waves, FFT Ocean)
-- 4.6.4.2 Bubbles & Foam
-- 4.6.4.3 Viscoelastic Fluids (Giesekus, Oldroyd-B)
-- 4.6.4.4 Multiphase Flows (Liquid-Gas, Liquid-Solid Coupling)
-- 4.6.4.5 Surface Tension Modeling
-- 4.6.4.6 Two-Way Fluid-Rigid Body Coupling
-- 4.6.4.7 Real-Time Fluid Simulation (NVIDIA Flex, PhysX Fluids, Unreal Niagara Fluids)
-
-### 4.7 Particle Systems & VFX
-- 4.7.1 Particle Fundamentals (Emitters, Velocity, Lifetime, Force Fields)
-- 4.7.2 GPU Particles (Compute-Shader-Driven, Transform Feedback)
-- 4.7.3 Particle Collisions (with Scene Geometry, Inter-Particle Collisions)
-- 4.7.4 Particle Lighting & Rendering (Billboards, Soft Particles, Trails/Ribbons)
-- 4.7.5 VFX Applications: Sparks, Explosions, Smoke & Dust, Magic, Debris
-- 4.7.6 Niagara (UE) / VFX Graph (Unity) Advanced Particle Systems
-
-### 4.8 Character Animation
-
-#### 4.8.1 Kinematics
-- 4.8.1.1 Human Kinematic Model (Joint DOFs, Range of Motion)
-- 4.8.1.2 Motion Retargeting
-- 4.8.1.3 Motion Warping & Stylization
-
-#### 4.8.2 Motion Synthesis
-- 4.8.2.1 Motion Graphs
-- 4.8.2.2 Motion Matching: Feature Vector Search
-- 4.8.2.3 Learned Motion Matching (Neural Network Acceleration)
-- 4.8.2.4 Motion Fields
-
-#### 4.8.3 Procedural Animation
-- 4.8.3.1 Procedural Locomotion: Foot IK, Gait Cycle Adaptation
-- 4.8.3.2 Procedural Adaptation (Terrain Adaptation, Slope Handling, Obstacle Stepping)
-- 4.8.3.3 Physics-Based Character Animation
-- 4.8.3.4 Deep Reinforcement Learning for Character Control (DeepMimic, AMP, ASE)
-
-#### 4.8.4 Facial Animation
-- 4.8.4.1 Facial Action Coding System (FACS / Action Units)
-- 4.8.4.2 Speech-Driven Lip Sync (Viseme Mapping)
-- 4.8.4.3 Facial Performance Capture & Retargeting
-- 4.8.4.4 Neural-Network-Based Facial Animation (Audio2Face, Video-Driven Facial Animation)
-
-#### 4.8.5 Motion Capture & Processing
-- 4.8.5.1 Optical Motion Capture (Vicon, OptiTrack)
-- 4.8.5.2 Inertial Motion Capture (Xsens, Rokoko)
-- 4.8.5.3 Video-Based Motion Capture (OpenPose, MediaPipe, HybrIK, WHAM)
-- 4.8.5.4 Motion Data Formats (BVH, FBX, ASF/AMC, C3D)
-- 4.8.5.5 Motion Data Cleaning & Filtering (Denoising, Gap Filling, Smoothing)
-- 4.8.5.6 Motion Data Annotation & Segmentation
-
-### 4.9 Crowd Simulation
-- 4.9.1 Boids Model (Separation, Alignment, Cohesion)
-- 4.9.2 Continuum Crowds Model
-- 4.9.3 Social Force Model
-- 4.9.4 Velocity-Obstacle-Based Methods (RVO / ORCA)
-- 4.9.5 Multi-Agent Reinforcement Learning Navigation
-- 4.9.6 Large-Scale Crowd Rendering (Instancing, LOD, Impostors)
-
-### 4.10 Hair & Fiber Simulation
-- 4.10.1 Hair Geometry Representation: Guide Hairs + Interpolation
-- 4.10.2 Hair Dynamics: FTL (Follow The Leader), Spring Chains
-- 4.10.3 Hair Collision Detection & Self-Collision
-- 4.10.4 Hair Rendering: Kajiya-Kay Model, Marschner Model, Dual-Cylinder Scattering Model
-- 4.10.5 Clump-Based Hair & Level-of-Detail
-- 4.10.6 Animal Fur (Fur Shells / Fin Geometry + Transparent Layering)
-- 4.10.7 GPU Hair Rendering (TressFX, HairWorks, Compute-Shader-Based)
-- 4.10.8 Feather Modeling
+> 💡 **Top-Level References:**
+> - [dilevin/CSC2549](https://github.com/dilevin/CSC2549) — Physics-based animation course (University of Toronto)
+> - [InteractiveComputerGraphics/PositionBasedDynamics](https://github.com/InteractiveComputerGraphics/PositionBasedDynamics) ![Stars](https://img.shields.io/github/stars/InteractiveComputerGraphics/PositionBasedDynamics?style=flat) — PBD/XPBD reference implementation
+> - [taichi-dev/taichi](https://github.com/taichi-dev/taichi) ![Stars](https://img.shields.io/github/stars/taichi-dev/taichi?style=flat) — Differentiable physics simulation framework
 
 ---
 
+### 6.1 Keyframe Animation & Interpolation
+
+#### 6.1.1 Keyframe Fundamentals
+- 6.1.1.1 Keyframe Paradigm: Artist Specifies Key Poses at Discrete Times; Computer Interpolates Between Keys; Separates Creative Control (What) from Mathematical Interpolation (How)
+  - ▸ *CG use:* Every animation in games, film, and interactive media; Maya/Blender curve editor is the artist interface
+- 6.1.1.2 Interpolation Types: Linear (Constant Velocity, C⁰, Jerky at Keys), Bézier/Spline (C¹/C² Smooth, Adjustable Tangents), Step (Hold Pose Until Next Key — Used for Pose-to-Pose Blocking)
+  - ▸ *CG use:* DCC curve editor: Linear for mechanical motion, Spline for organic, Step for blocking
+- 6.1.1.3 Easing Functions (Penner 2002): Ease-In (Slow→Fast), Ease-Out (Fast→Slow), Ease-In-Out (Slow→Fast→Slow); Cubic, Quintic, Exponential, Elastic, Bounce, Back; t' = f(t) where t ∈ [0,1]
+  - ▸ *CG use:* UI animation (CSS easing); camera transitions; game object tweening; every motion graphics tool
+- 6.1.1.4 Arc-Length Parameterization: Constant Arc-Length Speed; Reparameterize Curve by s = ∫‖γ'(u)‖du → s⁻¹(t); Avoids Speed Distortion from Control Point Distribution
+  - ▸ *CG use:* Camera fly-through (constant speed regardless of control point spacing); character path following
+
+#### 6.1.2 Advanced Keyframe Techniques
+- 6.1.2.1 Time Remapping: Animate Time Variable Independently; t_map = f(t_global); Slow Motion: Stretch Time; Fast Motion: Compress Time; Reverse: Negative Slope
+  - ▸ *CG use:* Cinematic time manipulation (bullet time, speed ramps); retiming mocap data
+- 6.1.2.2 Additive Animation Layers: Base Animation + Offset Animation = Combined; Offset Can Be Applied Selectively (Upper Body Only); Non-Destructive Workflow
+  - ▸ *CG use:* Game animation blending (base locomotion + aim offset on upper body); film animation layering
+- 6.1.2.3 Animation Curves as Signals: Filter Keyframe Data (Smooth Noisy Mocap); Frequency Analysis to Identify Jitter; Butterworth Low-Pass Filter for Denoising
+  - ▸ *CG use:* Motion capture cleanup; removing high-frequency noise from tracked data while preserving intention
+
+> 📖 **Textbooks:** *The Animator's Survival Kit* — Richard Williams (The classic); *Computer Animation: Algorithms and Techniques* — Rick Parent
 
 ---
+
+### 6.2 Skeletal Animation
+
+#### 6.2.1 Skeleton Structure & Forward Kinematics
+- 6.2.1.1 Skeleton Hierarchy: Joint = Pivot Point with Parent-Child Relationship; Bone = Segment Between Two Joints; Root Joint = Origin (Typically Pelvis); Chain: Root→Spine→Shoulder→Elbow→Wrist→Finger
+  - ▸ *CG use:* Character rigging standard; USD/USD Skeleton; glTF skinning; every game engine
+- 6.2.1.2 Local vs. Global Transforms: T_global(i) = T_global(parent) · T_local(i); Local: Joint Orientation Relative to Parent (Animator Edits); Global: World-Space Transform (For Rendering)
+  - ▸ *CG use:* Animation data stored as local transforms (rotation quaternions); rendering computes global transforms via hierarchy traversal
+- 6.2.1.3 Forward Kinematics (FK): Given Joint Angles θ, Compute End-Effector Position x = f(θ); Unique Solution; Simple to Compute via Matrix Chain; Animator Directly Rotates Each Joint
+  - ▸ *CG use:* FK is the standard animation mode; animator poses skeleton by rotating individual joints
+
+#### 6.2.2 Inverse Kinematics (IK)
+- 6.2.2.1 IK Problem: Given End-Effector Target Position x_target, Find Joint Angles θ Such That f(θ) = x_target; Underdetermined (Many Solutions for Multi-Joint Chains); Requires Numerical Optimization
+  - ▸ *CG use:* Foot placement on uneven terrain; hand grabbing objects; character interaction with environment
+- 6.2.2.2 CCD (Cyclic Coordinate Descent): Iteratively Rotate Each Joint (From End to Root) to Bring End-Effector Closer to Target; Simple, Robust, but Can Produce Unnatural Poses; O(n) Per Iteration
+  - ▸ *CG use:* Fast IK solver in game engines; real-time procedural animation (foot IK)
+- 6.2.2.3 Jacobian IK: Linearize f(θ+Δθ) ≈ f(θ) + J Δθ; Δx = J Δθ → Δθ = J⁺ Δx (Pseudo-Inverse) or Damped Least Squares Δθ = (JᵀJ + λ²I)⁻¹Jᵀ Δx; Smooth Motion but Computationally Heavier
+  - ▸ *CG use:* DCC tools (Maya, Blender IK solver); high-quality animation; DLS avoids singularity at full extension
+- 6.2.2.4 FABRIK (Forward And Backward Reaching IK — Aristidou 2011): Two-Phase: Forward (Root→Tip: Position Each Joint at Distance from Previous), Backward (Tip→Root: Pull Toward Target); Fast, Natural-Looking, No Matrix Computation
+  - ▸ *CG use:* Real-time IK for games; naturally handles joint limits; outperforms CCD and Jacobian for many problems
+- 6.2.2.5 Full-Body IK: IK with Multiple End-Effectors + Balance Constraints; Prioritized IK (Higher Priority Tasks Solved First, Lower Priority in Null Space); Center of Mass Constraint
+  - ▸ *CG use:* Character grabbing ledge while keeping feet planted; procedural animation adapting to environment
+
+#### 6.2.3 Skinning & Deformation
+- 6.2.3.1 Linear Blend Skinning (LBS / Skeletal Subspace Deformation): v' = Σ w_i · M_i · v (Weighted Sum of Bone Transforms); Weights w_i ≥ 0, Σ w_i = 1 (Partition of Unity); GPU Vertex Shader Implementation
+  - ▸ *CG use:* Universal real-time skinning; candy-wrapper artifact at joints (elbows, wrists collapse volume when twisted ~180°)
+- 6.2.3.2 Dual Quaternion Skinning (DQS — Kavan et al. 2008): Replace Linear Blend of Matrices with Dual Quaternion Blend + Normalization; Eliminates Candy-Wrapper — Volume Preservation at Joints; Slightly Higher GPU Cost (~10-20%)
+  - ▸ *CG use:* Higher quality skinning in modern games; UE5 supports DQS; joint deformation without volume loss
+- 6.2.3.3 Pose Space Deformation (PSD / Corrective Blend Shapes): Learn Residual Deformation as Function of Joint Angles; RBF Interpolation: w_k = RBF(‖θ − θ_k‖); Correct LBS/DQS Artifacts (Muscle Bulge, Shoulder Collapse)
+  - ▸ *CG use:* Film-quality character deformation; Disney/Pixar character rigging; game cinematics
+- 6.2.3.4 Delta Mush (Mancewicz et al. 2014): Apply Laplacian Smoothing to LBS Result → Compute Delta (Original − Smoothed) → Re-Apply Delta to Restore Detail; Automatic Smoothing of LBS Artifacts
+  - ▸ *CG use:* Production rigging smoothing; reduces need for manual corrective shapes; Disney Hyperion renderer
+- 6.2.3.5 Bounded Biharmonic Weights (BBW — Jacobson et al. 2011): Automatic Skinning Weight Computation via Biharmonic Equation; Minimize Δ²w Subject to Constraints; Artist Places Sparse Handle Points; No Manual Weight Painting!
+  - ▸ *CG use:* Rapid rigging prototyping; weight painting replacement for simple characters; Blender auto-weights
+
+> 📚 **GitHub Repos:** [PixarAnimationStudios/OpenSubdiv](https://github.com/PixarAnimationStudios/OpenSubdiv) — Subdivision + skinning; [libigl/libigl](https://github.com/libigl/libigl) — BBW implementation
+>
+> 📖 **Textbooks:** *Computer Animation: Algorithms and Techniques* — Rick Parent; *Game Engine Architecture* — Jason Gregory (Ch. 11)
+
+---
+
+### 6.3 Deformation Techniques
+
+#### 6.3.1 Mesh-Based Deformation
+- 6.3.1.1 Free-Form Deformation (FFD — Sederberg & Parry 1986): Embed Object in 3D Lattice of Control Points; Deform Lattice → Object Follows (Bernstein Polynomial Blending); Hierarchical FFD for Progressive Detail
+  - ▸ *CG use:* Non-skeletal deformation; squash-and-stretch cartoon effects; modeling tool (3ds Max FFD modifier)
+- 6.3.1.2 As-Rigid-As-Possible (ARAP — Sorkine & Alexa 2007): Minimize Σ ‖(v_i' − v_j') − R_i(v_i − v_j)‖²; R_i = Per-Vertex Rotation (Polar Decomposition of Local Neighborhood); Alternating: Fix R → Solve Positions → Fix Positions → Update R
+  - ▸ *CG use:* Natural-looking deformation preserving local rigidity; mesh editing with handle manipulation; shape interpolation
+- 6.3.1.3 Laplacian Mesh Editing: Encode Geometry via Differential Coordinates δ_i = v_i − (1/d_i) Σ_{j∈N(i)} v_j (Laplacian); Edit via Constraints + Reconstruct Positions (Least Squares); Detail-Preserving Deformation
+  - ▸ *CG use:* Pose transfer; detail-preserving mesh editing; surface deformation transfer between characters
+
+#### 6.3.2 Cage-Based & Advanced Deformation
+- 6.3.2.1 Cage-Based Deformation: Coarse Cage Encloses Detailed Mesh; Deform Cage → Mesh Follows via Generalized Barycentric Coordinates; Mean Value Coordinates (MVC — Ju et al. 2005): Smooth, Always Defined; Harmonic Coordinates (Joshi et al. 2007): Non-Negative, Cage-Conforming; Green Coordinates (Lipman et al. 2008): Conformal in Limit, Shape-Preserving
+  - ▸ *CG use:* Character deformation with coarse control; film-quality shape editing (Pixar Presto)
+- 6.3.2.2 Blend Shapes / Morph Targets: Linear Combination of Predefined Shapes: v = v_base + Σ w_k · Δv_k; Weights Typically ∈ [0,1]; Facial Animation Standard (FACS — Facial Action Coding System); Corrective Blend Shapes for Skeletal Deformation Artifacts
+  - ▸ *CG use:* Facial animation in all media; character expression library; PCA compression of blend shape space
+- 6.3.2.3 Example-Based Deformation (Sumner et al. 2005): Artist Provides Example Pairs (Rest Pose → Deformed Pose); Learn Deformation Model to Interpolate/Extrapolate Examples; Handle Unseen Poses via Weighted Combination of Nearest Examples
+  - ▸ *CG use:* Consistent deformation across a character animation space; reduce artist workload
+
+---
+
+### 6.4 Rigid Body Simulation
+
+#### 6.4.1 Dynamics & Time Integration
+- 6.4.1.1 Newton-Euler Equations: F = m a (Linear); τ = I α + ω × (I ω) (Angular); State = (x, q, v, ω); I_local → I_world = R I_local Rᵀ
+  - ▸ *CG use:* Every physics engine; rigid body solver core; Bullet, PhysX, Havok
+- 6.4.1.2 Time Stepping: Explicit Euler: x_{n+1}=x_n + v_n Δt (Simple, Unstable for Stiff Systems); Semi-Implicit Euler: v_{n+1}=v_n + a_n Δt, x_{n+1}=x_n + v_{n+1} Δt (Symplectic = Energy-Conserving for Conservative Systems); Verlet: x_{n+1}=2x_n − x_{n-1} + a_n Δt² (Velocity-Free, Time-Reversible)
+  - ▸ *CG use:* Game physics = Semi-Implicit Euler (good trade-off); Verlet for cloth/particles (position-based constraint enforcement)
+- 6.4.1.3 Adaptive Time Stepping: Δt_{n+1} = Δt_n · (tol / error)^(1/(p+1)); Reduce Δt When Error Large (Collision, High Acceleration), Increase When Error Small; Error Estimate via Embedded RK Pair (Fehlberg, Dormand-Prince)
+  - ▸ *CG use:* Offline simulation accuracy; game physics typically uses fixed Δt for determinism
+
+#### 6.4.2 Collision Detection & Response
+- 6.4.2.1 Broad Phase: Sweep and Prune (Sort AABB Min/Max Projections on Axis → Overlap List); Spatial Hashing (Infinite Grid + Hash, GPU-Friendly); Dynamic BVH (Bottom-Up Refit for Moving Objects); O(n) to O(n log n)
+  - ▸ *CG use:* Reduce O(n²) all-pairs collision to near-linear; PhysX, Bullet all use broad phase
+- 6.4.2.2 Narrow Phase — GJK (Gilbert-Johnson-Keerthi): Compute Minkowski Difference A⊖B = {a−b}; Distance = min ‖point in A⊖B‖; Iteratively Refine Simplex Inside A⊖B; Returns Closest Distance + Closest Points; EPA (Expanding Polytope Algorithm): Extends GJK to Compute Penetration Depth + Contact Normal
+  - ▸ *CG use:* THE standard convex collision algorithm in every physics engine; GJK + EPA handles all convex shapes
+- 6.4.2.3 Collision Response: Impulse-Based: Instantaneous Velocity Change via Conservation of Momentum; j = −(1+e)(v_rel·n) / (1/m_A + 1/m_B + n·(I_A⁻¹(r_A×n))×r_A + ...); e = Coefficient of Restitution (0=Plastic, 1=Elastic); Friction via Coulomb Model (Static μ_s > Kinetic μ_k)
+  - ▸ *CG use:* Game physics collision response; impulse-based is fast and stable for most cases
+
+---
+
+### 6.5 Soft Body & Cloth Simulation
+
+#### 6.5.1 Mass-Spring & PBD/XPBD
+- 6.5.1.1 Mass-Spring: Forces = Σ k_s (‖x_i−x_j‖−L₀)·(x_i−x_j)/‖x_i−x_j‖ (Spring) + k_d (v_j−v_i) (Damping); Structural + Shear + Bend Springs (Provot 1995 Cloth Model)
+  - ▸ *CG use:* Simple cloth/hair; game physics; limited accuracy (stiffness-dependent time step)
+- 6.5.1.2 Position-Based Dynamics (PBD — Müller et al. 2007): Directly Manipulate Positions to Satisfy Constraints; For Each Constraint: Project Positions to Constraint Manifold; C(x+Δx)→0 via Newton Step; Gauss-Seidel Iteration Over All Constraints
+  - ▸ *CG use:* Real-time cloth, hair, fluids in games; NVIDIA FleX; Unity/Unreal built-in physics; stable at large time steps
+- 6.5.1.3 XPBD (Extended PBD — Macklin et al. 2016): Add Compliance Parameter α = 1/k (Stiffness Inverse) to Lagrange Multiplier Update; λ_{n+1} = (−C − α̃ λ_n) / (∇CᵀM⁻¹∇C + α̃); Correct Stiffness Behavior Independent of Iteration Count; Converges to True Physics as Iterations→∞
+  - ▸ *CG use:* Fixes PBD's stiffness-dependence-on-iteration problem; NVIDIA PhysX 5; production cloth simulation
+
+#### 6.5.2 Finite Element Method (FEM) for Deformables
+- 6.5.2.1 Corotational FEM: Decompose Deformation Gradient F = R S (Polar Decomposition: R = Rotation, S = Stretch); Remove Rotation R Before Computing Strain → Geometric Nonlinearity Without Material Nonlinearity; Fast (Small Deformation in Local Frame + Global Rotation)
+  - ▸ *CG use:* Real-time deformable objects; game destructible environments; medical simulation
+- 6.5.2.2 Hyperelastic Models: Neo-Hookean Ψ = μ/2 (tr(C)−3) − μ ln J + λ/2 (ln J)² (Stable Under Compression, Doesn't Invert); St. Venant-Kirchhoff (Simple but Unstable Under Compression — Avoid); Mooney-Rivlin (Better Rubber Modeling)
+  - ▸ *CG use:* Neo-Hookean is the default for production FEM simulation; handles large deformation without element inversion
+- 6.5.2.3 Projective Dynamics (Bouaziz et al. 2014): Reformulate Implicit Euler as Optimization: min_x ½‖x−y‖²_M + Δt² E(x); E(x) = Σ w_i ‖A_i x − B_i p_i‖² (Element-Wise Quadratic); Alternating: Fix p (Local Projection) → Solve for x (Global Quadratic); Each Step is Fast + Parallel
+  - ▸ *CG use:* Real-time FEM in games and VR; GPU-accelerated via Cholesky prefactorization; Adobe's animation tools
+
+---
+
+### 6.6 Fluid Simulation
+
+#### 6.6.1 Grid-Based (Eulerian) Methods
+- 6.6.1.1 Navier-Stokes: ∂u/∂t + (u·∇)u = −(1/ρ)∇p + ν∇²u + f; ∇·u = 0 (Incompressibility); Advection + Pressure + Diffusion + External Forces
+  - ▸ *CG use:* Smoke, fire, water simulation; Stable Fluids (Stam 1999) introduced semi-Lagrangian advection to graphics
+- 6.6.1.2 Staggered (MAC) Grid: Velocity Stored at Cell Faces (Not Centers); Pressure at Cell Centers; Natural Divergence-Free Discretization; Avoids Checkerboard Pressure Instability
+  - ▸ *CG use:* Standard grid layout for incompressible flow; pressure solve yields exactly divergence-free velocities on faces
+- 6.6.1.3 Pressure Projection: Solve Poisson Equation ∇²p = ∇·u* (Divergence of Intermediate Velocity); u^{n+1} = u* − Δt ∇p; Result is Divergence-Free; Solve via Conjugate Gradient / Multigrid (AMG for Performance)
+  - ▸ *CG use:* The computational bottleneck of grid-based fluids; multigrid preconditioned CG for real-time
+
+#### 6.6.2 Particle-Based (Lagrangian) Methods
+- 6.6.2.1 SPH (Smoothed Particle Hydrodynamics): A(x) ≈ Σ m_j A_j/ρ_j W(‖x−x_j‖, h); Density ρ_i = Σ m_j W_{ij}; Pressure Force via p_i = κ(ρ_i−ρ₀); WCSPH, IISPH (Implicit Incompressible), DFSPH (Divergence-Free)
+  - ▸ *CG use:* Free-surface water; splash/spray/foam; real-time fluid in games (NVIDIA FleX); film VFX
+- 6.6.2.2 FLIP / PIC / APIC: PIC (Particle-In-Cell): Transfer Particle Velocity → Grid → Solve Pressure → Transfer Grid Velocity Back → Advect Particles (Smooth but Overly Diffusive); FLIP: Transfer Velocity Change (Δv) Not Full Velocity Back to Particles (Preserves Detail but Noisy); APIC (Affine): Transfer Affine Velocity Field per Particle (Best of Both — Smooth + Detailed)
+  - ▸ *CG use:* APIC is state-of-the-art for film-quality fluid; Disney's Moana water; Houdini flip solver
+
+#### 6.6.3 Material Point Method (MPM)
+- 6.6.3.1 MPM: Particles Carry Full Deformation Gradient F (Not Just Position); Transfer Particle → Grid (Mass + Momentum) → Solve on Grid (FEM) → Transfer Grid → Particles (Update F, v); Handles Large Deformation, Fracture, History-Dependent Materials Naturally
+  - ▸ *CG use:* Snow simulation (Disney's Frozen — Stomakhin et al. 2013); sand, mud, viscoplastic materials; the "swiss army knife" of simulation
+- 6.6.3.2 MLS-MPM (Hu et al. 2018): Moving Least Squares Shape Functions Replace B-Spline; Faster Than Classic MPM (~2×); Simpler Implementation; AFMPC (Affine Particle-In-Cell) Unification
+  - ▸ *CG use:* Real-time MPM in Taichi; GPU-accelerated snow/sand/granular materials; game physics research
+
+---
+
+### 6.7 Character Animation & Motion Synthesis
+
+#### 6.7.1 Motion Matching & Graphs
+- 6.7.1.1 Motion Graph (Kovar et al. 2002): Nodes = Frames of Mocap Data; Edges = Valid Transitions (Similar Pose + Velocity); Shortest Path for Desired Motion; Post-Process for Smoothness
+  - ▸ *CG use:* Character navigation from mocap library; dynamic motion synthesis
+- 6.7.1.2 Motion Matching (Clavet 2016 — For Honor, Last of Us Part II): Per-Frame: Query Database for Best Matching Frame Given Current Pose + Desired Future Trajectory; Match on: Joint Positions, Velocities, Future Path; PCA on Pose Features for Efficient Search; No Precomputed Graph
+  - ▸ *CG use:* State-of-the-art game character animation; smooth, responsive, no manual transition authoring; UE5 Motion Matching
+- 6.7.1.3 Learned Motion Matching (Holden et al. 2020): Neural Network Replaces Database Query; Input: Current Pose + Trajectory, Output: Next Pose; Learns Deformation + Foot IK Implicitly; Dramatically Smaller Memory than Database
+  - ▸ *CG use:* Mobile/console animation memory reduction; smoother motion than database lookup; ML-based animation
+
+#### 6.7.2 Physics-Based Character Animation
+- 6.7.2.1 DeepMimic (Peng et al. 2018): Deep RL Agent Trained to Imitate Reference Mocap; Physics Simulation + Neural Network Policy; Reward = Pose Matching + Velocity Matching + End-Effector Matching; Produces Physically Plausible Motion
+  - ▸ *CG use:* Character that reacts to pushes/obstacles naturally; physically valid animation from mocap
+- 6.7.2.2 Adversarial Motion Priors (AMP — Peng et al. 2021): Discriminator Learns Realistic Motion Manifold from Mocap; Generator (Policy) Tries to Produce Realistic Motion While Achieving Task; Style Reward from Discriminator
+  - ▸ *CG use:* Natural-looking motion without per-motion reward engineering; general-purpose physics-based animation
+- 6.7.2.3 ASE (Adversarial Skill Embeddings — Peng et al. 2022): Learn Latent Skill Space from Mocap; High-Level Controller Selects Skill; Low-Level Policy Executes Skill; Composable and Reusable Motor Skills
+  - ▸ *CG use:* Hierarchical character control; complex behaviors from simple skill combinations
+
+> 📚 **GitHub Repos:**
+> - [InteractiveComputerGraphics/PositionBasedDynamics](https://github.com/InteractiveComputerGraphics/PositionBasedDynamics) ![Stars](https://img.shields.io/github/stars/InteractiveComputerGraphics/PositionBasedDynamics?style=flat) — PBD/XPBD implementation
+> - [dilevin/CSC2549](https://github.com/dilevin/CSC2549) — Physics-based animation course (FEM, MPM, fluids)
+> - [taichi-dev/taichi](https://github.com/taichi-dev/taichi) ![Stars](https://img.shields.io/github/stars/taichi-dev/taichi?style=flat) — Differentiable MPM, FEM, fluid simulation
+> - [NVIDIAGameWorks/PhysX](https://github.com/NVIDIAGameWorks/PhysX) ![Stars](https://img.shields.io/github/stars/NVIDIAGameWorks/PhysX?style=flat) — Production physics engine
+>
+> 📖 **Textbooks:**
+> - *Computer Animation* — Rick Parent; *Fluid Simulation for Computer Graphics* — Bridson
+> - *Physics-Based Animation* — Erleben et al.; *Game Physics Engine Development* — Ian Millington
+
+---
+
 
 ## Chapter 7 · Geometry Processing & Shape Analysis
 
-### 5.1 Mesh Data Structures & Basic Operations
-- 5.1.1 Mesh Data Structures Overview (Face Sets, Winged-Edge, Half-Edge, Directed-Edge, Corner Table)
-- 5.1.2 Adjacency Operations (Vertex→Face, Vertex→Edge, Face→Face, Edge→Face, etc.)
-- 5.1.3 Local Topological Operations (Edge Collapse, Edge Split, Edge Flip, Vertex Removal)
-- 5.1.4 Euler Operators (Topology-Preserving Editing Primitives)
-- 5.1.5 Normal Computation (Uniform / Area / Angle Weighting)
-- 5.1.6 Gaussian Curvature & Mean Curvature Estimation (Discrete Differential Geometry Operators)
-- 5.1.7 Principal Curvature Direction & Principal Curvature Estimation
-- 5.1.8 Shape Diameter Function
+*The algorithms that manipulate, analyze, and optimize 3D geometry — simplification, smoothing, parameterization, reconstruction, and shape understanding. `▸ CG use:` links each technique.*
 
-### 5.2 Mesh Simplification & Refinement
-- 5.2.1 Vertex Clustering
-- 5.2.2 Edge Collapse Simplification: QEM Quadric Error Metric (Garland-Heckbert)
-- 5.2.3 Appearance-Preserving Simplification (Image-Driven Simplification)
-- 5.2.4 Progressive Meshes
-- 5.2.5 Adaptive Simplification (View-Dependent LOD / View-Dependent Refinement)
-- 5.2.6 Mesh Refinement (Inverse of Subdivision: √3 Refinement, Loop Refinement Application)
-- 5.2.7 Remeshing: Isotropic / Anisotropic Remeshing
-
-### 5.3 Mesh Smoothing & Denoising
-- 5.3.1 Laplacian Smoothing (Umbrella Operator)
-- 5.3.2 Bilateral Mesh Filtering
-- 5.3.3 Mean Curvature Flow
-- 5.3.4 Optimization-Based Denoising: L₀ Minimization, L₁ Sparse Optimization
-- 5.3.5 Non-Local Means Denoising
-- 5.3.6 Feature-Preserving Smoothing
-- 5.3.7 Guided Normal Filtering
-- 5.3.8 Deep-Learning-Based Mesh Denoising
-
-### 5.4 Mesh Parameterization
-- 5.4.1 Parameterization Fundamentals (Planar Embedding, Distortion Metrics)
-- 5.4.2 Convex Combination Methods (Floater Mean Value Coordinates, Harmonic Maps)
-- 5.4.3 Geometry-Energy-Based Methods (Dirichlet Energy, Conformal Energy)
-- 5.4.4 Least Squares Conformal Maps (LSCM)
-- 5.4.5 As-Rigid-As-Possible Parameterization (ARAP)
-- 5.4.6 Fixed-Boundary / Free-Boundary / Angle-Based Flattening (ABF)
-- 5.4.7 Globally Seamless Parameterization
-- 5.4.8 Cone Singularities & Seam Generation
-- 5.4.9 Cross-Parameterization / Consistent Parameterization
-- 5.4.10 Volumetric Parameterization (Tetrahedral / Hexahedral Parameterization)
-- 5.4.11 UV Atlas Packing (Rectangle Packing)
-
-### 5.5 Surface Reconstruction
-- 5.5.1 From Point Clouds to Meshes:
-  - 5.5.1.1 Marching Cubes
-  - 5.5.1.2 Marching Tetrahedra
-  - 5.5.1.3 Poisson Surface Reconstruction
-  - 5.5.1.4 Screened Poisson Reconstruction
-  - 5.5.1.5 Radial Basis Function Implicit Surface Reconstruction (RBF Reconstruction)
-  - 5.5.1.6 Floating-Scale Poisson Reconstruction (FPSR)
-- 5.5.2 Multi-View Stereo Reconstruction (MVS Patch-Based, Depth Map Fusion)
-- 5.5.3 TSDF-Based Fusion (KinectFusion, Voxel Hashing)
-- 5.5.4 Occupancy Field to Mesh Extraction (Multi-resolution Iso-surface Extraction)
-- 5.5.5 Deep-Learning-Based Surface Reconstruction (Deep Marching Cubes, Occupancy Networks, Neural Surface)
-- 5.5.6 Sketch-Based Modeling (Reconstruction from Line Drawings)
-- 5.5.7 Complete & Partial Scan Completion / Registration
-
-### 5.6 Shape Analysis
-- 5.6.1 Shape Descriptors:
-  - 5.6.1.1 Global: Spherical Harmonic Descriptor, Shape Distributions (D2), Zernike Moments
-  - 5.6.1.2 Local: Spin Images, SHOT, FPFH, RoPS
-  - 5.6.1.3 Spectral Descriptors (Heat Kernel Signature HKS, Wave Kernel Signature WKS)
-- 5.6.2 Shape Correspondence:
-  - 5.6.2.1 Functional Maps Framework
-  - 5.6.2.2 Spectral Matching / Blended Intrinsic Maps
-  - 5.6.2.3 Non-Rigid Registration (Non-rigid ICP, CPD)
-- 5.6.3 Symmetry Detection:
-  - 5.6.3.1 Reflection Symmetry, Rotational Symmetry, Translational Symmetry
-  - 5.6.3.2 Intrinsic Symmetry (Geodesic-Based Symmetry Detection)
-- 5.6.4 Mesh Segmentation:
-  - 5.6.4.1 Curvature-Based / Watershed-Based
-  - 5.6.4.2 Spectral Clustering
-  - 5.6.4.3 Randomized Cuts
-  - 5.6.4.4 Machine-Learning-Based Segmentation (PointNet Variants for Segmentation)
-- 5.6.5 Skeletonization: Medial Axis Transform, Curve Skeleton
-- 5.6.6 Mesh Saliency (Visual Attention Regions)
-
-### 5.7 Deformation & Editing
-- 5.7.1 Differential-Coordinate-Based Editing (Laplacian Coordinates / δ-Coordinates)
-- 5.7.2 ARAP Deformation
-- 5.7.3 Spatial Deformation (FFD, Cage Deformation, Green Coordinates)
-- 5.7.4 Physics-Based Deformation (Linear Elastic FEM, Neo-Hookean Nonlinear Deformation)
-- 5.7.5 Large-Deformation Handling & Rotation Estimation (Polar Decomposition)
-- 5.7.6 Shape Interpolation & Deformation Transfer
-
-### 5.8 Mesh Repair & Cleanup
-- 5.8.1 Non-Manifold Detection & Repair
-- 5.8.2 Consistent Normal Orientation
-- 5.8.3 Self-Intersection Detection & Repair
-- 5.8.4 Hole Filling (Minimal-Area-Based, Curvature-Continuity-Based)
-- 5.8.5 Degenerate & Zero-Area Face Handling
-- 5.8.6 Topological Error Repair (Non-Manifold Edges/Vertices, Isolated Vertices, Duplicate Faces)
-- 5.8.7 Watertight Conversion
-- 5.8.8 Deep-Learning-Based Automatic Repair
-
-### 5.9 Geometry Compression
-- 5.9.1 Geometry Compression Fundamentals (Quantization, Prediction, Entropy Coding)
-- 5.9.2 Mesh Compression Standards: MPEG-4 3DMC, Draco (Google), Cortocodec
-- 5.9.3 Progressive Mesh Compression
-- 5.9.4 Neural-Network-Based Geometry Compression
-- 5.9.5 Lossy/Lossless Compression of Texture Coordinates & Attributes
+> 💡 **Top-Level References:**
+> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Swiss-army-knife geometry processing library
+> - [geometry-central/geometry-central](https://github.com/nmwsharp/geometry-central) ![Stars](https://img.shields.io/github/stars/nmwsharp/geometry-central?style=flat) — DEC, geodesics, parameterization in C++
+> - [alecjacobson/geometry-processing](https://github.com/alecjacobson/geometry-processing) — Graduate course: mesh processing algorithms
 
 ---
 
+### 7.1 Mesh Data Structures & Topological Operations
+
+#### 7.1.1 Representations in Depth
+- 7.1.1.1 Half-Edge: Each Edge = Two Directed Half-Edges; Each Half-Edge Stores: Next, Prev, Twin, Vertex (Target), Face, Edge; O(1) Adjacency: Vertex→Ring, Face→Boundary, Edge Flips
+  - ▸ *CG use:* OpenMesh, CGAL Polyhedron_3, libigl; the standard for geometry processing
+- 7.1.1.2 Directed Edge: Single Integer Index per Half-Edge; Implicit Adjacency via Index Arithmetic; More Memory-Efficient than Half-Edge; Used in GPU Geometry Processing
+  - ▸ *CG use:* Geometry shader adjacency; mesh shader meshlet construction
+- 7.1.1.3 Corner Table (Rossignac 2001): Corner = (Vertex, Face) Association; V[c] = Vertex Idx, O[c] = Opposite Corner, N[c] = Next Corner Around Face; Extremely Compact (2 ints per corner)
+  - ▸ *CG use:* GPU-friendly mesh traversal; geometry compression (Edgebreaker); lightweight processing
+
+#### 7.1.2 Topological Operations
+- 7.1.2.1 Edge Flip: Swap Diagonal of Two Adjacent Triangles; Maintains Genus and Boundary; Used in Delaunay Triangulation (Lawson Flip) and Remeshing
+  - ▸ *CG use:* Delaunay mesh generation; isotropic remeshing; improving element quality
+- 7.1.2.2 Edge Collapse (Simplification): Merge Two Vertices into One; Remove Degenerate Triangles; Key Operation in QEM Simplification (Garland-Heckbert 1997)
+  - ▸ *CG use:* Progressive mesh LOD; mesh decimation; adaptive simplification
+- 7.1.2.3 Edge Split (Refinement): Split Edge at Midpoint, Split Adjacent Triangles; Increases Mesh Resolution; Key Operation in Subdivision and Adaptive Refinement
+  - ▸ *CG use:* Subdivision surfaces; adaptive tessellation; mesh refinement for FEM
 
 ---
+
+### 7.2 Mesh Simplification & Level of Detail
+
+#### 7.2.1 Quadric Error Metric (QEM) Simplification
+- 7.2.1.1 QEM (Garland & Heckbert 1997): Per-Vertex Error Quadric Q_v = Σ_{faces f ∋ v} K_f (4×4 Matrix); K_f Encodes Distance to Face Plane; Edge Collapse Cost: v̄ᵀ (Q_i+Q_j) v̄; Optimal New Position: Solve (Q_i+Q_j) v̄ = (0,0,0,1)ᵀ
+  - ▸ *CG use:* The standard mesh simplification algorithm; fast, quality-preserving, widely implemented
+- 7.2.1.2 Appearance-Preserving Simplification: Extend QEM with Texture Coordinate Error; Attribute Quadrics for Color, Normal, UV Preservation; Image-Driven Simplification (Render and Compare)
+  - ▸ *CG use:* Game asset LOD generation; preserve texture seams and material boundaries
+
+#### 7.2.2 Progressive Meshes & LOD
+- 7.2.2.1 Progressive Meshes (Hoppe 1996): Store Base Mesh + Sequence of Vertex Splits (Inverse of Edge Collapses); Any Resolution by Applying Subset of Splits; Geomorph Transitions Between LODs (Vertex Morphing)
+  - ▸ *CG use:* Continuous LOD; geometry streaming over network; adaptive terrain rendering
+- 7.2.2.2 View-Dependent LOD (Hoppe 1997): Refine Mesh Non-Uniformly: Finer Near Viewer + Silhouette, Coarser in Distance; Vertex Hierarchy (Forest of Binary Trees); Active Nodes Determined Per-Frame by View Parameters
+  - ▸ *CG use:* Large terrain rendering; CAD model visualization; VR high-quality foveated rendering
+
+---
+
+### 7.3 Mesh Smoothing, Fairing & Denoising
+
+#### 7.3.1 Classical Smoothing
+- 7.3.1.1 Laplacian Smoothing: v_i ← v_i + λ Σ_{j∈N(i)} w_{ij} (v_j−v_i); w=uniform (Umbrella Operator — Fast, Shrinkage), w=cotangent (Scale-Invariant, Shape-Preserving); Repeated Application → Mean Curvature Flow ∂x/∂t = −H n
+  - ▸ *CG use:* Noise removal; mesh fairing; excessive iterations cause volume shrinkage
+- 7.3.1.2 Taubin Smoothing (λ/μ Scheme — 1995): Alternate Positive λ (Smooth) and Negative μ (Inflate — Undo Shrinkage); μ < −λ, |μ| > λ for Low-Pass Filter; Preserves Volume Better than Pure Laplacian
+  - ▸ *CG use:* Mesh denoising without volume loss; standard pipeline for scan cleanup
+- 7.3.1.3 Bilateral Mesh Filtering: Filter Vertex Positions Using Spatial + Normal Weights; Spatial: Distance on Surface (Geodesic), Range: Normal Difference; Preserves Sharp Edges While Smoothing Flat Regions
+  - ▸ *CG use:* Feature-preserving denoising; 3D scan processing; photogrammetry mesh cleanup
+
+#### 7.3.2 Optimization-Based Methods
+- 7.3.2.1 L₀ / L₁ Sparsity-Prior Denoising: Minimize Data Term + λ · ‖Lv‖₀ (Number of Non-Zero Laplacians) or λ · ‖Lv‖₁ (Sparse Laplacian); L₀ Better Preserves Flat Regions + Sharp Creases
+  - ▸ *CG use:* CAD model denoising (sharp edges are important); architectural mesh processing
+- 7.3.2.2 Guided Normal Filtering (Zhang et al. 2015): Filter Face Normals (Not Positions); Bilateral/Guided Filter on Normal Field → Update Vertex Positions to Match Filtered Normals via Poisson Reconstruction
+  - ▸ *CG use:* State-of-the-art feature-preserving mesh denoising; handles large noise while preserving edges
+- 7.3.2.3 Non-Local Means for Meshes: For Each Face/Patch, Find Similar Patches Elsewhere on Surface; Average with Similarity Weights; Exploits Self-Similarity for Superior Denoising
+  - ▸ *CG use:* High-quality denoising of noisy scans; texture-like geometric detail recovery
+
+---
+
+### 7.4 Mesh Parameterization & UV Mapping
+
+#### 7.4.1 Conformal & Distortion-Minimizing Methods
+- 7.4.1.1 Least Squares Conformal Maps (LSCM — Lévy et al. 2002): Minimize Conformal Energy E = Σ_T ‖∇u − [0 −1; 1 0] ∇v‖²; Fixed Two Vertices to Pin Translation+Rotation; Linear System (Sparse); Angle-Preserving
+  - ▸ *CG use:* Blender UV unwrap (Smart UV Project variant); texture mapping for organic models
+- 7.4.1.2 ARAP Parameterization (Liu et al. 2008): As-Rigid-As-Possible in 2D; Minimize Σ_T ‖J_T − R_T‖²_F (Jacobian Should Be Rotation); Local/Global Alternating Optimization; Area + Angle Preserving
+  - ▸ *CG use:* High-quality UV unwrapping; minimal distortion; Blender's Unwrap uses LSCM, ARAP available as plug-in
+- 7.4.1.3 Angle-Based Flattening (ABF — Sheffer & de Sturler 2001): Optimize Angles Directly (Not Positions); Constraint: Angles Sum to 2π Around Interior Vertices; Produces Valid (No Triangle Flip) Parameterization; ABF++ for Free Boundaries
+  - ▸ *CG use:* Guaranteed valid UV maps; no triangle flips; slower than LSCM but guaranteed quality
+
+#### 7.4.2 Global & Seamless Parameterization
+- 7.4.2.1 Globally Smooth Parameterization: Cone Singularities (Gaussian Curvature Concentrators); Integer-Valued Transition Functions Across Cut Graph; Quadrangulation via Parameterization → Extract Integer Grid Lines
+  - ▸ *CG use:* Quad meshing; cross-field guided remeshing; texture atlas generation
+- 7.4.2.2 Atlas Generation: Seam-Guided Segmentation (Minimize Seam Length + Distortion); Chart Packing into Unit Square; UDIM Multi-Tile Layout for Film Resolution Textures
+  - ▸ *CG use:* Production UV atlases (Mari, Substance Painter); multi-tile texture workflows
+
+---
+
+### 7.5 Surface Reconstruction from Point Clouds
+
+#### 7.5.1 Implicit Reconstruction
+- 7.5.1.1 Poisson Surface Reconstruction (Kazhdan et al. 2006): Solve Δχ = ∇·V (Indicator Function χ from Oriented Points); V = Filtered Normal Field; Multigrid Poisson Solver; Extract Isosurface via Marching Cubes; Watertight Output
+  - ▸ *CG use:* The gold standard for point cloud → mesh; Meshlab, CloudCompare, COLMAP all implement Poisson
+- 7.5.1.2 Screened Poisson (Kazhdan & Hoppe 2013): Add Data Term: χ(x_i) ≈ 0.5 (Point at Surface); Balances Gradient Fit + Point Interpolation; Sharper Features than Classic Poisson
+  - ▸ *CG use:* Higher quality scans; better preservation of sharp edges and fine detail
+- 7.5.1.3 RBF Reconstruction (Carr et al. 2001): f(x) = Σ w_i φ(‖x−c_i‖) + P(x); Add Off-Surface Points (Normal Offset) for Sign; Global Support RBF (Thin-Plate, Bi-Harmonic) → Solve Dense Linear System; Fast Multipole Method for Scalability
+  - ▸ *CG use:* Scattered data reconstruction; medical imaging surface extraction; offline high-quality reconstruction
+
+#### 7.5.2 Volumetric & Learning-Based Methods
+- 7.5.2.1 TSDF Fusion (Curless & Levoy 1996): D(x) = Σ w_i d_i(x) / Σ w_i (Weighted Running Average); Each Depth Map → SDF Sample; Fuse Multiple Depth Maps into Single Volume; Extract via Marching Cubes; KinectFusion (Newcombe et al. 2011) = Real-Time GPU TSDF
+  - ▸ *CG use:* Real-time 3D scanning; RGB-D reconstruction; AR environmental understanding
+- 7.5.2.2 Neural Surface Reconstruction: Occupancy Networks, DeepSDF, NeuS, Neuralangelo (See Ch. 5 for full treatment); Implicit Neural Representations Learn Smooth Priors from Data
+  - ▸ *CG use:* State-of-the-art reconstruction from images/point clouds; handles missing data naturally
+
+---
+
+### 7.6 Shape Analysis & Descriptors
+
+#### 7.6.1 Spectral Shape Analysis
+- 7.6.1.1 Laplace-Beltrami Spectrum: Δφ_k = λ_k φ_k; Spectrum {λ_k} is Isometry-Invariant; ShapeDNA: Use First N Eigenvalues as Shape Fingerprint; Functional Maps: Express Correspondence as Map Between Function Spaces C(M) → C(N)
+  - ▸ *CG use:* Non-rigid shape matching; shape retrieval; deformation analysis; medical shape classification
+- 7.6.1.2 Heat Kernel Signature (HKS — Sun et al. 2009): h_t(x) = K_t(x,x) = Σ_k e^{−λ_k t} φ_k²(x); Multi-Scale Descriptor (Small t = Local Geometry, Large t = Global Shape); Intrinsic (Bending-Invariant); Wave Kernel Signature (WKS — Aubry et al. 2011): Band-Pass Filter → Better Feature Separation
+  - ▸ *CG use:* Point correspondence in non-rigid shapes; shape segmentation; feature point detection
+
+#### 7.6.2 Geometric Features & Segmentation
+- 7.6.2.1 Shape Diameter Function (SDF — Shapira et al. 2008): For Each Surface Point, Average Ray Length Inside Volume Along Opposite Normal Direction; Captures Local Thickness; Pose-Invariant
+  - ▸ *CG use:* Shape segmentation (thin limbs vs. thick torso); skeleton extraction; part-based shape retrieval
+- 7.6.2.2 Mesh Segmentation: Curvature-Based (Watershed on Mean/Gaussian Curvature), Spectral Clustering (Eigenvectors of Laplacian as Embedding → K-Means), Randomized Cuts (Golovinskiy & Funkhouser 2008), Shape Diameter + Graph Cut
+  - ▸ *CG use:* Part-based modeling; texture atlas generation; shape correspondence pre-processing
+
+---
+
+### 7.7 Shape Correspondence & Registration
+
+#### 7.7.1 Rigid & Non-Rigid Registration
+- 7.7.1.1 ICP (Iterative Closest Point — Besl & McKay 1992): For Each Source Point, Find Nearest Target Point (Correspondence) → Solve Procrustes for Optimal Rigid Transform → Repeat; Point-to-Plane Variant: Minimize Distance to Target Tangent Plane (Faster Convergence)
+  - ▸ *CG use:* Scan alignment; 3D reconstruction loop closure; quality inspection (CAD vs. scan)
+- 7.7.1.2 Non-Rigid ICP: Allow Per-Vertex Deformation (ARAP or Laplacian Regularization); E-Step: Find Nearest Points on Target; M-Step: Deform Source to Minimize Distance + Regularization; Embedded Deformation Graph for Efficiency
+  - ▸ *CG use:* Facial expression transfer; body shape fitting (SMPL to scan); animation retargeting
+- 7.7.1.3 Coherent Point Drift (CPD — Myronenko & Song 2010): Probabilistic Framework: GMM Centroid = Source Points, Target = Data; Maximize Likelihood via EM; Coherent Motion Prior (GMM Components Move Together); Outperforms ICP for Non-Rigid Cases
+  - ▸ *CG use:* Medical image registration; point set alignment with noise/outliers; motion capture marker matching
+
+#### 7.7.2 Functional Maps Framework
+- 7.7.2.1 Functional Maps (Ovsjanikov et al. 2012): Represent Correspondence as Linear Operator C: F(M,ℝ) → F(N,ℝ); Truncate to k Leading Eigenfunctions → C is Small k×k Matrix; Optimize C for Descriptor Preservation + Operator Commutativity
+  - ▸ *CG use:* State-of-the-art shape correspondence; scalable to large shape collections; basis for many follow-up works
+- 7.7.2.2 Deep Functional Maps (Litany et al. 2017): Learn Feature Descriptors via Neural Network → Compute Functional Map from Learned Features → Supervise with Geodesic Error; End-to-End Differentiable; Generalizes Across Shape Categories
+  - ▸ *CG use:* Automatic shape matching; learned correspondence without handcrafted descriptors
+
+---
+
+### 7.8 Mesh Repair, Remeshing & Compression
+
+#### 7.8.1 Mesh Repair
+- 7.8.1.1 Common Defects: Non-Manifold Edges/Vertices, Self-Intersections, Degenerate Faces (Zero Area), Inconsistent Normals, Holes, Duplicate Vertices, Isolated Components
+  - ▸ *CG use:* 3D printing requires watertight, manifold, non-self-intersecting meshes; every scan→print pipeline needs repair
+- 7.8.1.2 Hole Filling: Minimum Area Triangulation (Liepa 2003), Advancing Front (Fill from Hole Boundary Inward, Maintain Smoothness), Context-Based (Learn Hole Geometry from Surrounding Surface — Neural Methods); Fairing for Smooth Blending
+  - ▸ *CG use:* Scan post-processing; incomplete archaeological artifact reconstruction
+
+#### 7.8.2 Isotropic & Anisotropic Remeshing
+- 7.8.2.1 Isotropic Remeshing: Uniform Edge Length + Regular Vertex Valence (6 Interior, 4 Boundary); Centroidal Voronoi Tessellation + Lloyd Relaxation → Even Point Distribution → Delaunay Triangulation; Botsch & Kobbelt (2004) Framework
+  - ▸ *CG use:* FEM mesh generation (uniform quality); shape modeling subdivision
+- 7.8.2.2 Anisotropic Remeshing: Edge Length Varies with Principal Curvature (Shorter Along High Curvature Direction); Mesh Aligned with Curvature Directions; Better Approximation with Fewer Triangles
+  - ▸ *CG use:* CAD model meshing; CFD boundary layer meshing; curvature-adaptive LOD
+
+#### 7.8.3 Geometry Compression
+- 7.8.3.1 Draco (Google): Edgebreaker Connectivity Compression + Predictive Vertex Position Coding + Entropy Coding; 10-100× Compression for Meshes and Point Clouds; KTX 2.0 for Textures; glTF Extension
+  - ▸ *CG use:* Web 3D delivery; game asset streaming; AR asset compression; Google Earth 3D tiles
+- 7.8.3.2 Corto / Open3DGC: Lightweight Alternative to Draco; Optimized for Real-Time Decode on Mobile; Progressive Decoding (Base Mesh → Refinement)
+  - ▸ *CG use:* Mobile 3D streaming; WebGL progressive mesh loading
+
+> 📚 **GitHub Repos:**
+> - [libigl/libigl](https://github.com/libigl/libigl) ![Stars](https://img.shields.io/github/stars/libigl/libigl?style=flat) — Simplification, smoothing, parameterization, reconstruction
+> - [geometry-central/geometry-central](https://github.com/nmwsharp/geometry-central) ![Stars](https://img.shields.io/github/stars/nmwsharp/geometry-central?style=flat) — DEC, geodesics, vector fields
+> - [google/draco](https://github.com/google/draco) ![Stars](https://img.shields.io/github/stars/google/draco?style=flat) — Production mesh compression
+> - [PointCloudLibrary/pcl](https://github.com/PointCloudLibrary/pcl) ![Stars](https://img.shields.io/github/stars/PointCloudLibrary/pcl?style=flat) — Comprehensive point cloud processing
+>
+> 📖 **Textbooks:**
+> - *Polygon Mesh Processing* — Botsch, Kobbelt, Pauly, Alliez, Lévy (The definitive reference)
+> - *Geometric Modeling* — Mortenson; *Curves and Surfaces for CAGD* — Farin
+
+---
+
 
 ## Chapter 8 · 3D Vision, Reconstruction & Computational Photography
 
+*From camera geometry to dense reconstruction and smartphone photography — how the physical world becomes digital 3D. `▸ CG use:` links each technique.*
 
-### 9.1 Camera Models & Geometry
-- 9.1.1 Pinhole Camera Model
-- 9.1.2 Intrinsic Matrix (Focal Length, Principal Point, Distortion Parameters)
-- 9.1.3 Extrinsic Matrix (Rotation R + Translation t)
-- 9.1.4 Radial & Tangential Distortion Models (Brown-Conrady Model)
-- 9.1.5 Fisheye Lens Models (Equidistant Projection, Equisolid Angle Projection, FOV Model)
-- 9.1.6 Dual-Camera Models & Panoramic Stitching
-- 9.1.7 Light Field / Plenoptic Function
-
-### 9.2 Multi-View Geometry
-- 9.2.1 Epipolar Geometry
-- 9.2.2 Essential Matrix (E) & Fundamental Matrix (F)
-- 9.2.3 Homography (H) & Planar Scenes
-- 9.2.4 Triangulation
-- 9.2.5 Structure from Motion (SfM):
-  - 9.2.5.1 Incremental SfM (COLMAP Style)
-  - 9.2.5.2 Global SfM
-  - 9.2.5.3 Hierarchical SfM
-- 9.2.6 Simultaneous Localization and Mapping (SLAM):
-  - 9.2.6.1 Visual SLAM (ORB-SLAM3, DSO, VINS-Mono)
-  - 9.2.6.2 Visual-Inertial SLAM (VIO)
-  - 9.2.6.3 Dense SLAM (KinectFusion, ElasticFusion, BundleFusion)
-  - 9.2.6.4 NeRF / 3DGS-Based SLAM
-
-### 9.3 Depth Estimation
-- 9.3.1 Binocular Stereo Matching:
-  - 9.3.1.1 Local Matching: SAD, NCC, Census Transform
-  - 9.3.1.2 Global Matching: Graph Cuts, Semi-Global Matching (SGM)
-  - 9.3.1.3 Deep-Learning-Based Stereo Matching (PSMNet, RAFT-Stereo, CREStereo)
-- 9.3.2 Monocular Depth Estimation:
-  - 9.3.2.1 Cue-Based (Defocus, Linear Perspective, Relative Size)
-  - 9.3.2.2 Deep-Learning-Based (MiDaS, DPT, ZoeDepth, Depth Anything)
-- 9.3.3 Time-of-Flight (ToF): Modulated Continuous-Wave, Pulsed
-- 9.3.4 Structured Light (Encoded Structured Light, Random Speckle: Kinect v1)
-
-### 9.4 3D Reconstruction
-- 9.4.1 Multi-View Stereo (MVS):
-  - 9.4.1.1 Voxel Coloring & Space Carving
-  - 9.4.1.2 Patch-Based (PatchMatch / PMVS / ACMM)
-  - 9.4.1.3 Depth-Map-Fusion-Based (COLMAP MVS, OpenMVS)
-- 9.4.2 Photometric Stereo
-- 9.4.3 Shape-from-X (Shape from Shading, Defocus, Polarization, Texture)
-- 9.4.4 Deep-Learning-Based MVS (MVSNet, CasMVSNet, PatchMatchNet)
-- 9.4.5 Neural Implicit Reconstruction (NeuS, VolSDF, Neuralangelo, BakedSDF)
-
-### 9.5 Computational Photography
-- 9.5.1 HDR Capture & Fusion
-- 9.5.2 Panorama Stitching (Image Registration, Seam Optimization, Gain Compensation)
-- 9.5.3 Image / Video Stabilization
-- 9.5.4 Portrait Mode (Depth Estimation + Bokeh Rendering)
-- 9.5.5 Super-Resolution (Single-Image / Multi-Frame Fusion)
-- 9.5.6 Low-Light Enhancement (Multi-Frame Denoising & Fusion)
-- 9.5.7 Computational Illumination (Flash/Ambient Decomposition & Re-lighting)
-- 9.5.8 Reflection & Obstruction Removal
+> 💡 **Top-Level References:**
+> - [colmap/colmap](https://github.com/colmap/colmap) ![Stars](https://img.shields.io/github/stars/colmap/colmap?style=flat) — State-of-the-art SfM + MVS pipeline
+> - [naver/dust3r](https://github.com/naver/dust3r) ![Stars](https://img.shields.io/github/stars/naver/dust3r?style=flat) — Dense stereo from unposed images (2024 breakthrough)
+> - [nerfstudio-project/nerfstudio](https://github.com/nerfstudio-project/nerfstudio) ![Stars](https://img.shields.io/github/stars/nerfstudio-project/nerfstudio?style=flat) — Neural reconstruction framework
 
 ---
 
+### 8.1 Camera Models & Projective Geometry
+
+#### 8.1.1 Camera Geometry
+- 8.1.1.1 Pinhole Camera Model: x = K [R|t] X; K = [f_x s c_x; 0 f_y c_y; 0 0 1] (Intrinsic Matrix: Focal Length, Skew, Principal Point); [R|t] = Extrinsic Matrix; 3×4 Projection Matrix P Maps 3D World → 2D Image
+  - ▸ *CG use:* Every SfM/SLAM/3D reconstruction pipeline; camera calibration; CG rendering projection
+- 8.1.1.2 Radial & Tangential Distortion (Brown-Conrady): x_d = x(1 + k₁r² + k₂r⁴ + k₃r⁶) + [2p₁xy + p₂(r²+2x²); p₁(r²+2y²) + 2p₂xy]; k₁,k₂,k₃ = Radial, p₁,p₂ = Tangential; Undistort Before Processing
+  - ▸ *CG use:* Lens distortion correction; photogrammetry pre-processing; OpenCV calibrateCamera
+- 8.1.1.3 Light Field / Plenoptic Function: L(x,y,z,θ,φ,λ,t) — 7D Function; 4D Light Field (Two-Plane Parameterization — Levoy & Hanrahan 1996): L(u,v,s,t); Refocus After Capture (Synthetic Aperture), Change Viewpoint
+  - ▸ *CG use:* Lytro camera; post-capture refocus; VR light field rendering; neural radiance fields approximate plenoptic function
+
+#### 8.1.2 Multi-View Geometry
+- 8.1.2.1 Epipolar Geometry: Epipolar Plane (Camera Centers + 3D Point); Epipolar Line (Intersection of Epipolar Plane with Image Plane); All Correspondences Lie on Epipolar Line; Fundamental Matrix F Encodes Epipolar Geometry (Uncalibrated), Essential Matrix E (Calibrated)
+  - ▸ *CG use:* Stereo matching (reduce 2D search to 1D along epipolar line); visual odometry; SfM initialization
+- 8.1.2.2 Essential Matrix: E = [t]× R (3×3, Rank 2, 5 DOF); x₂ᵀ E x₁ = 0 (Normalized Image Coordinates); 8-Point Algorithm (Longuet-Higgins 1981), 5-Point Algorithm (Nistér 2004 — Minimal Solver, RANSAC)
+  - ▸ *CG use:* Relative camera pose estimation; SfM initial pair selection; Visual SLAM initialization
+- 8.1.2.3 Fundamental Matrix: F = K₂⁻ᵀ E K₁⁻¹ (3×3, Rank 2, 7 DOF); p₂ᵀ F p₁ = 0 (Pixel Coordinates); 8-Point + Normalization (Hartley 1997), 7-Point Algorithm
+  - ▸ *CG use:* Uncalibrated stereo; image matching verification; outlier rejection in SfM
+- 8.1.2.4 Homography: Plane-Induced Mapping H (3×3); p₂ ≅ H p₁; 4 Point Correspondences (DLT); Decompose H → R,t,n (Faugeras & Lustman 1988)
+  - ▸ *CG use:* Planar scene reconstruction; panorama stitching; augmented reality marker tracking
 
 ---
+
+### 8.2 Structure from Motion (SfM)
+
+#### 8.2.1 SfM Pipeline
+- 8.2.1.1 Incremental SfM (COLMAP style): Feature Extraction (SIFT — Scale-Invariant Feature Transform) → Feature Matching (GPU Brute-Force + Lowe's Ratio Test) → Geometric Verification (Fundamental/Homography Estimation → RANSAC) → Initial Image Pair (Wide Baseline + Many Inliers) → Incremental Registration (PnP for New Cameras → Triangulate New Points → Bundle Adjustment) → Global Bundle Adjustment
+  - ▸ *CG use:* COLMAP is the standard open-source SfM; most 3D reconstruction and NeRF pipelines start with COLMAP poses
+- 8.2.1.2 Global SfM: Simultaneously Estimate All Camera Rotations (Rotation Averaging on SO(3)) + Translations (Translation Averaging); Single Global Optimization Instead of Incremental; More Scalable, Less Robust to Outliers
+  - ▸ *CG use:* Large-scale reconstruction (city-scale); Theia, OpenMVG global pipelines
+- 8.2.1.3 Bundle Adjustment (BA): Jointly Optimize Camera Parameters + 3D Point Positions; min_{C_i, X_j} Σ ‖π(C_i, X_j) − x_{ij}‖² (Reprojection Error); Sparse Levenberg-Marquardt (Schur Complement Trick: Marginalize Points → Solve Cameras → Back-Substitute Points)
+  - ▸ *CG use:* The computational core of SfM and SLAM; Ceres Solver, g2o, GTSAM are the standard BA libraries
+
+#### 8.2.2 Feature Extraction & Matching
+- 8.2.2.1 SIFT (Lowe 2004): Scale-Space Extrema (DoG Pyramid) → Keypoint Localization (Subpixel Refinement) → Orientation Assignment (Gradient Histogram) → 128D Descriptor (Gradient Histograms in 4×4 Grid); Rotation + Scale Invariant; Patent Expired 2020
+  - ▸ *CG use:* The gold standard feature for SfM; robust to viewpoint, illumination, scale changes
+- 8.2.2.2 Modern Learned Features: SuperPoint (DeTone et al. 2018 — CNN Keypoint + Descriptor), SuperGlue (Sarlin et al. 2020 — GNN Attention Matching), LoFTR (Sun et al. 2021 — Transformer Dense Matching Without Keypoints), LightGlue (Lindebaum et al. 2023 — Faster SuperGlue)
+  - ▸ *CG use:* Learned features outperform SIFT in challenging conditions (night, weather, textureless); SuperGlue+LightGlue are standard in modern pipelines
+- 8.2.2.3 DUSt3R (Wang et al. 2024): Dense Pointmap Prediction Directly from Image Pair (No Keypoints!); Transformer Architecture Predicts Per-Pixel 3D for Both Images Simultaneously; Align Pointmaps via Procrustes (No Explicit Pose Estimation!); Foundation Model for 3D Vision
+  - ▸ *CG use:* Replaces SfM + MVS pipeline; 3D reconstruction from uncalibrated images; democratizes 3D capture
+
+---
+
+### 8.3 Multi-View Stereo (MVS) & Depth Estimation
+
+#### 8.3.1 Classical MVS
+- 8.3.1.1 PatchMatch Stereo (Bleyer et al. 2011, PMVS — Furukawa & Ponce 2010): Random Initialization + Spatial Propagation (Good Disparities Propagate to Neighbors) + Random Refinement + View Propagation; Handles Slanted Surfaces (Per-Pixel 3D Plane); GPU Real-Time Variants
+  - ▸ *CG use:* COLMAP MVS; high-quality depth maps; widely used in photogrammetry pipelines
+- 8.3.1.2 Semi-Global Matching (SGM — Hirschmüller 2008): Mutual Information Cost + 8-Path Dynamic Programming Smoothness Term; 1D DP Along Multiple Directions → Approximate 2D MRF; Fast, Parallelizable; Built into Many Industrial Stereo Cameras
+  - ▸ *CG use:* Real-time stereo on embedded systems; drone obstacle avoidance; automotive stereo
+
+#### 8.3.2 Learned Depth Estimation
+- 8.3.2.1 Learned Stereo Matching: PSMNet (Chang & Chen 2018 — 3D Cost Volume + Stacked Hourglass), RAFT-Stereo (Lipson et al. 2021 — Iterative 2D Correlation + GRU Update, Inspired by RAFT Optical Flow), CREStereo (Li et al. 2022 — Recurrent Refinement with Cascaded Resolution)
+  - ▸ *CG use:* State-of-the-art stereo depth; generation of training data for NeRF/3DGS
+- 8.3.2.2 Monocular Depth Estimation: MiDaS (Ranftl et al. 2020 — Transformer, Trained on Mixed Datasets → Zero-Shot Generalization); Depth Anything (Yang et al. 2024 — Large-Scale Unlabeled Data Training via Teacher-Student, DINOv2 Backbone → State-of-the-Art)
+  - ▸ *CG use:* Single-image depth for AR; depth prior for sparse-view NeRF; robotics visual navigation
+- 8.3.2.3 Multi-View Stereo Networks: MVSNet (Yao et al. 2018 — Differentiable Homography Warping + 3D UNet Cost Volume Regularization), CasMVSNet (Gu et al. 2020 — Cascade from Coarse to Fine), PatchMatchNet (Wang et al. 2021 — Learned PatchMatch)
+  - ▸ *CG use:* Learned MVS reconstruction; faster than classical while maintaining quality
+
+---
+
+### 8.4 SLAM (Simultaneous Localization and Mapping)
+
+#### 8.4.1 Visual & Visual-Inertial SLAM
+- 8.4.1.1 ORB-SLAM3 (Campos et al. 2020): Three Parallel Threads: Tracking (ORB Features → Pose from PnP + Relocalization), Local Mapping (Keyframe Management + Local BA), Loop Closing (Bag-of-Words Place Recognition + Pose Graph Optimization + Full BA); Monocular/Stereo/RGB-D; Atlas Multi-Map System
+  - ▸ *CG use:* The standard visual SLAM system; AR/VR tracking; robotics; autonomous driving
+- 8.4.1.2 DSO (Direct Sparse Odometry — Engel et al. 2018): Direct Method: Optimize Photometric Error (Not Feature Reprojection); Sparse Gradient Points (High Image Gradient Regions); Joint Optimization of Pose + Depth + Camera Parameters; No Feature Descriptors!
+  - ▸ *CG use:* High-precision odometry in feature-sparse environments; complements feature-based methods
+- 8.4.1.3 VINS-Mono (Qin et al. 2018): Tightly-Coupled Visual-Inertial Odometry; IMU Pre-Integration Between Keyframes + Visual Feature Constraints + Sliding Window Optimization; Robust Initialization (Visual-Inertial Alignment); Loop Closure with Pose Graph
+  - ▸ *CG use:* Drone navigation; handheld AR (ARKit/ARCore use VIO); fast camera motion where pure visual fails
+
+#### 8.4.2 Dense & Neural SLAM
+- 8.4.2.1 KinectFusion (Newcombe et al. 2011): Real-Time Dense TSDF Volume via GPU; ICP Frame-to-Model Tracking; Raycasting from Volume for Rendering; The First Real-Time Dense SLAM
+  - ▸ *CG use:* Real-time 3D scanning; HoloLens spatial mapping; AR environmental mesh
+- 8.4.2.2 ElasticFusion (Whelan et al. 2015): Surfel-Based Map (Not Volume); Non-Rigid Deformation for Loop Closure (Deform Map to Close Loops); Real-Time; Handles Room-Scale Environments
+  - ▸ *CG use:* Room-scale real-time reconstruction; AR persistent mapping
+- 8.4.2.3 NeRF-SLAM / 3DGS-SLAM: Neural Implicit Map Representation (Hash Grid + Tiny MLP); RGB + Depth → Jointly Optimize Pose + Neural Map; Dense Photorealistic Reconstruction; SplaTAM, MonoGS (Single RGB Camera → 3DGS Map!)
+  - ▸ *CG use:* Photorealistic AR mapping; dense 3D reconstruction from monocular video; robotics perceptual mapping
+
+---
+
+### 8.5 Computational Photography
+
+#### 8.5.1 HDR & Image Fusion
+- 8.5.1.1 HDR Capture (Debevec & Malik 1997): Multiple Exposures → Recover Camera Response Function g(Z_{ij}) = ln E_i + ln Δt_j via Linear Least Squares; Weighted Fusion of Exposures → Radiance Map; Tone Map for Display
+  - ▸ *CG use:* IBL light probe capture; smartphone HDR mode; every camera pipeline
+- 8.5.1.2 Multi-Frame Fusion: Align + Merge Multiple Frames (Handheld Burst); Reduces Noise (√N Reduction) + Increases Dynamic Range; Google HDR+ (Hasinoff et al. 2016) — Tile-Based Alignment + Wiener Fusion; Apple Deep Fusion (Neural Network-Based)
+  - ▸ *CG use:* Smartphone photography; low-light enhancement; surveillance camera quality
+
+#### 8.5.2 Panorama, Video & Computational Effects
+- 8.5.2.1 Panorama Stitching: Feature Matching → Homography Estimation → Bundle Adjustment (Global Alignment) → Seam Cutting (Graph Cut on Overlap) → Multi-Band Blending (Burt & Adelson 1983 — Blend Low Freq Over Large Area, High Freq Over Small Area); Cylindrical/Spherical Projection for Wide Angles
+  - ▸ *CG use:* Smartphone panorama mode; VR 360° capture; Google Street View
+- 8.5.2.2 Portrait Mode: Stereo Depth (Dual Camera) or Dual-Pixel PDAF Depth or Learned Monocular Depth → Synthetic Bokeh via Scatter Disk Rendering; Segmentation + Depth Map → Layer Separation; Defocus Map = f(1/depth − 1/focus_depth)
+  - ▸ *CG use:* Every modern smartphone; computational bokeh approaches optical quality
+- 8.5.2.3 Super-Resolution: Classical (Multi-Frame: Subpixel Shift → Higher Resolution via L1/L2 Reconstruction); Learned (SRCNN, ESRGAN, Real-ESRGAN, SwinIR); Diffusion-Based (Stable Diffusion Upscale, Cascaded Diffusion — State-of-the-Art)
+  - ▸ *CG use:* 4K from 1080p; enhancing legacy game textures; medical imaging enhancement; satellite imagery
+
+> 📚 **GitHub Repos:**
+> - [colmap/colmap](https://github.com/colmap/colmap) ![Stars](https://img.shields.io/github/stars/colmap/colmap?style=flat) — SfM + MVS pipeline; [naver/dust3r](https://github.com/naver/dust3r) ![Stars](https://img.shields.io/github/stars/naver/dust3r?style=flat) — Unposed stereo reconstruction
+> - [opencv/opencv](https://github.com/opencv/opencv) ![Stars](https://img.shields.io/github/stars/opencv/opencv?style=flat) — Camera calibration, stereo, SfM tools
+> - [PointCloudLibrary/pcl](https://github.com/PointCloudLibrary/pcl) ![Stars](https://img.shields.io/github/stars/PointCloudLibrary/pcl?style=flat) — Point cloud processing, ICP, feature extraction
+> - [xinntao/Real-ESRGAN](https://github.com/xinntao/Real-ESRGAN) ![Stars](https://img.shields.io/github/stars/xinntao/Real-ESRGAN?style=flat) — Practical super-resolution
+>
+> 📖 **Textbooks:**
+> - *Multiple View Geometry in Computer Vision* — Hartley & Zisserman (The bible)
+> - *Computer Vision: Algorithms and Applications* — Szeliski; *Photogrammetric Computer Vision* — Förstner & Wrobel
+
+---
+
 
 ## Chapter 9 · Graphics Systems, Hardware & Engineering
 
+*The engineering backbone of computer graphics — GPU architectures, graphics APIs, shader languages, rendering engines, and data interchange. `▸ CG use:` links each system to production practice.*
 
-### 7.1 GPU Architecture
-
-#### 7.1.1 Rendering Pipeline Hardware View
-- 7.1.1.1 Vertex Fetch & Geometry Engines
-- 7.1.1.2 Primitive Assembly & Rasterizer (ROPs)
-- 7.1.1.3 Texture Mapping Units (TMU) & Cache Hierarchy
-- 7.1.1.4 Streaming Multiprocessor (SM / CU / Xe Core) Architecture
-- 7.1.1.5 SIMD / SIMT Execution Model: Warp / Wavefront / Subgroup
-- 7.1.1.6 Branch Divergence & Occupancy
-- 7.1.1.7 Register File & Shared Memory / Local Data Share (LDS)
-- 7.1.1.8 Raster Output Units (ROP) & Pixel Blending
-
-#### 7.1.2 Modern GPU Features
-- 7.1.2.1 Async Compute & Parallel Queues
-- 7.1.2.2 Mesh Shader / Task Shader Pipeline (Replacing Legacy Geometry Pipeline)
-- 7.1.2.3 Variable Rate Shading (VRS Tier 1/2)
-- 7.1.2.4 Sampler Feedback & Texture-Space Shading
-- 7.1.2.5 Ray Tracing Cores (RT Core: BVH Traversal, Triangle Intersection Acceleration)
-- 7.1.2.6 Tensor Cores (Matrix Multiply Acceleration, AI Inference/Denoising/DLSS)
-- 7.1.2.7 Shader Execution Reordering (SER)
-- 7.1.2.8 Opacity & Displacement Micro-Maps (OMM / DMM)
-- 7.1.2.9 GPU Work Graphs (GPU-Driven Rendering Pipeline)
-- 7.1.2.10 DirectStorage (GPU Direct-to-SSD Access)
-
-#### 7.1.3 Video Memory & Bandwidth
-- 7.1.3.1 VRAM Types: GDDR6/6X/7, HBM2/3/3e
-- 7.1.3.2 Cache Hierarchy (L1, L2, Infinity Cache / Last-Level Cache)
-- 7.1.3.3 Bandwidth Compression (Delta Color Compression, DCC / Lossless Bandwidth Compression)
-- 7.1.3.4 Hardware Texture Compression Support (BCn, ASTC, ETC)
-- 7.1.3.5 Sparse / Partially Resident Resources (Tiled Resources / Sparse Textures)
-
-### 7.2 Graphics APIs
-
-#### 7.2.1 OpenGL / OpenGL ES / WebGL
-- 7.2.1.1 OpenGL Pipeline Model & State Machine
-- 7.2.1.2 OpenGL ES 3.x / WebGL 2.0 Capability Sets
-- 7.2.1.3 Extension Mechanism (GL_EXT / GL_ARB)
-- 7.2.1.4 Bindless Design (Bindless Textures / ARB_bindless_texture)
-- 7.2.1.5 AZDO (Approaching Zero Driver Overhead) Techniques
-
-#### 7.2.2 Vulkan
-- 7.2.2.1 Instance, Physical Device, Logical Device
-- 7.2.2.2 Command Buffers & Command Pools (Multi-Threaded Recording)
-- 7.2.2.3 Pipeline State Objects (PSO): Graphics / Compute / Ray Tracing Pipelines
-- 7.2.2.4 Descriptor Set Layouts & Descriptor Pools (Descriptor Indexing / Update After Bind)
-- 7.2.2.5 Synchronization Primitives: Semaphores, Fences, Pipeline Barriers, Subpass Dependencies
-- 7.2.2.6 Render Pass & Dynamic Rendering
-- 7.2.2.7 Memory Management: VMA (Vulkan Memory Allocator), Device-Local vs. Host-Visible
-- 7.2.2.8 Push Constants & Specialization Constants
-- 7.2.2.9 Timeline Semaphores
-- 7.2.2.10 Vulkan Ray Tracing (VK_KHR_ray_tracing_pipeline)
-- 7.2.2.11 Vulkan Video Encode/Decode (VK_KHR_video_queue)
-
-#### 7.2.3 DirectX 12
-- 7.2.3.1 Device Creation & Factory Pattern
-- 7.2.3.2 Command Queues, Command Lists, Command Allocators
-- 7.2.3.3 Pipeline State Objects (PSO) & Root Signatures
-- 7.2.3.4 Resource Descriptor Heaps (CBV/SRV/UAV Descriptor Heaps)
-- 7.2.3.5 Resource Barriers & State Transitions
-- 7.2.3.6 Fence-Based Synchronization
-- 7.2.3.7 DirectX Raytracing (DXR): State Objects (RTPSO), Shader Tables
-- 7.2.3.8 DirectML (Machine Learning Inference & Training Acceleration)
-- 7.2.3.9 DirectStorage (GPU Direct-to-NVMe SSD)
-
-#### 7.2.4 Metal
-- 7.2.4.1 MTLDevice, MTLCommandQueue, MTLCommandBuffer
-- 7.2.4.2 Render Pipeline Descriptors (MTLRenderPipelineDescriptor)
-- 7.2.4.3 Argument Buffers: GPU-Writable Descriptors
-- 7.2.4.4 Heaps & Fence Synchronization
-- 7.2.4.5 Metal Ray Tracing (MPSRayIntersector)
-- 7.2.4.6 MetalFX (Temporal / Spatial Super-Resolution)
-
-#### 7.2.5 WebGPU
-- 7.2.5.1 Adapter & Device Model
-- 7.2.5.2 Pipelines (Render Pipeline + Compute Pipeline)
-- 7.2.5.3 Bind Group Layouts
-- 7.2.5.4 Command Encoders (RenderPass / ComputePass)
-- 7.2.5.5 WGSL Shading Language
-- 7.2.5.6 Comparison with WebGL & Heterogeneous Fallback
-
-#### 7.2.6 Cross-Platform Abstractions
-- 7.2.6.1 bgfx, The-Forge, NVRHI, Diligent Engine
-- 7.2.6.2 Google ANGLE (OpenGL ES → Vulkan/Metal/D3D)
-- 7.2.6.3 MoltenVK (Vulkan → Metal Translation Layer)
-- 7.2.6.4 DXVK / vkd3d-proton (D3D → Vulkan Translation Layer)
-
-### 7.3 Shader Programming Languages
-
-#### 7.3.1 High-Level Shading Languages
-- 7.3.1.1 GLSL (OpenGL Shading Language)
-- 7.3.1.2 HLSL (High-Level Shading Language): SM 5.0 / SM 6.x Features
-- 7.3.1.3 MSL (Metal Shading Language): Based on C++14
-- 7.3.1.4 WGSL (WebGPU Shading Language)
-- 7.3.1.5 OpenCL Kernel Language (for General-Purpose GPU Computing)
-
-#### 7.3.2 Shader Compilation & Intermediate Representations
-- 7.3.2.1 SPIR-V (Standard Portable Intermediate Representation)
-- 7.3.2.2 DXIL (DirectX Intermediate Language)
-- 7.3.2.3 Metal IR (Based on LLVM Bitcode)
-- 7.3.2.4 Shader Compilation Toolchains: glslang, DXC, SPIRV-Cross, Slang, Rust-GPU
-
-#### 7.3.3 Modern Shader Features
-- 7.3.3.1 Wave / Subgroup Intrinsics (Ballot, Shuffle, Vote, Reduce)
-- 7.3.3.2 16-bit Type Support (min16float, half)
-- 7.3.3.3 8-bit Integer Operations (DP4A / Int8 Accelerated Inference)
-- 7.3.3.4 Structured Buffers & Byte Address Buffers
-- 7.3.3.5 Shader Pointers & Recursion (SPV_KHR_physical_storage_buffer_addresses)
-- 7.3.3.6 Bindless Resources (Descriptor Indexing)
-
-### 7.4 GPU Computing & Parallel Programming
-- 7.4.1 CUDA (Compute Unified Device Architecture):
-  - 7.4.1.1 Thread Hierarchy: Grid → Block → Thread
-  - 7.4.1.2 Shared Memory, Constant Memory, Global Memory, Texture Memory
-  - 7.4.1.3 Cooperative Groups
-  - 7.4.1.4 CUDA Graphs (Reducing Launch Overhead)
-  - 7.4.1.5 Multi-Stream Concurrency (Streams / Async Copy / Overlap Compute & Transfer)
-- 7.4.2 OpenCL: Platforms, Devices, Contexts, Command Queues, Kernels
-- 7.4.3 Vulkan Compute / DirectX Compute Shaders
-- 7.4.4 SYCL / DPC++ (Standards-Based C++ Accelerated Programming)
-- 7.4.5 HIP (AMD ROCm Heterogeneous Interface)
-- 7.4.6 GPU Reduction, Scan, Sort Patterns (Reduction, Prefix Sum, Radix Sort / Bitonic Sort)
-- 7.4.7 GPU Parallel Algorithm Design Patterns (Map, Gather, Scatter, Partition)
-
-### 7.5 Rendering Engine Architecture
-
-#### 7.5.1 Common Engine Components
-- 7.5.1.1 Resource Manager (Texture, Mesh, Shader, Material Lifecycle Management)
-- 7.5.1.2 Scene Management (Scene Graph, Spatial Partitioning, Streaming)
-- 7.5.1.3 Render Graph / Frame Graph: Automatic Resource Dependency Resolution & Barrier Generation
-- 7.5.1.4 Rendering Pipeline Abstraction (Pass, View, Technique)
-- 7.5.1.5 Material System: Shader Variant Management, Parameter Binding
-- 7.5.1.6 Draw Call Collection / Sorting / Batching
-- 7.5.1.7 Multi-Threaded Rendering Architecture (Game Thread → Render Thread → GPU)
-- 7.5.1.8 World Streaming / Level Streaming
-
-#### 7.5.2 Visibility & Culling
-- 7.5.2.1 Frustum Culling
-- 7.5.2.2 Occlusion Culling:
-  - 7.5.2.2.1 Hardware Occlusion Queries
-  - 7.5.2.2.2 Software Occlusion Culling (Potentially Visible Set, PVS)
-  - 7.5.2.2.3 Hierarchical Z-Buffer (Hi-Z) Occlusion Culling
-  - 7.5.2.2.4 Distance-Based Culling
-  - 7.5.2.2.5 Portal Culling (Indoor Scenes)
-- 7.5.2.3 Visibility Buffer: Two-Stage Visibility + Material
-- 7.5.2.4 GPU-Driven Culling (Indirect Draw Count Generation)
-
-#### 7.5.3 Debugging & Performance Analysis
-- 7.5.3.1 GPU Debugging Tools: RenderDoc, NVIDIA Nsight, PIX, Xcode GPU Capture
-- 7.5.3.2 GPU Performance Counters & Bottleneck Diagnosis (ALU / Bandwidth / Fill-Rate / Latency Bound)
-- 7.5.3.3 Shader Performance Analysis (ALUs, Texture Stalls, Occupancy)
-- 7.5.3.4 Frame Profiler / Timing Graph
-- 7.5.3.5 Graphics Debugging & Pixel History (Pixel History / Mesh Viewer)
-- 7.5.3.6 API Validation Layers (Vulkan Validation Layers, D3D12 Debug Layer)
-
-#### 7.5.4 Major Engines
-- 7.5.4.1 Unreal Engine 5 Rendering Architecture (Nanite, Lumen, Virtual Shadow Maps)
-- 7.5.4.2 Unity Rendering Pipelines (Built-in, URP, HDRP, Custom SRP)
-- 7.5.4.3 Godot Rendering Architecture (Vulkan/GLES3 Backends)
-- 7.5.4.4 O3DE (Open 3D Engine) Renderer
-- 7.5.4.5 Design Considerations for Custom Engines
+> 💡 **Top-Level References:**
+> - [SaschaWillems/Vulkan](https://github.com/SaschaWillems/Vulkan) ![Stars](https://img.shields.io/github/stars/SaschaWillems/Vulkan?style=flat) — Comprehensive Vulkan examples
+> - [google/filament](https://github.com/google/filament) ![Stars](https://img.shields.io/github/stars/google/filament?style=flat) — Production PBR renderer with complete documentation
+> - [KhronosGroup/glTF](https://github.com/KhronosGroup/glTF) ![Stars](https://img.shields.io/github/stars/KhronosGroup/glTF?style=flat) — glTF 2.0 specification and tools
 
 ---
 
+### 9.1 GPU Architecture
 
+#### 9.1.1 GPU Compute Model
+- 9.1.1.1 SIMT Execution: Single Instruction, Multiple Threads; Warp (NVIDIA 32 Threads) / Wavefront (AMD 64 Threads) / Subgroup (Vulkan/D3D12); Threads in Warp Execute Same Instruction — Divergence Causes Serialization
+  - ▸ *CG use:* Understanding warp occupancy and divergence is critical for shader optimization; avoid per-thread branching on divergent conditions
+- 9.1.1.2 Streaming Multiprocessor (SM / CU): Warp Schedulers (4/SM on Ampere), Register File (64K 32-bit/SM), Shared Memory / LDS (Up to 164 KB on Ampere — Configurable L1/SMEM Split), Tensor Cores (FP16/BF16/INT8/FP8 Matrix Multiply), RT Cores (BVH Traversal + Triangle Intersection)
+  - ▸ *CG use:* Shader performance is fundamentally limited by SM resources: register pressure, shared memory usage, and warp occupancy
+- 9.1.1.3 Memory Hierarchy: Global Memory (HBM2/GDDR6X — 1-2 TB/s, High Latency ~600 cycles), L2 Cache (40-96 MB on Ada/Blackwell), L1/SMEM (~30 cycles latency), Register File (0 cycles); Coalesced Memory Access: Adjacent Threads → Adjacent Addresses → Single Transaction (128 Bytes)
+  - ▸ *CG use:* Non-coalesced global memory access = 8-10× bandwidth penalty; texture cache (optimized for 2D locality) for random access
+- 9.1.1.4 Compute Shader Model: Dispatch Thread Groups (3D Grid of Thread Blocks); Each Thread Block Mapped to SM; Within Thread Block: Shared Memory + Barrier Synchronization; Across Blocks: No Synchronization Guarantee
+  - ▸ *CG use:* Particle systems, post-processing, culling, light culling, GPU skinning — all use compute shaders
 
-### 10.1 3D File Formats
-- 10.1.1 OBJ: Meshes, Normals, Texture Coordinates, Material Libraries (MTL)
-- 10.1.2 PLY (Stanford Polygon Format): Supports Vertex Attributes
-- 10.1.3 STL: Triangle Mesh Standard (Binary/ASCII), 3D Printing
-- 10.1.4 FBX (Autodesk): Scene Hierarchy, Animation, Materials, Embedded Data
-- 10.1.5 glTF 2.0 (GL Transmission Format / "3D JPEG"):
-  - 10.1.5.1 JSON Scene Description + Binary Buffer (.bin)
-  - 10.1.5.2 PBR Material Standard (Metallic-Roughness / Specular-Glossiness Extensions)
-  - 10.1.5.3 Animation, Skinning, Morph Target Support
-  - 10.1.5.4 Draco Mesh Compression Extension
-  - 10.1.5.5 KTX 2.0 Texture Extension (Universal Texture Compression)
-  - 10.1.5.6 EXT_meshopt_compression, EXT_texture_webp & Other Extensions
-- 10.1.6 USD / Universal Scene Description (Pixar):
-  - 10.1.6.1 Hierarchical Scene Composition (Composition Arcs: Sublayer, Reference, Payload, VariantSet)
-  - 10.1.6.2 Hydra Rendering Framework
-  - 10.1.6.3 USDZ (Apple AR Format)
-- 10.1.7 Alembic: Geometry Caching & Animation Exchange
-- 10.1.8 Collada (.dae): XML Exchange Format
-- 10.1.9 Native Formats: 3DS Max (.3ds), Blender (.blend), Maya (.ma/.mb)
-- 10.1.10 CAD Formats: STEP, IGES, JT, BREP
-
-### 10.2 Image & Texture Formats
-- 10.2.1 PNG, JPEG, WebP, AVIF, JPEG-XL
-- 10.2.2 HDR Formats: OpenEXR, Radiance HDR (.hdr), 32-bit TIFF
-- 10.2.3 GPU Texture Formats (BCn, ASTC, ETC2, PVRTC)
-- 10.2.4 KTX 2.0 (Khronos Texture Container): Basis Universal Super-Compression
-- 10.2.5 DDS (DirectDraw Surface)
-
-### 10.3 Shader & Material Exchange
-- 10.3.1 MaterialX (Industry Standard Material Definition & Exchange)
-- 10.3.2 MDL (NVIDIA Material Definition Language)
-- 10.3.3 OpenPBR (Jointly Advanced by Adobe, Autodesk & Others)
-- 10.3.4 UsdShade (USD Material Binding)
-- 10.3.5 SPIR-V (Shader Exchange)
-
-### 10.4 Animation & Motion Data Formats
-- 10.4.1 BVH (Biovision Hierarchy)
-- 10.4.2 FBX Animation Data
-- 10.4.3 glTF Animation (Keyframes, Linear Interpolation, Cubic Spline)
-- 10.4.4 Alembic Animation Cache
-- 10.4.5 C3D (Motion Capture Raw Data)
+#### 9.1.2 Modern GPU Features
+- 9.1.2.1 Mesh Shaders (Turing+): Replace Vertex → Tessellation → Geometry Pipeline with Task Shader (Optional, Work Amplification) + Mesh Shader (Output Meshlets Directly to Rasterizer); No Fixed-Function Primitive Assembly; GPU-Driven Geometry Pipeline
+  - ▸ *CG use:* UE5 Nanite; geometry culling on GPU; procedural geometry generation; reduces draw call count
+- 9.1.2.2 Work Graphs (D3D12 / Vulkan Device-Generated Commands): GPU Generates Work for Itself; Producer Node → Consumer Node Execution; No CPU Round-Trip for Dependent Work; Material Shading, Classification, GPU Particle Emission
+  - ▸ *CG use:* Fully GPU-driven rendering; culling → draw → compute post-processing → present all on GPU
+- 9.1.2.3 Sampler Feedback & Texture-Space Shading: GPU Reports Which Texture Regions Were Sampled → CPU/GPU Only Shades Those Regions; Shade Texture Once, Reuse Across Frames (Sparse Shading); VRS Tier 2
+  - ▸ *CG use:* Reducing shading cost; texture-space irradiance caching; dynamic resolution without visible blur
 
 ---
 
+### 9.2 Modern Graphics APIs
+
+#### 9.2.1 Vulkan — Explicit GPU Control
+- 9.2.1.1 Core Concepts: Physical Device → Logical Device → Queues (Graphics, Compute, Transfer, Sparse Binding); Command Buffers (Multi-Threaded Recording); Pipeline State Objects (PSO — Precompiled Pipeline, No Runtime State Changes); Descriptor Sets (Bindless via Descriptor Indexing); Timeline Semaphores (Monotonically Increasing Counters)
+  - ▸ *CG use:* Low-overhead API for high-performance rendering; explicit memory management (VMA); async compute overlap
+- 9.2.1.2 Synchronization: Pipeline Barriers (Transition Image Layout + Flush/Invalidate Caches); Subpass Dependencies (Implicit Sync Within Render Pass); Events (Fine-Grained GPU-GPU Sync Within Command Buffer); Fences (GPU→CPU Signal); Semaphores (Queue → Queue Signal)
+  - ▸ *CG use:* Correct synchronization is the hardest part of Vulkan; validation layers catch errors
+- 9.2.1.3 Vulkan Ray Tracing: Acceleration Structure (TLAS + BLAS build via compute); Shader Binding Table (SBT — Shader Records per Geometry); Ray Generation → Traversal → Hit/Miss Shaders; Ray Query (Inline in Any Shader)
+  - ▸ *CG use:* Cross-platform RT (Windows, Linux, Android); Steam Deck; game console emulators
+
+#### 9.2.2 D3D12, Metal & WebGPU
+- 9.2.2.1 D3D12: Similar to Vulkan (Explicit); Root Signatures (Descriptor Layout); State Objects (Graphics/Compute/RT Pipeline State); Resource Barriers with Automatic Subresource State Tracking (Enhanced Barriers in Agility SDK); DXR for Ray Tracing; Work Graphs (New in Agility SDK 2024); DirectSR (Super Resolution API Abstraction)
+  - ▸ *CG use:* Windows/Xbox rendering; PC AAA games; professional visualization
+- 9.2.2.2 Metal (Apple): Command Queue → Command Buffer → Command Encoder (Render/Compute/Blit/Parallel); Argument Buffers (GPU-Writable Descriptors); Indirect Command Buffers (GPU-Recorded Rendering Commands); Tile Shaders (Programmable Blend in Tile Memory); MetalFX (Temporal/Spatial Upscaling)
+  - ▸ *CG use:* macOS/iOS/visionOS rendering; Apple Silicon unified memory → zero-copy CPU-GPU data; Vision Pro passthrough
+- 9.2.2.3 WebGPU: Next-Gen Web Graphics API; Designed for Native Web Performance (Avoids WebGL's OpenGL ES Legacy); WGSL Shading Language; Compute + Render Pipeline; Bind Groups; Explicit Barriers; Cross-Platform via Dawn (Chromium) or wgpu (Firefox/Rust)
+  - ▸ *CG use:* Web 3D rendering; ML inference in browser (WebGPU compute); cross-platform 3D without native builds
 
 ---
+
+### 9.3 Shader Programming & Compilation
+
+#### 9.3.1 Shader Languages
+- 9.3.1.1 GLSL (OpenGL / Vulkan via SPIR-V): C-Like; Built-in Vector/Matrix Types (vec3, mat4); Limited Compile-Time Features; Compile to SPIR-V via glslang; Legacy but Still Widespread
+  - ▸ *CG use:* Shadertoy; prototyping; OpenGL compatibility; Vulkan via glslang→SPIR-V
+- 9.3.1.2 HLSL (D3D12 / Vulkan via DXC): C++-Like with Templates, Interfaces, Operator Overloading; SM 6.x Features: Wave Intrinsics, 16-Bit Types, Ray Tracing Intrinsics, Mesh Shaders; Compile to DXIL (D3D12) or SPIR-V (Vulkan via DXC); Dominant in AAA Games
+  - ▸ *CG use:* Unreal Engine, Unity (HLSL→SPIR-V), AAA game development; DirectX ecosystem
+- 9.3.1.3 Slang (NVIDIA): Superset of HLSL; Adds Generics, Interfaces with Associated Types, Automatic Differentiation (Slang.D); Compile to Multiple Targets (DXIL, SPIR-V, CUDA, C++, Metal); Production at NVIDIA
+  - ▸ *CG use:* Differentiable rendering (Slang.D); cross-platform shader development; NVIDIA Omniverse
+- 9.3.1.4 WGSL (WebGPU): Rust-Inspired Syntax; Designed for Security (No Raw Pointers, Bounds-Checked); Struct Types, Uniform/Storage Buffer Bindings; Compiler in Browser
+  - ▸ *CG use:* WebGPU shaders; browser-based 3D; web ML inference
+
+#### 9.3.2 Shader Compilation & Intermediate Representations
+- 9.3.2.1 SPIR-V (Vulkan/OpenCL Standard IR): Binary Intermediate Representation; SSA-Based (Static Single Assignment); Supports All Shader Stages + Compute + Ray Tracing; Extensible via Capabilities/Extensions; spirv-opt (Optimizer), spirv-cross (SPIR-V→GLSL/HLSL/MSL)
+  - ▸ *CG use:* Vulkan's shader format; enables cross-compilation ecosystem; validation and reflection
+- 9.3.2.2 DXIL (DirectX Intermediate Language): LLVM Bitcode-Based IR; Signed, Validated by D3D Runtime; DXC Compiles HLSL→DXIL; Driver Compiles DXIL→ISA (GPU-Specific); Enables Shader Debugging (PIX) and Optimization
+  - ▸ *CG use:* D3D12 shader pipeline; PIX shader debugging; game console shader compilation (Xbox uses DXIL variant)
+
+---
+
+### 9.4 Rendering Engine Architecture
+
+#### 9.4.1 Frame Graph & Render Graph
+- 9.4.1.1 Render Graph: Declarative Pass Specification (Input Resources → Pass → Output Resources); Automatic Resource Lifetime Management (Aliasing, Barrier Insertion, Memory Reuse); Execution Order Optimization; Async Compute Overlap Detection
+  - ▸ *CG use:* UE5 RDG (Render Dependency Graph); Frostbite Frame Graph; Unity SRP Render Graph; simplifies complex multi-pass rendering
+- 9.4.1.2 GPU-Driven Rendering Pipeline: CPU: Minimal Per-Frame Work (Resource Streaming, UI, Game Logic); GPU: Culling → Classification (Material Binning) → Indirect Draw Generation → Execute Indirect → Post-Processing; Persistent Shader Thread + GPU Work Submission
+  - ▸ *CG use:* UE5 Nanite (GPU-driven geometry); GPU Work Graphs; reducing CPU draw call overhead to near-zero
+
+#### 9.4.2 Multi-Threaded Rendering
+- 9.4.2.1 Threading Model: Game Thread (Logic, Physics, AI) → Render Thread (Command Recording, Resource Upload, Draw Call Preparation) → GPU (Async Execution, Frames in Flight via Fences); Pipelined Parallelism (3 Frames Overlapping)
+  - ▸ *CG use:* AAA game engine standard; maximize CPU/GPU utilization; typically 2-3 frames of latency
+- 9.4.2.2 Parallel Command Recording: Vulkan Secondary Command Buffers (Record per-Thread → Execute in Primary); D3D12 Bundles (Similar Concept); Multi-Threaded Command List Generation; Deferred Contexts for Resource Creation
+  - ▸ *CG use:* Reduce single-thread recording bottleneck; scalable to many CPU cores
+
+---
+
+### 9.5 Performance Optimization & Profiling
+
+#### 9.5.1 Profiling Tools
+- 9.5.1.1 GPU Profilers: NVIDIA Nsight Graphics (Frame Debugger, Shader Profiler, GPU Trace, Range Profiling); AMD Radeon GPU Profiler (RGP — Hardware Thread Trace, Event Timing); PIX for Windows (D3D12, Timing Captures, GPU Memory, Shader Debugging); RenderDoc (Cross-Platform, Open Source, Frame Capture + Replay)
+  - ▸ *CG use:* Frame analysis; bottleneck identification (ALU vs. Bandwidth vs. Fill vs. Latency); shader optimization
+- 9.5.1.2 Performance Counters: ALU Utilization (Occupancy), Texture L1/L2 Hit Rates, Memory Bandwidth Utilization, ROP Throughput, Primitive Culling Rate; Occupancy Limiter: Registers Per Thread × Threads Per Block vs. Register File Size
+  - ▸ *CG use:* Diagnose why a shader is slow: register spilling? texture cache misses? warp divergence? each has different solutions
+
+#### 9.5.2 Key Optimization Techniques
+- 9.5.2.1 Draw Call Optimization: Instancing (Draw Many Copies of Same Mesh), Indirect Draw (GPU-Generated Draw Counts), GPU-Driven Draw Generation; Bundle Similar Materials, Merge Static Meshes, Texture Atlas
+  - ▸ *CG use:* Draw calls are the most expensive CPU operation; target < 1000 per frame for 60 FPS on modern hardware
+- 9.5.2.2 Bandwidth Optimization: Texture Compression (BCn/ASTC — Saves 4-8× vs. RGBA8), Delta Color Compression (Lossless — GPU Hardware Compression of Render Target Data), Tile-Based Rendering (Mobile — Only Write Tile to DRAM Once); Z-Prepass (Write Depth First → Fragment Shader Only for Visible Pixels)
+  - ▸ *CG use:* Memory bandwidth is often the limiting factor, not ALU; reduce texture resolution, use compressed formats, minimize render targets
+
+---
+
+### 9.6 Data Formats & Interchange Standards
+
+#### 9.6.1 3D Formats
+- 9.6.1.1 glTF 2.0 (Khronos): "JPEG of 3D"; JSON Scene + Binary Buffer + Textures; PBR Material (Metalness-Roughness + Extensions); Draco Compression Extension; Animation, Skinning, Morph Targets; KTX 2.0 Texture; USDZ Variant (Apple AR)
+  - ▸ *CG use:* Web 3D standard; game engine interchange; Sketchfab, Facebook 3D Posts, Google AR
+- 9.6.1.2 USD (Universal Scene Description — Pixar): Stage (Scene Composition), Layers (SubLayer, Reference, Payload, VariantSet), Prims (Hierarchical Elements), Attributes (Typed Values + Time Samples), Composition Arcs (Non-Destructive Overrides); Hydra (Render Delegate Framework)
+  - ▸ *CG use:* Film/VFX standard; NVIDIA Omniverse; UE5/USD interoperability; Apple USDZ for AR; USD is becoming the universal 3D interchange
+- 9.6.1.3 MaterialX (ASWF): XML-Based Material Graph Definition; Platform-Agnostic Node Graph → Generated Shader Code for OSL/GLSL/MDL/HLSL; Standard PBR Node Library; Tightly Integrated with USD (UsdShade)
+  - ▸ *CG use:* Cross-renderer material exchange; consistent look across modeling, animation, lighting, rendering
+
+#### 9.6.2 Image, Texture & Shader Formats
+- 9.6.2.1 HDR Formats: OpenEXR (Half Float, Multi-Layer, Deep, Tiled, Mipmapped — VFX Industry Standard); Radiance HDR (.hdr — Simple, Legacy); JPEG-XL HDR, AVIF HDR (Web-Deliverable HDR)
+  - ▸ *CG use:* Production rendering output; environment maps; texture storage for PBR; deep compositing
+- 9.6.2.2 KTX 2.0 (Khronos Texture Container): Basis Universal (ETC1S/UASTC Super-Compression), Transcoding to GPU Format at Load Time; Universal Textures (Cross-Platform); Zstd Compression for Metadata; glTF Standard Texture Format
+  - ▸ *CG use:* glTF ecosystem; web streaming; reduces GPU texture format fragmentation
+
+> 📚 **GitHub Repos:**
+> - [SaschaWillems/Vulkan](https://github.com/SaschaWillems/Vulkan) ![Stars](https://img.shields.io/github/stars/SaschaWillems/Vulkan?style=flat) — Comprehensive Vulkan example suite
+> - [GPUOpen-LibrariesAndSDKs](https://github.com/GPUOpen-LibrariesAndSDKs) — AMD open-source graphics tools
+> - [PixarAnimationStudios/USD](https://github.com/PixarAnimationStudios/USD) ![Stars](https://img.shields.io/github/stars/PixarAnimationStudios/USD?style=flat) — USD ecosystem
+> - [AcademySoftwareFoundation/MaterialX](https://github.com/AcademySoftwareFoundation/MaterialX) ![Stars](https://img.shields.io/github/stars/AcademySoftwareFoundation/MaterialX?style=flat) — Material standard
+> - [RenderDoc/renderdoc](https://github.com/RenderDoc/renderdoc) ![Stars](https://img.shields.io/github/stars/RenderDoc/renderdoc?style=flat) — Cross-platform graphics debugger
+>
+> 📖 **Textbooks:**
+> - *Vulkan Programming Guide* — Sellers & Kessenich; *Real-Time Rendering* — Akenine-Möller et al. (Ch. 3: GPU, Ch. 4: Transforms)
+> - *GPU Zen* — Engel (Advanced GPU optimization); *Game Engine Architecture* — Jason Gregory
+
+---
+
 
 ## Chapter 10 · Display, Interaction & Professional Practice
 
+*How graphics reaches the human — display technologies, VR/AR/MR, 3D interaction, and real-world application domains. `▸ CG use:` links each topic to industry practice.*
 
-### 8.1 Display Technologies
-- 8.1.1 LCD, OLED, Mini-LED, Micro-LED, QLED
-- 8.1.2 Refresh Rate, Response Time, Input Lag
-- 8.1.3 V-Sync, Adaptive Sync (G-Sync / FreeSync), VRR
-- 8.1.4 Multi-Monitor Stitching & CAVE Environments
-- 8.1.5 Color Calibration & Color Management (ICC Profiles / Display Calibration Workflow)
-
-### 8.2 Virtual Reality (VR)
-- 8.2.1 VR Rendering Pipeline (Stereoscopic Rendering: Binocular Disparity, IPD)
-- 8.2.2 Lens Distortion Correction (Inverse Barrel Distortion)
-- 8.2.3 Chromatic Aberration Correction
-- 8.2.4 Asynchronous Time Warp (ATW)
-- 8.2.5 Asynchronous Space Warp (ASW)
-- 8.2.6 Foveated Rendering (Fixed / Dynamic, Eye Tracking)
-- 8.2.7 Latency Sensitivity & Motion-to-Photon Latency Optimization
-- 8.2.8 Single-Pass Stereo / Instanced Stereo
-- 8.2.9 VR Input & Tracking (6DOF Controllers, Hand Tracking)
-
-### 8.3 Augmented Reality (AR) & Mixed Reality (MR)
-- 8.3.1 See-Through AR (Optical / Video See-Through) Rendering
-- 8.3.2 Lighting Consistency (Environmental Light Estimation, Environment Probes / IBL)
-- 8.3.3 Occlusion Consistency (Real-Time Occlusion Estimation & Segmentation)
-- 8.3.4 Plane Detection & Anchoring (ARCore / ARKit / HoloLens Spatial Mapping)
-- 8.3.5 Real-Time Semantic Segmentation & Depth Estimation
-
-### 8.4 3D Displays
-- 8.4.1 Stereoscopic Displays (Active Shutter / Passive Polarized 3D)
-- 8.4.2 Autostereoscopic Displays (Glasses-Free 3D / Lenticular Lens, Parallax Barrier)
-- 8.4.3 Light Field Displays
-- 8.4.4 Volumetric Displays
-- 8.4.5 Holographic Display Concepts
-
-### 8.5 User Interaction & 3D UI
-- 8.5.1 3D Picking: Ray Casting, Pixel-ID-Based Color Encoding
-- 8.5.2 3D Manipulators (Gizmo / Manipulator): Translation, Rotation, Scaling
-- 8.5.3 3D Camera Controls (Orbit, FPS, Trackball, Arcball)
-- 8.5.4 Gesture & Motion Interaction (Leap Motion, Kinect, Vision-Based Hand Tracking)
-- 8.5.5 Haptic Feedback (Haptic Rendering)
-- 8.5.6 Gaze-Based Interaction
+> 💡 **Top-Level References:**
+> - [KhronosGroup/OpenXR-SDK-Source](https://github.com/KhronosGroup/OpenXR-SDK-Source) ![Stars](https://img.shields.io/github/stars/KhronosGroup/OpenXR-SDK-Source?style=flat) — OpenXR standard for VR/AR
+> - [ValveSoftware/openvr](https://github.com/ValveSoftware/openvr) ![Stars](https://img.shields.io/github/stars/ValveSoftware/openvr?style=flat) — SteamVR API
+> - [EpicGames/UnrealEngine](https://github.com/EpicGames/UnrealEngine) — Access to UE source (registered developers)
 
 ---
 
+### 10.1 Display Technologies
 
+#### 10.1.1 Display Hardware
+- 10.1.1.1 LCD: Liquid Crystal Modulates Backlight Polarization; IPS (Wide View Angle, Lower Contrast), VA (High Contrast, Narrower Angle), TN (Fast Response, Poor Color/View Angle); LED Backlight (Edge-Lit or Full-Array Local Dimming — FALD for HDR)
+  - ▸ *CG use:* Consumer monitors and TVs; color accuracy critical for content creation (IPS preferred)
+- 10.1.1.2 OLED: Self-Emissive Pixels (No Backlight → True Blacks, Infinite Contrast); WRGB (LG) or Pentile (Samsung AMOLED); Burn-In Risk (Static UI Elements); Faster Response than LCD (< 0.1ms vs. 1-5ms)
+  - ▸ *CG use:* HDR mastering monitors; VR headsets (low persistence, high contrast); premium smartphones; gaming displays
+- 10.1.1.3 Micro-LED (Emerging): Inorganic LED per Pixel; OLED-Like Contrast + No Burn-In + Higher Brightness (10,000+ nits); Currently Very Expensive (Large Displays Only); Future of HDR
+  - ▸ *CG use:* Future cinema displays; VR (micro-displays with high brightness for optical efficiency); digital signage
+- 10.1.1.4 HDR Standards: HDR10 (Static Metadata, 1000 nits Max, 10-bit, Rec.2020), Dolby Vision (Dynamic Metadata Per Scene/Frame, 12-bit, up to 10,000 nits), HLG (Hybrid Log-Gamma — Backwards Compatible with SDR, Broadcast Standard), HDR10+ (Samsung — Dynamic Metadata, Royalty-Free)
+  - ▸ *CG use:* Game/film HDR delivery; content creation workflow: author in scRGB or ACES → grade in HDR via PQ → deliver with metadata
 
-### 11.1 Games & Real-Time Interaction
-- 11.1.1 AAA Game Rendering (High-End Graphics Pipeline)
-- 11.1.2 Indie Game Rendering Styles (Pixel Art, 2D Lighting, Low-Poly Aesthetic)
-- 11.1.3 UI Rendering (Vector Fonts, SDF Text, Resolution-Adaptive Layouts)
-- 11.1.4 Mobile Graphics Optimization (Low-Power, Bandwidth-Friendly Strategies)
-
-### 11.2 Film & Animation
-- 11.2.1 Offline Renderers (RenderMan, Arnold, V-Ray, Cycles, Redshift, Octane, MoonRay)
-- 11.2.2 Visual Effects (VFX) Pipeline: Compositing, Keying, Tracking, Particle Effects
-- 11.2.3 Virtual Production: LED Wall + Real-Time Engine Rendering (StageCraft)
-- 11.2.4 Performance Capture: Body + Face Synchronized Capture
-- 11.2.5 Digital Humans (MetaHuman)
-
-### 11.3 Scientific Visualization
-- 11.3.1 Volume Rendering (Direct / Indirect Volume Rendering, Transfer Function Design)
-- 11.3.2 Flow Visualization (Streamlines, Streaklines, Line Integral Convolution LIC)
-- 11.3.3 Tensor Field Visualization (Hyperstreamlines, Diffusion Tensor Imaging DTI Visualization)
-- 11.3.4 Information Visualization (Graphs, Hierarchies, Parallel Coordinates)
-- 11.3.5 Geographic Information Visualization (GIS, Terrain Rendering, Large-Scale Point Clouds)
-- 11.3.6 Medical Visualization (CT/MRI Reconstruction, Surgical Simulation, Anatomy Education)
-
-### 11.4 Industrial & Engineering Design
-- 11.4.1 CAD (Computer-Aided Design): Solid Modeling, Surface Modeling, Parametric Design
-- 11.4.2 CAE (Computer-Aided Engineering): FEM Pre-/Post-Processing Visualization
-- 11.4.3 CAM (Computer-Aided Manufacturing): Toolpath Visualization
-- 11.4.4 BIM (Building Information Modeling)
-- 11.4.5 3D Printing Slicing & Support Structure Generation
-- 11.4.6 Digital Twin Visualization
-
-### 11.5 Autonomous Driving & Robotics Simulation
-- 11.5.1 Sensor Simulation (RGB Cameras, LiDAR, Radar, Depth Cameras)
-- 11.5.2 Synthetic Data Generation (Domain Randomization, Autoencoder-Based Realism)
-- 11.5.3 Environment Simulation (Weather, Lighting Variation, Dynamic Obstacles)
-- 11.5.4 Simulation Platforms (CARLA, AirSim, NVIDIA DRIVE Sim / Omniverse, Isaac Sim)
-
-### 11.6 Virtual Humans / Digital Humans
-- 11.6.1 High-Fidelity Facial Reconstruction & Animation (Light Stage, Multi-View 3DMM Fitting)
-- 11.6.2 Skin Rendering (Subsurface Scattering, Pore-Level Detail, Micro-Geometry)
-- 11.6.3 Eye Rendering (Corneal Reflection, Pupil Refraction, Iris Detail)
-- 11.6.4 Hair Rendering (Curve-Based Hair, Marschner Scattering Model)
-- 11.6.5 Clothing Simulation & Rendering
-- 11.6.6 Real-Time Digital Humans (MetaHuman, NVIDIA ACE / Audio2Face)
+#### 10.1.2 Display Interfaces & Sync
+- 10.1.2.1 V-Sync / Adaptive Sync: V-Sync: Wait for Vertical Blank → Tear-Free but Input Lag + Stutter if Missed Frame; Adaptive Sync (G-Sync / FreeSync / VRR): Display Refresh Matches GPU Frame Rate Dynamically → Smooth, No Tear, Low Lag; HDMI 2.1 VRR, DisplayPort Adaptive-Sync
+  - ▸ *CG use:* Gaming (VRR is essential); media playback (match to 24/30/60 Hz); reducing perceived stutter
+- 10.1.2.2 Color Calibration: ICC Profile (Display Characterization); Colorimeter/Photospectrometer Hardware Calibration; Calibrate to Target White Point (D65), Gamma (2.2 SDR, PQ HDR), Gamut (sRGB/DCI-P3/Rec.2020); 3D LUT for Hardware Calibration
+  - ▸ *CG use:* Color-critical work (VFX, print, medical imaging); consistent appearance across displays
+- 10.1.2.3 Multi-Display & CAVE Systems: Bezel Correction, Color Matching Across Displays; CAVE (Cave Automatic Virtual Environment — Projection on Walls/Floor); Large-Scale Tiled Displays
+  - ▸ *CG use:* Simulation training; architectural walkthrough; scientific visualization; immersive art installations
 
 ---
 
+### 10.2 Virtual Reality (VR)
 
+#### 10.2.1 VR Rendering
+- 10.2.1.1 Stereoscopic Rendering: Render Left + Right Eye Views with IPD Offset (Interpupillary Distance ~63mm); Vergence-Accommodation Conflict (Eyes Focus at Fixed Screen Distance, Converge at Varying Depths → Eye Strain); Varifocal Displays (Future: Dynamically Adjust Focus)
+  - ▸ *CG use:* Every VR application renders stereo; single-pass stereo (render both eyes in one draw call via instancing or multiview)
+- 10.2.1.2 Lens Distortion Correction: VR Lenses Magnify and Distort Display; Pre-Distort Rendered Image (Barrel Distortion) → Cancel Lens Distortion (Pincushion); Chromatic Aberration Correction (Separate R,G,B Distortion); Hardware- Accelerated via Compositor
+  - ▸ *CG use:* OpenVR/OpenXR compositor handles distortion automatically; developer renders undistorted
+- 10.2.1.3 Asynchronous Time Warp (ATW) / Space Warp (ASW): ATW: Reproject Last Frame Using Latest Head Pose → Reduces Motion-to-Photon Latency; ASW: Generate Intermediate Frame via Motion Estimation (Optical Flow) → Maintain FPS When App Drops Frames
+  - ▸ *CG use:* Critical for VR comfort; reduces motion sickness; Oculus/Meta pioneered ASW 2.0 with depth-based reprojection
+- 10.2.1.4 Foveated Rendering: Full Resolution Only at Gaze Point (Fovea Centralis ~2° Visual Angle → ~5% of Pixels!); Reduced Resolution in Periphery; Eye Tracking Required (~120Hz Gaze Update); VRS Tier 2 Per-Pixel Shading Rate (Quadrant or 2×2)
+  - ▸ *CG use:* PSVR2 (Tobii eye tracking + foveated rendering); Quest Pro; dramatically reduces shading cost in VR
 
-### 12.1 Neural Rendering & Generation
-- 12.1.1 Neural Scene Representations (NeRF, 3DGS, NGP, Triplane)
-- 12.1.2 GANs in Computer Graphics
-- 12.1.3 Diffusion Models for 3D Generation & Texture Synthesis
-- 12.1.4 Autoregressive 3D Generation
-- 12.1.5 Multimodal 3D Generation (Text / Image / Video → 3D)
-
-### 12.2 Differentiable Graphics
-- 12.2.1 Differentiable Rendering in Inverse Problems
-- 12.2.2 Differentiable Physics Simulation
-- 12.2.3 End-to-End Differentiable Pipelines
-- 12.2.4 Gradient-Driven Content Creation Tools
-
-### 12.3 Cloud Rendering & Streaming
-- 12.3.1 Cloud Gaming Architecture (GeForce Now, Xbox Cloud Gaming, Luna)
-- 12.3.2 Pixel Streaming: Encoding, Latency Optimization, Bandwidth Adaptation
-- 12.3.3 Virtual Workstations (NVIDIA vGPU, AWS Thinkbox Deadline Distributed Rendering)
-- 12.3.4 WebRTC & Low-Latency Video Streaming
-- 12.3.5 The Role of Edge Computing in Graphics
-
-### 12.4 Quantum Graphics
-- 12.4.1 Quantum Computing Potential in Ray Tracing
-- 12.4.2 Quantum Monte Carlo Sampling
-
-### 12.5 Bio-Inspired Graphics
-- 12.5.1 Bio-Inspired Vision (Rendering Based on Human Eye Models)
-- 12.5.2 Neuroscience-Based Graphics Evaluation Metrics
-- 12.5.3 Brain-Inspired Computational Photography
-
-### 12.6 Graphics & AI Convergence
-- 12.6.1 AI-Assisted Content Creation (AI-Assisted Art / Copilot for 3D)
-- 12.6.2 AI-Driven Real-Time Rendering Optimization (Adaptive Sampling, Predictive LOD)
-- 12.6.3 Neural Super-Sampling & Intelligent Image Enhancement
-- 12.6.4 Synthetic Training Data Generation from Graphics
-- 12.6.5 World Models & Generative World Simulation (Sora / Genie Direction)
-
-### 12.7 Metaverse & Spatial Computing
-- 12.7.1 Cross-Platform Spatial Anchors & Persistent Worlds
-- 12.7.2 Real-Time Global 3D Reconstruction & Sharing
-- 12.7.3 Spatial Audio Rendering (Spatial Audio / HRTF / Ambisonics)
-- 12.7.4 3D Asset Interoperability Standards (OpenUSD / glTF Ecosystem)
-- 12.7.5 Light Field / Holographic Communication (3D Video Calls / Telepresence)
+#### 10.2.2 VR Interaction & Tracking
+- 10.2.2.1 6DOF Tracking: Inside-Out (Cameras on Headset → SLAM + Hand Tracking — Quest, Vision Pro), Outside-In (External Base Stations → Lighthouse — Valve Index, HTC Vive); IMU + Visual Fusion for Low Latency (~1ms IMU, ~10ms Visual Correction)
+  - ▸ *CG use:* Room-scale VR; accurate hand presence; controller-free interaction
+- 10.2.2.2 Hand & Body Tracking: Camera-Based Skeletal Tracking (MediaPipe, Quest Hand Tracking, Ultraleap); EMG Wristbands (Meta Orion — Neural Interface Research); Full-Body via External Cameras or IMU Suits (Xsens, Rokoko)
+  - ▸ *CG use:* Natural interaction in VR; social VR avatars; motion capture democratization
 
 ---
 
-## Appendix A · Major Conferences & Journals
-- A.1 ACM SIGGRAPH / SIGGRAPH Asia
-- A.2 Eurographics (EG)
-- A.3 Symposium on Interactive 3D Graphics and Games (I3D)
-- A.4 High Performance Graphics (HPG)
-- A.5 Eurographics Symposium on Rendering (EGSR)
-- A.6 ACM SIGGRAPH Symposium on Computer Animation (SCA)
-- A.7 Symposium on Geometry Processing (SGP)
-- A.8 IEEE Visualization (VIS)
-- A.9 ACM Transactions on Graphics (TOG)
-- A.10 Computer Graphics Forum (CGF)
-- A.11 IEEE Transactions on Visualization and Computer Graphics (TVCG)
-- A.12 Journal of Computer Graphics Techniques (JCGT)
+### 10.3 Augmented & Mixed Reality (AR/MR)
 
-## Appendix B · Landmark Papers & Works
-- B.1 Phong (1975) — Empirical Illumination Model
-- B.2 Blinn (1977) — Blinn-Phong Reflection & Bump Mapping
-- B.3 Whitted (1980) — Recursive Ray Tracing
-- B.4 Cook & Torrance (1981) — Microfacet BRDF
-- B.5 Kajiya (1986) — The Rendering Equation
-- B.6 Loren Carpenter (1980s) — Reyes Rendering Architecture (RenderMan)
-- B.7 Debevec & Malik (1997) — HDR Image Capture & Image-Based Modeling
-- B.8 Veach & Guibas (1997) — Metropolis Light Transport
-- B.9 Kajiya & Kay (1989) — Hair Rendering
-- B.10 Perlin (1985) — Noise Functions
-- B.11 Catmull & Clark (1978) — Subdivision Surfaces
-- B.12 Garland & Heckbert (1997) — QEM Mesh Simplification
-- B.13 Möller & Trumbore (1997) — Fast Ray-Triangle Intersection
-- B.14 Loop (1987) — Triangle Subdivision Surfaces
-- B.15 Kajiya & Von Herzen (1984) — Ray Marching in Volume Rendering
-- B.16 Veach (1997 PhD) — Path Integral Framework & MIS
-- B.17 Jensen (1996) — Photon Mapping
-- B.18 Müller et al. — MPM in Graphics
-- B.19 Mildenhall et al. (2020) — NeRF
-- B.20 Kerbl et al. (2023) — 3D Gaussian Splatting
+#### 10.3.1 AR Rendering
+- 10.3.1.1 Video See-Through (VST): Camera Feed + Virtual Objects Rendered on Top (Quest 3/Pro, Apple Vision Pro, Smartphone AR); Low Latency Critical (< 20ms Photon-to-Photon); Real-World Occlusion via Depth Sensor (LiDAR/ToF)
+  - ▸ *CG use:* Apple Vision Pro passthrough; ARKit/ARCore smartphone AR; Meta Quest mixed reality
+- 10.3.1.2 Optical See-Through (OST): Transparent Display (HoloLens, Magic Leap); Virtual Objects Added to Real-World Light; Real World Always Visible (No Latency); Dark Virtual Objects Appear Transparent (Additive Light Only); Limited Field of View (~50° vs. 120°+ VST)
+  - ▸ *CG use:* Enterprise AR (manufacturing, field service, medical); lightweight glasses form factor
+- 10.3.1.3 Lighting Estimation: Environment Probe Capture (Cubemap or SH from Camera); Light Direction + Intensity Estimation; Real-Time Shadow from Estimated Light; Reflection of Real World on Virtual Objects; IBL with Real Environment
+  - ▸ *CG use:* AR object placement realism; ARKit/ARCore light estimation; Google ARCore Environmental HDR
 
-## Appendix C · Important International Standards
-- C.1 Khronos: OpenGL, Vulkan, OpenCL, SPIR, glTF, WebGL, WebGPU, OpenXR
-- C.2 ISO/IEC JTC 1/SC 24: CGM, VRML/X3D, SEDRIS
-- C.3 MPEG: 3D Mesh Coding, Video-based Point Cloud Compression (V-PCC)
-- C.4 SMPTE: Color-Related Standards (ST 2084/PQ, ST 2086, ST 2094 Dynamic Metadata)
-- C.5 ITU-R: Color Space Standards (BT.709, BT.2020, BT.2100)
-- C.6 IEEE: Floating-Point Standard (754), Display Standards
-- C.7 CIE: Colorimetry Standards (CIE 1931, CIE 1976, CIECAM02/16)
-- C.8 OpenUSD Alliance: USD Ecosystem Standards
+#### 10.3.2 Spatial Mapping & Anchoring
+- 10.3.2.1 Plane Detection: ARKit/ARCore: Horizontal + Vertical Plane Detection from Sparse Point Cloud; Anchor Virtual Content to Detected Planes; Mesh Generation (LiDAR Scanner on iPad Pro/iPhone Pro → Real-Time 3D Mesh of Environment); Scene Understanding (Semantic Labeling — Floor, Wall, Table, Door)
+  - ▸ *CG use:* AR furniture placement (IKEA Place); AR measuring tools; game level generation from real room
+- 10.3.2.2 Persistent Anchors / Spatial Anchors: Save Anchor to Cloud, Share Across Devices; Azure Spatial Anchors, ARCloud; Cross-Platform (iOS + Android); GPS + Visual Feature Fusion for Outdoor Large-Scale AR
+  - ▸ *CG use:* Multi-player AR games; persistent AR content (leave notes in real locations); Niantic Lightship (Pokémon GO infrastructure)
 
 ---
 
-*This document aims to provide a comprehensive overview of the computer graphics knowledge landscape, spanning from foundational mathematics to cutting-edge research. Each entry represents an independent topic or technical direction, serving as a reference index for curriculum design, self-study roadmaps, or technical research.*
+### 10.4 3D Interaction & User Interfaces
+
+#### 10.4.1 3D Picking & Manipulation
+- 10.4.1.1 Ray-Based Picking: Cast Ray from Cursor/Controller into Scene; Intersect with Geometry (BVH Acceleration); Select Closest Hit; Highlight (Outline, Glow, Color Change); VR Controller Ray (Curved Ray via Bezier for Distant Objects)
+  - ▸ *CG use:* Every 3D editor and VR application; selection precision for dense geometry
+- 10.4.1.2 Gizmo Manipulation: Translation, Rotation, Scale Handles with Constraint Axes; Arcball Rotation (Quaternion Map from Mouse Drag); Screen-Space Manipulation; VR Direct Manipulation (Grab Object with Virtual Hand Controller)
+  - ▸ *CG use:* DCC tool interaction (Blender, Maya, UE Editor); CAD modeling; VR creative tools
+
+#### 10.4.2 Camera Control & Navigation
+- 10.4.2.1 Camera Controllers: Orbit (Arcball/Turntable — Rotate Around Target Point, Pinch to Zoom), FPS (WASD + Mouse Look), Trackball (Shoemake 1992 — Quaternion-Based Rotation), Fly-Through (Cinematic, Path-Following)
+  - ▸ *CG use:* Every 3D application implements camera control; teleport in VR for comfort
+- 10.4.2.2 Gaze-Based Interaction: Dwell Time (Look at Object for N Seconds → Select); Eye Tracking + Confirmation Gesture (Pinch); Gaze + Pinch (Apple Vision Pro Primary Interaction — "Look and Pinch"); Voice + Gaze Hybrid
+  - ▸ *CG use:* Hands-free AR interaction; accessibility; Apple Vision Pro UX paradigm
 
 ---
+
+### 10.5 Application Domains — Games, Film & VFX
+
+#### 10.5.1 Real-Time Games
+- 10.5.1.1 AAA Rendering Pipeline: Forward+ or Clustered Deferred, PBR Materials, ReSTIR DI/GI, Ray-Traced Reflections/Shadows/AO, DLSS/FSR Upscaling, Denoising (NRD/DLSS-RR), V-Sync/Variable Rate Shading; PS5/Xbox Series: ~10 TFLOPS GPU, Hardware RT, SSD Streaming
+  - ▸ *CG use:* Cyberpunk 2077 RT Overdrive; Alan Wake 2; UE5 Lumen + Nanite titles
+- 10.5.1.2 Indie & Stylized Rendering: NPR Methods (Cel Shading, Outline Rendering, Halftone); Low-Poly Aesthetic; Pixel Art Rendering (3D→2D Pixelation); Hand-Painted Texture Workflow
+  - ▸ *CG use:* Genshin Impact (anime cel shading); Return of the Obra Dinn (1-bit dithering); Minecraft (voxel aesthetic)
+- 10.5.1.3 Mobile Rendering: TBDR Architecture (Tile-Based Deferred Rendering); ASTC Texture Compression; Vulkan/Metal; Multi-View Rendering (VR/AR); Energy-Aware Frame Pacing (Avoid Thermal Throttling)
+  - ▸ *CG use:* Genshin Impact, PUBG Mobile, Fortnite Mobile; mobile VR (Quest standalone); smartphone AR
+
+#### 10.5.2 Film, VFX & Animation
+- 10.5.2.1 Production Renderers: Path Tracing with Global Illumination (Arnold — Autodesk, RenderMan — Pixar, V-Ray — Chaos, Cycles — Blender, Redshift — Maxon, Karma — SideFX, MoonRay — DreamWorks); Spectral Rendering (Accurate Dispersion, Thin-Film); Deep Image Output (Per-Pixel Depth Samples for Compositing)
+  - ▸ *CG use:* Every VFX and animated film uses these; render times: hours to days per frame (render farms); denoising critical
+- 10.5.2.2 Virtual Production: LED Wall (StageCraft — ILM): Real-Time UE Rendering on Massive LED Display Behind Actors → In-Camera Final Pixel; Camera Tracking + Real-Time Perspective Correction; Volumetric Capture (Multiple Cameras → 3D Performance)
+  - ▸ *CG use:* The Mandalorian, The Batman, Thor: Love and Thunder; reduces post-production time significantly
+- 10.5.2.3 Digital Humans: MetaHuman (UE — Cloud-Based Character Creator); Light Stage Capture (USC ICT — Pore-Level Facial Detail); Facial Rig (FACS Blend Shapes + Wrinkle Maps); Subsurface Scattering, Hair (Curve-Based), Eye Model; Real-Time Performance (UE5 MetaHuman Animator — iPhone Video → Facial Animation)
+  - ▸ *CG use:* Game characters; film digital doubles; virtual influencers; video game cutscenes
+
+---
+
+### 10.6 Application Domains — Science, Industry & Autonomy
+
+#### 10.6.1 Scientific & Medical Visualization
+- 10.6.1.1 Volume Rendering: Transfer Function (Scalar Value → Color + Opacity); Direct Volume Rendering (Ray Marching Through 3D Texture), Maximum Intensity Projection (MIP — Radiography), Isosurface Rendering (Marching Cubes)
+  - ▸ *CG use:* CT/MRI visualization; confocal microscopy; seismic data; fluid dynamics post-processing
+- 10.6.1.2 Flow Visualization: Streamlines (Tangent to Velocity Field), Pathlines, Streaklines, Timelines; Line Integral Convolution (LIC — Cabral & Leedom 1993 — Texture-Based Dense Flow Visualization); Tensor Field Visualization (DTI — Diffusion Tensor Imaging for Brain White Matter)
+  - ▸ *CG use:* Aerodynamic simulation; ocean currents; blood flow; weather visualization
+
+#### 10.6.2 CAD, CAM & Digital Twins
+- 10.6.2.1 CAD/CAE/CAM Visualization: B-Rep Rendering + CSG + Parametric Modeling; FEM Post-Processing (Stress, Strain, Deformation Colormaps); VR/AR for Design Review; GPU-Accelerated Ray Tracing for Realistic Product Rendering (NVIDIA Iray, KeyShot)
+  - ▸ *CG use:* Automotive design; aerospace engineering; consumer product design; architectural BIM visualization
+- 10.6.2.2 Digital Twin: Real-Time 3D Replica of Physical System; IoT Sensor Data → Real-Time Status Visualization; Predictive Maintenance Overlay; Simulation Integration (What-If Analysis on Live Data)
+  - ▸ *CG use:* Factory monitoring (NVIDIA Omniverse); smart city management; wind farm optimization; Formula 1 race strategy
+
+#### 10.6.3 Autonomous Driving & Robotics Simulation
+- 10.6.3.1 Sensor Simulation: RGB Cameras (Physically-Based, HDR), LiDAR (Ray Casting with Realistic Noise Model, Material-Dependent Reflectance), Radar (Doppler + Range + Cross-Section), Ultrasonic; Synchronized Multi-Sensor Data Streams
+  - ▸ *CG use:* Training perception models (domain randomization → sim-to-real transfer); safety validation (edge case generation)
+- 10.6.3.2 Synthetic Data Engines: NVIDIA DRIVE Sim / Omniverse Replicator, CARLA, AirSim, Isaac Sim; Domain Randomization (Texture, Lighting, Weather, Occlusion Variation); Auto-Labeled Ground Truth (Depth, Semantics, Instance ID, 3D Bounding Box — Free!); Photorealistic Rendering with RTX
+  - ▸ *CG use:* Training data generation replaces expensive manual labeling; generating rare/dangerous scenarios for safety testing
+
+---
+
+### 10.7 Cloud Rendering, Streaming & Future Directions
+
+#### 10.7.1 Cloud & Edge Rendering
+- 10.7.1.1 Cloud Gaming: Game Runs on Cloud GPU, Streams Video to Client (GeForce Now, Xbox Cloud Gaming, Amazon Luna); Encoder: H.264/H.265/AV1 Low-Latency Mode; Client: Video Decode + Input Upload; < 30ms Total Latency (Network + Encode + Decode) Target
+  - ▸ *CG use:* AAA gaming on low-end devices; instant play without downloads; cross-platform continuity
+- 10.7.1.2 Pixel Streaming (UE5): Server-Side Rendering → WebRTC Video Stream to Browser; Client Sends Mouse/Keyboard Input; No Plugins, No Install; Scalable via GPU Instances
+  - ▸ *CG use:* Remote design review; interactive configurators; virtual events; cloud-based DCC tools
+
+#### 10.7.2 Metaverse, Spatial Computing & AIGC
+- 10.7.2.1 Spatial Computing (Apple Vision Pro Paradigm): Apps Exist in 3D Space Around User; Shared Spatial Anchors for Multi-User; Passthrough as Primary Mode (Not VR Immersion); Gaze + Pinch Interaction; Environments (Immersive Backgrounds with varying Immersion Levels)
+  - ▸ *CG use:* Next-gen computing platform; productivity, entertainment, communication all spatial; Unity/PolySpatial + RealityKit development
+- 10.7.2.2 AI-Generated Content (AIGC) for 3D: Text/Image → 3D Models (DreamFusion, LRM, MVDream); Text → PBR Materials (MatFuse, ControlMat); Text → Animation (MDM — Motion Diffusion Model); AI-Assisted Level Design (Procedural + AI Variation)
+  - ▸ *CG use:* Democratizing 3D content creation; rapid prototyping; user-generated content; game asset pipelines of the future
+- 10.7.2.3 Real-Time Neural Rendering: DLSS/FSR/XeSS (Super-Resolution + Frame Generation); Neural Radiance Cache (NRC — Real-Time GI); Neural Materials (MLP Evaluated in Shader); Neural Compression (Learned Texture/Geometry Compression); World Models (Generative Simulation — Sora/Genie Direction)
+  - ▸ *CG use:* The convergence of neural networks and real-time rendering; film-quality graphics at game frame rates; AI-native game engines
+
+> 📚 **GitHub Repos:**
+> - [KhronosGroup/OpenXR-SDK-Source](https://github.com/KhronosGroup/OpenXR-SDK-Source) ![Stars](https://img.shields.io/github/stars/KhronosGroup/OpenXR-SDK-Source?style=flat) — OpenXR standard
+> - [EpicGames/UnrealEngine](https://github.com/EpicGames/UnrealEngine) — UE5 source access
+> - [carla-simulator/carla](https://github.com/carla-simulator/carla) ![Stars](https://img.shields.io/github/stars/carla-simulator/carla?style=flat) — Autonomous driving simulator
+> - [isl-org/Open3D](https://github.com/isl-org/Open3D) ![Stars](https://img.shields.io/github/stars/isl-org/Open3D?style=flat) — 3D data processing and visualization
+> - [AcademySoftwareFoundation/OpenColorIO](https://github.com/AcademySoftwareFoundation/OpenColorIO) ![Stars](https://img.shields.io/github/stars/AcademySoftwareFoundation/OpenColorIO?style=flat) — Color management for VFX
+>
+> 📖 **Textbooks:**
+> - *Game Engine Architecture* — Jason Gregory; *Real-Time Rendering* — Akenine-Möller et al.
+> - *The VR Book: Human-Centered Design for Virtual Reality* — Jason Jerald
+> - *3D User Interfaces: Theory and Practice* — LaViola et al.
+
+---
+
 
 **Author: Xx1899**
